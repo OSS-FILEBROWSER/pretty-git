@@ -1,0 +1,16 @@
+{
+  "name": "pretty-git",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "browserfs": "^1.4.3"
+  }
+}
