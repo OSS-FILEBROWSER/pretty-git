@@ -54,12 +54,4 @@ const gitStatus = (path) => {
   });
 };
 
-const getFilesInCurrentDir = (path) => {
-  const files = fs.readdirSync(path);
-  console.log(files);
-};
-
-// Call the function to run `git init`
-//gitInit();
-gitStatus("./my-git-repo");
-getFilesInCurrentDir("./");
+export { gitStatus, gitInit };
