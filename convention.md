@@ -33,6 +33,8 @@
   - 소문자로 시작
 - 정적 변수에 한해서만 대문자 + snake 표기법을 따른다.
   - ex) `MY_STATIC_FIELD`
+- priavte member : 언더스코어로 시작
+  - ex) `_privateVar`
 
 ### 커밋 컨벤션
 
