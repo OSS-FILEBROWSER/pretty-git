@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 import { spawn } from "child_process";
 
 const gitInit = (path) => {
@@ -54,4 +55,27 @@ const gitStatus = (path) => {
   });
 };
 
-export { gitStatus, gitInit };
+const getFilesInCurrentDir = () => {
+  const files = fs.readdirSync("/");
+  console.log(files);
+};
+
+//default로 root path
+const getAllDirs = (dirPath = "/", arrayOfDirs) => {
+  const files = fs.readdirSync(dirPath);
+
+  arrayOfDirs = arrayOfDirs || [];
+
+  files.forEach((file) => {
+    const fullPath = path.join(dirPath, file);
+
+    if (fs.statSync(fullPath).isDirectory()) {
+      arrayOfDirs.push(fullPath);
+      arrayOfDirs = getAllDirs(fullPath, arrayOfDirs);
+    }
+  });
+
+  return arrayOfDirs;
+};
+
+export { gitStatus, gitInit, getFilesInCurrentDir, getAllDirs };

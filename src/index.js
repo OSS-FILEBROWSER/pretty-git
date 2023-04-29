@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import { getFilesInCurrentDir, getAllDirs } from "./modules/createGitRepo.js";
 
 //환경변수 설정
 dotenv.config();
@@ -11,6 +12,9 @@ const app = express();
 
 // Routes
 app.get("/", (req, res) => {
+  getFilesInCurrentDir();
+  // const dirs = getAllDirs();
+  // console.log(dirs);
   res.send("Pretty Git");
 });
 
