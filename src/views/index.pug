@@ -1,0 +1,15 @@
+doctype html
+html(lang="en")
+    //head tag 추가,코드 반복 제거
+    include head.pug
+    body
+        button#back
+            img(src='/icons/return.png')
+        div#directory-container
+            ul#directory-list
+                each dir in dirs
+                    li.directory-item
+                        //img 주소 및 크기 고정
+                        img(src='/icons/folder.png', style="width: 20px; height: 20px;")
+                        span.directory-name=dir
+        script(src="/scripts/directory.js", defer)
