@@ -7,9 +7,9 @@ html(lang="en")
             img(src='/icons/return.png')
         div#directory-container
             ul#directory-list
-                each dir in dirs
+                each file in files
                     li.directory-item
                         //img 주소 및 크기 고정
                         img(src='/icons/folder.png', style="width: 20px; height: 20px;")
-                        span.directory-name=dir
+                        span.directory-name=file.name
         script(src="/scripts/directory.js", defer)

@@ -1,4 +1,4 @@
-import fs, { stat } from "fs";
+import fs from "fs";
 import path from "path";
 import { spawn } from "child_process";
 //class import
@@ -11,8 +11,39 @@ export default class Client {
   }
 
   getFilesInCurrentDir = () => {
-    const files = fs.readdirSync(this._path);
-    return files;
+    return new Promise((resolve, reject) => {
+      let files = [];
+      fs.readdir(this._path, (err, fileList) => {
+        if (err) {
+          reject(err);
+        } else {
+          Promise.all(
+            fileList.map((file) => {
+              return new Promise((resolve, reject) => {
+                fs.stat(`${this._path}${file}`, (err, stats) => {
+                  if (err) {
+                    files.push({ type: "unknown", name: file });
+                  } else {
+                    if (stats.isDirectory()) {
+                      files.push({ type: "directory", name: file });
+                    } else if (stats.isFile()) {
+                      files.push({ type: "file", name: file });
+                    } else {
+                      files.push({ type: "unknown", name: file });
+                    }
+                  }
+                  resolve();
+                });
+              });
+            })
+          )
+            .then(() => {
+              resolve(files);
+            })
+            .catch(reject);
+        }
+      });
+    });
   };
 
   setHistory = (newHistory) => {
