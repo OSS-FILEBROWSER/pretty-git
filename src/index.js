@@ -26,11 +26,12 @@ app.use(express.json());
 app.use(express.static(path.join(__DIRNAME, "src/public")));
 
 // Routes
-app.get("/", (req, res) => {
-  const files = user.getFilesInCurrentDir();
+app.get("/", async (req, res) => {
+  const files = await user.getFilesInCurrentDir();
+  console.log(files);
   res.render("index", {
     title: "Pretty git, 더 즐거워진 깃의 사용",
-    dirs: files,
+    files: files,
   });
 });
 
