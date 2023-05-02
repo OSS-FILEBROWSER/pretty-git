@@ -1,32 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { spawn } from "child_process";
-
-const gitInit = (path) => {
-  const repoDir = path; // the directory where you want to run `git init`
-
-  // Create the directory if it doesn't exist
-  if (!fs.existsSync(repoDir)) {
-    fs.mkdirSync(repoDir);
-  }
-
-  // Spawn the `git init` command
-  const child = spawn("git", ["init"], { cwd: repoDir });
-
-  // Log any output from the command to the console
-  child.stdout.on("data", (data) => {
-    console.log(`stdout: ${data}`);
-  });
-
-  child.stderr.on("data", (data) => {
-    console.error(`stderr: ${data}`);
-  });
-
-  // Log the exit code when the command has finished running
-  child.on("close", (code) => {
-    console.log(`child process exited with code ${code}`);
-  });
-};
+import Client from "../classes/Client";
 
 const gitStatus = (path) => {
   const repoDir = path; // the directory where you want to run `git status`

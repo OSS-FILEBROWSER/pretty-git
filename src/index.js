@@ -65,3 +65,11 @@ app.get("/dirs/backward", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+user.gitInit("/Users/rocket/workspace/gitinit-test")
+  .then((result) => {
+    console.log(result);
+  })
+  .catch((error) => {
+    console.error(error);
+  });
