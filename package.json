@@ -15,7 +15,6 @@
     "browserfs": "^1.4.3",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "jade-bootstrap": "^1.0.14",
     "pug": "^3.0.2"
   }
 }
