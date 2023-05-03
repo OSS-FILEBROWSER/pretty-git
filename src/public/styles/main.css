@@ -1,35 +1,154 @@
+body {
+  width: 100%;
+  height: 100%;
+}
+
 li {
   list-style: none;
   border: 2px solid black;
 }
 
-#directory-container {
-  width: 100%;
-  height: 100%;
+button,
+input[type="submit"],
+input[type="reset"] {
+  background: none;
+  color: inherit;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  outline: inherit;
 }
 
-#directory-list {
+#root {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  align-items: center;
 }
 
-.directory-item {
+#directory-container {
+  width: 90%;
+  height: 100%;
+  display: grid;
+  /* 최대 100개의 row에 대해서 적용 */
+  grid-template-rows: repeat(2, 250px);
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 250px;
+  gap: 80px;
+}
+
+#back {
+  -webkit-user-drag: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+/* header */
+.app-header {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  text-align: center;
+  height: 80px;
+  border-bottom: 2px solid #eee;
+}
+
+.header-content-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.app-header span {
+  margin-left: 10px;
+}
+
+.app-header img {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto;
+}
+
+/* back button */
+.back-button {
+  align-self: flex-start;
+  display: flex;
+  flex-direction: row;
   flex: 1;
+  margin: 10px 10px;
   width: 200px;
+  height: 10px;
+  background-color: black;
+  color: #fff;
+  border-radius: 25px;
+}
+
+.back-button:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.back-font {
+  width: 95%;
+}
+
+.back-img-container {
+  width: 35px;
+  height: 35px;
+  margin: auto 8px;
+  border-radius: 25px;
+  background-color: #fff;
+}
+
+.back-img-container img {
+  width: inherit;
+  height: inherit;
+}
+
+/* directory layout & item style */
+.directory-item {
+  -webkit-user-drag: none;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
   transition: 0.3s;
   font-size: 20px;
   font-weight: 400;
   line-height: 40px;
   background-color: bisque;
-  margin-bottom: 2px;
-  padding-left: 4px;
-}
-
-.directory-item span {
-  padding-left: 5px;
+  border-radius: 25px;
+  border: 2px solid black;
 }
 
 .directory-item:hover {
   opacity: 0.5;
   cursor: pointer;
+}
+
+.file-image-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 75%;
+}
+
+.file-image-container img {
+  width: 100px;
+  height: 100px;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.3;
+}
+
+.directory-name {
+  text-align: center;
+  font-weight: 500;
+  font-size: 20px;
 }
