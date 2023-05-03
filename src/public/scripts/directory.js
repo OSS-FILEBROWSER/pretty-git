@@ -19,6 +19,8 @@ directories.forEach((dir) => {
         }
       });
   });
+
+  dir.addEventListener('contextmenu', handleCreateContextMenu, false);
 });
 
 backButton.addEventListener("click", () => {
@@ -53,7 +55,7 @@ function handleCreateContextMenu(event){
       onClick: function(event){
         //클릭 이벤트 구현
       }
-    },
+    }
   ]));
   
   // 이전 Element 삭제
@@ -100,5 +102,5 @@ function renderContextMenuList( list ){
   return ctxMenuList;
 }
 
-document.addEventListener('contextmenu', handleCreateContextMenu, false);
+//document.addEventListener('contextmenu', handleCreateContextMenu, false);
 document.addEventListener('click', handleClearContextMenu, false);
