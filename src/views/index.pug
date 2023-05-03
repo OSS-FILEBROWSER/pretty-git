@@ -1,8 +1,11 @@
 include head.pug
 block body
-    include header
-
     div#root
+        include header
+        button.back-button(id="back")
+            p.back-font="Go to previous"
+            div.back-img-container
+                img(src='/icons/return.png')
         div#directory-container
             each file in files
                 div(class=`${file.type == "directory" ? "directory-item" : "directory-item disabled"}`)
@@ -15,7 +18,5 @@ block body
                         else
                             img(src='/icons/prohibited.png')
                     p.directory-name=file.name
-        button(id="back")
-            img(src='/icons/return.png')
 
     script(src="/scripts/directory.js", defer)

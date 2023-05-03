@@ -30,7 +30,7 @@ app.get("/", async (req, res) => {
   const files = await user.getFilesInCurrentDir();
   console.log(files);
   res.render("index", {
-    title: "Pretty git, 더 즐거워진 깃의 사용",
+    title: "Pretty git, Make Your git usage Fancy",
     files: files,
   });
 });
