@@ -24,7 +24,6 @@ directories.forEach((dir) => {
   dir.addEventListener("contextmenu", (event) => {
     // 기본 Context Menu가 나오지 않게 차단
     event.preventDefault();
-    const directoryName = dir.childNodes[2].innerHTML; // 현재 디렉토리 이름
 
     const ctxMenu = document.createElement("div");
 
