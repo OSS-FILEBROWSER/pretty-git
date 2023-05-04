@@ -24,6 +24,7 @@ directories.forEach((dir) => {
   dir.addEventListener("contextmenu", (event) => {
     // 기본 Context Menu가 나오지 않게 차단
     event.preventDefault();
+    const directoryName = dir.childNodes[2].innerHTML; // 현재 디렉토리 이름
 
     const ctxMenu = document.createElement("div");
 
@@ -44,11 +45,12 @@ directories.forEach((dir) => {
             //event.srcElement는 click 이벤트를 발생시킨 원천 엘리먼트를 가르킨다.
             try {
               const response = await axios.post("/dirs/gitinit", {
-                dirName: dirName,
+                dirName: directoryName,
               });
               console.log(response);
               window.location.href = "/";
             } catch (error) {
+              console.log(error);
               alert("something gone wrong while processing git init");
             }
           },
