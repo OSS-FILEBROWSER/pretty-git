@@ -61,6 +61,19 @@ app.get("/dirs/backward", (req, res) => {
   }
 });
 
+app.get("/dirs/gitinit", (req, res) => {
+  // user.path = user.path + `${req.body.dirName}/`;
+  const testpath = `/Users/rocket/workspace/${req.body.dirName}/`;
+  user.gitInit(testpath)
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
+});
+
+
 // Server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
