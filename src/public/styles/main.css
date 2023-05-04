@@ -131,6 +131,7 @@ input[type="reset"] {
 }
 
 .file-image-container {
+  position: relative;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -140,6 +141,19 @@ input[type="reset"] {
 .file-image-container img {
   width: 100px;
   height: 100px;
+}
+
+.git-image-container {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 35px;
+  height: 35px;
+}
+
+.git-image-container img {
+  width: inherit;
+  height: inherit;
 }
 
 .disabled {
