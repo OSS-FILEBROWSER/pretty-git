@@ -62,8 +62,9 @@ app.get("/dirs/backward", (req, res) => {
 });
 
 app.get("/dirs/gitinit", (req, res) => {
-  user.path = user.path + `${req.body.dirName}/`;
-  user.gitInit(user.path)
+  // user.path = user.path + `${req.body.dirName}/`;
+  const testpath = `/Users/rocket/workspace/${req.body.dirName}/`;
+  user.gitInit(testpath)
     .then((result) => {
       res.send(result);
     })
