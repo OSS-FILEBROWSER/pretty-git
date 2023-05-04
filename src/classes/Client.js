@@ -21,15 +21,36 @@ export default class Client {
             fileList.map((file) => {
               return new Promise((resolve, reject) => {
                 fs.stat(`${this._path}${file}`, (err, stats) => {
+                  //현재 디렉토리에 .git 이 존재하는지 확인
+                  const isAlreadyInit = this.isDotGitExists(
+                    `${this._path}${file}/.git`
+                  );
+
                   if (err) {
-                    files.push({ type: "unknown", name: file });
+                    files.push({
+                      type: "unknown",
+                      name: file,
+                      initialized: false,
+                    });
                   } else {
                     if (stats.isDirectory()) {
-                      files.push({ type: "directory", name: file });
+                      files.push({
+                        type: "directory",
+                        name: file,
+                        initialized: isAlreadyInit,
+                      });
                     } else if (stats.isFile()) {
-                      files.push({ type: "file", name: file });
+                      files.push({
+                        type: "file",
+                        name: file,
+                        initialized: false,
+                      });
                     } else {
-                      files.push({ type: "unknown", name: file });
+                      files.push({
+                        type: "unknown",
+                        name: file,
+                        initialized: false,
+                      });
                     }
                   }
                   resolve();
@@ -42,6 +63,59 @@ export default class Client {
             })
             .catch(reject);
         }
+      });
+    });
+  };
+
+  isDotGitExists = (path) => {
+    if (fs.existsSync(path) && fs.lstatSync(".git").isDirectory()) {
+      const isValid = this.validateDotGit(path);
+      return isValid;
+    } else {
+      return false;
+    }
+  };
+
+  //유효한 .git 디렉터리인지 확인하는 함수 - 초기 .git 안에 포함되어야하는 모든 디렉터리와 파일을 검사
+  validateDotGit = (path) => {
+    const dotGitDirList = ["hooks", "objects", "refs", "info"];
+    const dotGitFileList = ["HEAD", "description", "config"];
+
+    for (let dir of dotGitDirList) {
+      if (
+        !fs.existsSync(`${path}/${dir}`) ||
+        !fs.lstatSync(`${path}/${dir}`).isDirectory()
+      ) {
+        return false;
+      }
+    }
+
+    for (let file of dotGitFileList) {
+      if (
+        !fs.existsSync(`${path}/${file}`) ||
+        !fs.lstatSync(`${path}/${file}`).isFile()
+      ) {
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  gitInit = (path) => {
+    return new Promise((resolve, reject) => {
+      const child = spawn("git", ["init"], { cwd: path });
+
+      child.on("exit", (code, signal) => {
+        if (code === 0) {
+          resolve("git init 성공!");
+        } else {
+          reject(`git init 실패. code: ${code}, signal: ${signal}`);
+        }
+      });
+
+      child.on("error", (error) => {
+        reject(`git init 실행 중 오류 발생: ${error}`);
       });
     });
   };

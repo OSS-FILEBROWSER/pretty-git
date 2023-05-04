@@ -1,15 +1,28 @@
-doctype html
-html(lang="en")
-    //head tag 추가,코드 반복 제거
-    include head.pug
-    body
-        button#back
-            img(src='/icons/return.png')
+include head.pug
+block body
+    div#root
+        include header
+        button.back-button(id="back")
+            p.back-font="Go to previous"
+            div.back-img-container
+                img(src='/icons/return.png')
         div#directory-container
-            ul#directory-list
-                each file in files
-                    li.directory-item
-                        //img 주소 및 크기 고정
-                        img(src='/icons/folder.png', style="width: 20px; height: 20px;")
-                        span.directory-name=file.name
-        script(src="/scripts/directory.js", defer)
+            each file in files
+                div(class=`${file.type == "directory" ? "directory-item" : "directory-item disabled"}`)
+                    //img 주소 및 크기 고정
+                    div.file-image-container
+                        if file.type == "directory"
+                            if file.initialized
+                                div.git-image-container
+                                    img(src='/icons/git.png')
+                                img(src='/icons/folder.png')
+                            else
+                                img(src='/icons/folder.png')
+                        else if file.type == "file"
+                            img(src='/icons/documents.png')
+                        else
+                            img(src='/icons/prohibited.png')
+                    p.directory-name=file.name
+
+    script(src="/scripts/directory.js", defer)
+

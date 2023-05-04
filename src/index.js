@@ -30,7 +30,7 @@ app.get("/", async (req, res) => {
   const files = await user.getFilesInCurrentDir();
   console.log(files);
   res.render("index", {
-    title: "Pretty git, 더 즐거워진 깃의 사용",
+    title: "Pretty git, Make Your git usage Fancy",
     files: files,
   });
 });
@@ -60,6 +60,18 @@ app.get("/dirs/backward", (req, res) => {
     res.redirect("/");
   }
 });
+
+app.post("/dirs/gitinit", (req, res) => {
+  user.path = user.path + `${req.body.dirName}/`;
+  user.gitInit(user.path)
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
+});
+
 
 // Server
 app.listen(PORT, () => {
