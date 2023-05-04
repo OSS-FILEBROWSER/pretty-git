@@ -21,7 +21,56 @@ directories.forEach((dir) => {
       });
   });
 
-  dir.addEventListener("contextmenu", handleCreateContextMenu, false);
+  dir.addEventListener("contextmenu", (event) => {
+    // 기본 Context Menu가 나오지 않게 차단
+    event.preventDefault();
+
+    const ctxMenu = document.createElement("div");
+
+    ctxMenu.id = "context-menu";
+    ctxMenu.className = "custom-context-menu";
+
+    //위치 설정
+    ctxMenu.style.top = event.pageY + "px";
+    ctxMenu.style.left = event.pageX + "px";
+
+    // 메뉴 목록 생성
+    ctxMenu.appendChild(
+      renderContextMenuList([
+        {
+          label: "git init",
+          onClick: async () => {
+            //클릭 이벤트 구현
+            //event.srcElement는 click 이벤트를 발생시킨 원천 엘리먼트를 가르킨다.
+            try {
+              const response = await axios.post("/dirs/gitinit", {
+                dirName: dirName,
+              });
+              console.log(response);
+              window.location.href = "/";
+            } catch (error) {
+              alert("something gone wrong while processing git init");
+            }
+          },
+        },
+        {
+          label: "git commit",
+          onClick: async () => {
+            //클릭 이벤트 구현
+          },
+        },
+      ])
+    );
+
+    // 이전 Element 삭제
+    const prevCtxMenu = document.getElementById("context-menu");
+    if (prevCtxMenu) {
+      prevCtxMenu.remove();
+    }
+
+    // Body에 Context Menu를 추가.
+    document.body.appendChild(ctxMenu);
+  });
 });
 
 backButton.addEventListener("click", () => {
@@ -29,47 +78,6 @@ backButton.addEventListener("click", () => {
     window.location.href = "/";
   });
 });
-
-function handleCreateContextMenu(event) {
-  // 기본 Context Menu가 나오지 않게 차단
-  event.preventDefault();
-
-  const ctxMenu = document.createElement("div");
-
-  ctxMenu.id = "context-menu";
-  ctxMenu.className = "custom-context-menu";
-
-  //위치 설정
-  ctxMenu.style.top = event.pageY + "px";
-  ctxMenu.style.left = event.pageX + "px";
-
-  // 메뉴 목록 생성
-  ctxMenu.appendChild(
-    renderContextMenuList([
-      {
-        label: "git init",
-        onClick: function (event) {
-          //클릭 이벤트 구현
-        },
-      },
-      {
-        label: "git commit",
-        onClick: function (event) {
-          //클릭 이벤트 구현
-        },
-      },
-    ])
-  );
-
-  // 이전 Element 삭제
-  const prevCtxMenu = document.getElementById("context-menu");
-  if (prevCtxMenu) {
-    prevCtxMenu.remove();
-  }
-
-  // Body에 Context Menu를 추가.
-  document.body.appendChild(ctxMenu);
-}
 
 // context menu 없애기
 function handleClearContextMenu(event) {
@@ -96,8 +104,8 @@ function renderContextMenuList(list) {
     }
 
     // Item 추가
-    ctxMenuItem_a.appendChild(ctxMenuItem_a_text);
-    ctxMenuItem.appendChild(ctxMenuItem_a);
+    ctxMenuItemAnchor.appendChild(ctxMenuItemAnchorText);
+    ctxMenuItem.appendChild(ctxMenuItemAnchor);
     ctxMenuList.appendChild(ctxMenuItem);
   });
 

@@ -12,7 +12,12 @@ block body
                     //img 주소 및 크기 고정
                     div.file-image-container
                         if file.type == "directory"
-                            img(src='/icons/folder.png')
+                            if file.initialized
+                                div.git-image-container
+                                    img(src='/icons/git.png')
+                                img(src='/icons/folder.png')
+                            else
+                                img(src='/icons/folder.png')
                         else if file.type == "file"
                             img(src='/icons/documents.png')
                         else
