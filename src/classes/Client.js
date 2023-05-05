@@ -102,13 +102,33 @@ export default class Client {
     return true;
   };
 
+  gitInit = (path) => {
+    return new Promise((resolve, reject) => {
+      const child = spawn("git", ["init"], { cwd: path });
+
+      child.on("exit", (code, signal) => {
+        if (code === 0) {
+          resolve("git init 성공!");
+        } else {
+          reject(`git init 실패. code: ${code}, signal: ${signal}`);
+        }
+      });
+
+      child.on("error", (error) => {
+        reject(`git init 실행 중 오류 발생: ${error}`);
+      });
+    });
+  };
+
   setHistory = (newHistory) => {
     newHistory.prev = this._history;
     this._history = newHistory; //현재 위치 교체
   };
 
   popHistory = () => {
-    this._history = this._history.prev;
+    if (this._history.prev) {
+      this._history = this._history.prev;
+    }
   };
 
   //data 조작의 오류를 막기 위해 getter, setter 설정.

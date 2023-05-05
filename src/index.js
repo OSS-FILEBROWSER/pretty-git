@@ -61,6 +61,18 @@ app.get("/dirs/backward", (req, res) => {
   }
 });
 
+app.post("/dirs/gitinit", (req, res) => {
+  user.path = user.path + `${req.body.dirName}/`;
+  user.gitInit(user.path)
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
+});
+
+
 // Server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
