@@ -126,7 +126,9 @@ export default class Client {
   };
 
   popHistory = () => {
-    this._history = this._history.prev;
+    if (this._history.prev) {
+      this._history = this._history.prev;
+    }
   };
 
   //data 조작의 오류를 막기 위해 getter, setter 설정.
