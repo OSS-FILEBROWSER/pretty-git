@@ -1,6 +1,12 @@
 const rootElement = document.querySelector("#root");
 const directories = document.querySelectorAll(".directory-item");
 const backButton = document.querySelector("#back");
+const gitStatusModal = document.querySelector(".git-status-modal");
+const openModalButton = document.querySelector(".open-modal");
+const closeModalButton = document.querySelector(".close-modal");
+const untracked = [];
+const modified = [];
+const staged = [];
 
 directories.forEach((dir) => {
   dir.addEventListener("dblclick", () => {
@@ -72,6 +78,17 @@ directories.forEach((dir) => {
     // Body에 Context Menu를 추가.
     document.body.appendChild(ctxMenu);
   });
+
+  //파일의 상태가 untracked인지 modified인지 staged인지 분류
+  if (dir.childNodes[4] === "untracked") {
+    untracked.push(dir.childNodes[2]);
+  } else if (dir.childNodes[4] === "modified") {
+    modified.push(dir.childNodes[2]);
+  } else if (dir.childNodes[4] === "staged") {
+    staged.push(dir.childNodes[2]);
+  }
+
+  showGitStatusModal();
 });
 
 backButton.addEventListener("click", () => {
@@ -112,6 +129,35 @@ function renderContextMenuList(list) {
 
   // List Element 반환
   return ctxMenuList;
+}
+
+//modal 구현
+openModalButton.addEventListener("click", () => {
+  gitStatusModal.style.display = 'block';
+  disableBodyScroll();
+
+  directories.forEach((dir) => {
+    dir.classList.add('modal-open');
+  })
+});
+
+closeModalButton.addEventListener('click', function() {
+  gitStatusModal.style.display = 'none';
+  enableBodyScroll();
+});
+
+function disableBodyScroll() {
+  document.body.style.overflow = 'hidden';
+}
+
+function enableBodyScroll() {
+  document.body.style.overflow = 'visible';
+}
+
+function showGitStatusModal() {
+  const untrackedList = untracked.map((file) => `<li>${file}</li>`).join('');
+  const modifiedList = modified.map((file) => `<li>${file}</li>`).join('');
+  const stagedList = staged.map((file) => `<li>${file}</li>`).join('');
 }
 
 //root element event 관련

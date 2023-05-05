@@ -6,6 +6,33 @@ block body
             p.back-font="Go to previous"
             div.back-img-container
                 img(src='/icons/return.png')
+        button.open-modal
+            p="Git Status"
+        div.git-status-modal
+            div.modal-body
+                h2="Git Status"
+                button.close-modal
+                    img(src='/icons/return.png')
+                p 
+                    br
+                p 
+                    br
+                .file-section
+                    h3="Untracked"
+                    //- ul
+                    //-     each file in untrackedList 
+                    //-         li = file
+                .file-section 
+                    h3="Modified"
+                    //- ul 
+                    //-     each file in modifiedList
+                    //-         li = file
+                .file-section 
+                    h3="Staged"
+                    //- ul 
+                    //-     each file in stagedList 
+                    //-         li = file
+                
         div#directory-container
             each file in files
                 div(class=`${file.type == "directory" ? "directory-item" : "directory-item disabled"}`)
