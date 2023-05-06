@@ -4,9 +4,14 @@ const backButton = document.querySelector("#back");
 const gitStatusModal = document.querySelector(".git-status-modal");
 const openModalButton = document.querySelector(".open-modal");
 const closeModalButton = document.querySelector(".close-modal");
-const untracked = [];
-const modified = [];
-const staged = [];
+const untrackedList = document.querySelector(".status-item.untracked ul");
+const modifiedList = document.querySelector(".status-item.modified ul");
+const stagedList = document.querySelector(".status-item.staged ul");
+const committedList = document.querySelector(".status-item.committed ul");
+const untracked = ["new.txt", "new2.txt"];
+const modified = ["new3.txt", "new4.txt", "new5.txt"];
+const staged = ["new6.txt", "new7.txt"];
+const committed = ["new8.txt"];
 
 directories.forEach((dir) => {
   dir.addEventListener("dblclick", () => {
@@ -50,7 +55,7 @@ directories.forEach((dir) => {
             //클릭 이벤트 구현
             //event.srcElement는 click 이벤트를 발생시킨 원천 엘리먼트를 가르킨다.
             try {
-              const response = await axios.post("/dirs/gitinit", {
+              const response = await axios.post("/dirs/git/init", {
                 dirName: directoryName,
               });
               window.location.href = "/";
@@ -86,9 +91,10 @@ directories.forEach((dir) => {
     modified.push(dir.childNodes[2]);
   } else if (dir.childNodes[4] === "staged") {
     staged.push(dir.childNodes[2]);
+  } else if (dir.childNodes[4] === "committed") {
+    committed.push(dir.childNodes[2]);
   }
 
-  showGitStatusModal();
 });
 
 backButton.addEventListener("click", () => {
@@ -154,12 +160,7 @@ function enableBodyScroll() {
   document.body.style.overflow = 'visible';
 }
 
-function showGitStatusModal() {
-  const untrackedList = untracked.map((file) => `<li>${file}</li>`).join('');
-  const modifiedList = modified.map((file) => `<li>${file}</li>`).join('');
-  const stagedList = staged.map((file) => `<li>${file}</li>`).join('');
-}
+
 
 //root element event 관련
 rootElement.addEventListener("click", handleClearContextMenu);
-//document.addEventListener('contextmenu', handleCreateContextMenu, false);
