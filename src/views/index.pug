@@ -10,28 +10,22 @@ block body
             p="Git Status"
         div.git-status-modal
             div.modal-body
-                h2="Git Status"
-                button.close-modal
-                    img(src='/icons/return.png')
-                p 
-                    br
-                p 
-                    br
-                .file-section
-                    h3="Untracked"
-                    //- ul
-                    //-     each file in untrackedList 
-                    //-         li = file
-                .file-section 
-                    h3="Modified"
-                    //- ul 
-                    //-     each file in modifiedList
-                    //-         li = file
-                .file-section 
-                    h3="Staged"
-                    //- ul 
-                    //-     each file in stagedList 
-                    //-         li = file
+                h3 Git Status 
+                button.close-modal 
+                    img(src='icons/return.png')
+                div.status-list
+                    div.status-item.untracked
+                        h4 Untracked
+                        ul 
+                    div.status-item.modified
+                        h4 Modified
+                        ul 
+                    div.status-item.staged
+                        h4 Staged
+                        ul 
+                    div.status-item.committed 
+                        h4 Committed 
+                        ul
                 
         div#directory-container
             each file in files
@@ -52,4 +46,4 @@ block body
                     p.directory-name=file.name
 
     script(src="/scripts/directory.js", defer)
-
+    script(src="/scripts/dragDrop.js", defer)

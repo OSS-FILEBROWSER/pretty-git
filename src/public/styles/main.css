@@ -180,11 +180,6 @@ input[type="reset"] {
 
   background-color: rgba(0, 0, 0, 0.4);
   z-index: 999;
-  /* position: fixed;
-  top: 50%;
-  left: 50%;
-
-  display: none; */
 }
 
 .open-modal {
@@ -208,7 +203,7 @@ input[type="reset"] {
   top: 50%;
   left: 50%;
 
-  width: 400px;
+  width: 1000px;
   height: 400px;
 
   padding: 30px;
@@ -220,6 +215,10 @@ input[type="reset"] {
   box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
 
   transform: translateX(-50%) translateY(-50%);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .file-section {
@@ -243,4 +242,58 @@ input[type="reset"] {
 
 .file-section li {
   margin-bottom: 5px;
+}
+
+.status-list {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.status-item {
+  width: 23%;
+  background-color: #f4f4f4;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.untracked {
+  border-color: #e57373;
+}
+
+.deleted {
+  border-color: #3300CC;
+}
+
+.modified {
+  border-color: #ffb74d;
+}
+
+.staged {
+  border-color: #4caf50;
+}
+
+.committed {
+  border-color: #64b5f6;
+}
+
+.status-item h4 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.status-item ul {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+}
+
+.status-item ul li {
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: break-word;
 }
