@@ -7,6 +7,7 @@ import path from "path";
 //직접 작성한 모듈이나 클래스를 import하려면, 꼭 .js 확장자를 붙여줘야함.
 import Client from "./classes/Client.js";
 import History from "./classes/History.js";
+import GitManager from "./classes/GitManager.js";
 
 //환경변수 설정
 dotenv.config();
@@ -18,6 +19,7 @@ const __DIRNAME = path.resolve();
 const app = express();
 // 클래스 인스턴스
 const user = new Client();
+const gitManager = new GitManager(user.path);
 
 // Global middleware
 app.set("views", path.join(__DIRNAME, "src/views")); // view 디렉토리 절대경로 위치 설정
@@ -63,7 +65,8 @@ app.get("/dirs/backward", (req, res) => {
 
 app.post("/dirs/gitinit", (req, res) => {
   user.path = user.path + `${req.body.dirName}/`;
-  user.gitInit(user.path)
+  user
+    .gitInit(user.path)
     .then((result) => {
       res.send(result);
     })
@@ -72,6 +75,13 @@ app.post("/dirs/gitinit", (req, res) => {
     });
 });
 
+user
+  .gitStatus("/Users/wjsdP/test/")
+  .then((data) => {
+    gitManager.updateStatus(data);
+    gitManager.printAllManagerData();
+  })
+  .catch((err) => console.log(err));
 
 // Server
 app.listen(PORT, () => {
