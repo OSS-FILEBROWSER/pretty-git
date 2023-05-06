@@ -63,8 +63,7 @@ app.get("/dirs/backward", (req, res) => {
   }
 });
 
-app.post("/dirs/gitinit", (req, res) => {
-  user.path = user.path + `${req.body.dirName}/`;
+app.post("/dirs/git/init", (req, res) => {
   user
     .gitInit(user.path)
     .then((result) => {
@@ -75,13 +74,49 @@ app.post("/dirs/gitinit", (req, res) => {
     });
 });
 
-user
-  .gitStatus("/Users/wjsdP/test/")
-  .then((data) => {
-    gitManager.updateStatus(data);
-    gitManager.printAllManagerData();
-  })
-  .catch((err) => console.log(err));
+app.post("/dirs/git/status", (req, res) => {
+  //test용 user path
+  const path = `/Users/wjsdP/${req.body.dirName}`;
+  user
+    .gitStatus(path)
+    .then((data) => {
+      gitManager.updateStatus(data, path);
+      res.status(200).json({
+        msg: "success",
+        staged: gitManager.staged,
+        unstaged: gitManager.unstaged,
+        untracked: gitManager.untracked,
+        branch: gitManager.branch,
+      });
+      gitManager.printAllManagerData();
+    })
+    .catch((err) => res.json({ msg: "fail" }));
+});
+
+app.post("/dirs/git/add", (req, res) => {
+  //untracked -> staged
+});
+
+app.post("/dirs/git/restore/:staged", (req, res) => {
+  if (req.params.staged == 0) {
+    //modified -> unmodified
+  } else {
+    //staged -> modified or untracked(deleted일때)
+  }
+});
+
+app.post("/dirs/git/rm/:cached", (req, res) => {
+  if (req.params.cached == 0) {
+    //committed -> staged(파일도 삭제)
+  } else {
+    //committed -> untracked
+  }
+});
+
+app.post("/dirs/git/mv", (req, res) => {
+  //rename file
+  //commited -> staged
+});
 
 // Server
 app.listen(PORT, () => {
