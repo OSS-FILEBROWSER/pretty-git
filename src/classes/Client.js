@@ -120,6 +120,41 @@ export default class Client {
     });
   };
 
+  gitStatus = (path) => {
+    const repoDir = path; // the directory where you want to run `git status`
+
+    // Check if the directory exists
+    if (!fs.existsSync(repoDir)) {
+      return Promise.reject(`Error: ${repoDir} does not exist`);
+    }
+
+    return new Promise((resolve, reject) => {
+      // Spawn the `git status` command
+      const child = spawn("git", ["status"], { cwd: repoDir });
+
+      let stdout = "";
+      let stderr = "";
+
+      // Log any output from the command to the console
+      child.stdout.on("data", (data) => {
+        stdout += data;
+      });
+
+      child.stderr.on("data", (data) => {
+        stderr += data;
+      });
+
+      // Log the exit code when the command has finished running
+      child.on("close", (code) => {
+        if (code !== 0) {
+          reject(`child process exited with code ${code}\n${stderr}`);
+        } else {
+          resolve(stdout);
+        }
+      });
+    });
+  };
+
   setHistory = (newHistory) => {
     newHistory.prev = this._history;
     this._history = newHistory; //현재 위치 교체

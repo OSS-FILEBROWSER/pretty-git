@@ -7,6 +7,7 @@ import path from "path";
 //직접 작성한 모듈이나 클래스를 import하려면, 꼭 .js 확장자를 붙여줘야함.
 import Client from "./classes/Client.js";
 import History from "./classes/History.js";
+import GitManager from "./classes/GitManager.js";
 
 //환경변수 설정
 dotenv.config();
@@ -18,6 +19,7 @@ const __DIRNAME = path.resolve();
 const app = express();
 // 클래스 인스턴스
 const user = new Client();
+const gitManager = new GitManager(user.path);
 
 // Global middleware
 app.set("views", path.join(__DIRNAME, "src/views")); // view 디렉토리 절대경로 위치 설정
@@ -61,9 +63,9 @@ app.get("/dirs/backward", (req, res) => {
   }
 });
 
-app.post("/dirs/gitinit", (req, res) => {
-  user.path = user.path + `${req.body.dirName}/`;
-  user.gitInit(user.path)
+app.post("/dirs/git/init", (req, res) => {
+  user
+    .gitInit(user.path)
     .then((result) => {
       res.send(result);
     })
@@ -72,6 +74,49 @@ app.post("/dirs/gitinit", (req, res) => {
     });
 });
 
+app.post("/dirs/git/status", (req, res) => {
+  //test용 user path
+  const path = `/Users/wjsdP/${req.body.dirName}`;
+  user
+    .gitStatus(path)
+    .then((data) => {
+      gitManager.updateStatus(data, path);
+      res.status(200).json({
+        msg: "success",
+        staged: gitManager.staged,
+        unstaged: gitManager.unstaged,
+        untracked: gitManager.untracked,
+        branch: gitManager.branch,
+      });
+      gitManager.printAllManagerData();
+    })
+    .catch((err) => res.json({ msg: "fail" }));
+});
+
+app.post("/dirs/git/add", (req, res) => {
+  //untracked -> staged
+});
+
+app.post("/dirs/git/restore/:staged", (req, res) => {
+  if (req.params.staged == 0) {
+    //modified -> unmodified
+  } else {
+    //staged -> modified or untracked(deleted일때)
+  }
+});
+
+app.post("/dirs/git/rm/:cached", (req, res) => {
+  if (req.params.cached == 0) {
+    //committed -> staged(파일도 삭제)
+  } else {
+    //committed -> untracked
+  }
+});
+
+app.post("/dirs/git/mv", (req, res) => {
+  //rename file
+  //commited -> staged
+});
 
 // Server
 app.listen(PORT, () => {
