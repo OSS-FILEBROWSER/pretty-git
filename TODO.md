@@ -29,7 +29,8 @@
   - For untracked files:
     - Adding the new files into a staging area (untracked -> staged; git add)
   - For modified files
-    - Adding the modified files into a staging area (modified -> staged; git add)  Undoing the modification (modified -> unmodified; git restore)
+    - Adding the modified files into a staging area (modified -> staged; git add)
+    - Undoing the modification (modified -> unmodified; git restore)
   - For staged files
     - Unstaging changes (staged -> modified or untracked; git restore --staged)
   - For committed or unmodified files
@@ -40,3 +41,8 @@
     - 커밋 메뉴 클릭 -> 스테이지 영역의 아이템 리스트 표시
     - 커밋을 확정하면 -> 커밋 시작
     - 커밋된 이후 파일을 committed 상태로 변경
+
+# Chore
+
+1. Readme에 플랫폼별 노드 설치 방법 명시
+2. nodemon수동 설치 명령어 명시
