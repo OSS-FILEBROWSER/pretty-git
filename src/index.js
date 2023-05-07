@@ -7,8 +7,6 @@ import path from "path";
 //직접 작성한 모듈이나 클래스를 import하려면, 꼭 .js 확장자를 붙여줘야함.
 import Client from "./classes/Client.js";
 import History from "./classes/History.js";
-import GitManager from "./classes/GitManager.js";
-
 //환경변수 설정
 dotenv.config();
 //환경변수
@@ -19,7 +17,6 @@ const __DIRNAME = path.resolve();
 const app = express();
 // 클래스 인스턴스
 const user = new Client();
-const gitManager = new GitManager(user.path);
 
 // Global middleware
 app.set("views", path.join(__DIRNAME, "src/views")); // view 디렉토리 절대경로 위치 설정
@@ -30,7 +27,7 @@ app.use(express.static(path.join(__DIRNAME, "src/public")));
 // Routes
 app.get("/", async (req, res) => {
   const files = await user.getFilesInCurrentDir();
-  console.log(files);
+
   res.render("index", {
     title: "Pretty git, Make Your git usage Fancy",
     files: files,
@@ -41,17 +38,19 @@ app.post("/dirs/forward", (req, res) => {
   const temp = user.path; // 경로 복원용 임시 저장 변수
   user.path = user.path + `${req.body.dirName}/`; // 유저 경로 업데이트
 
-  try {
-    user.getFilesInCurrentDir(); // 바뀐 경로로부터 다시 디렉토리 정보 얻어오기
-    const newHistory = new History(user.path);
-    user.setHistory(newHistory);
-    console.log(user.history);
-    //재렌더링
-    res.redirect("/");
-  } catch (err) {
-    user.path = temp; // 디렉터리 이동이 아닐 경우 경로 복원
-    res.status(400).send(err.code); // invalid request
-  }
+  user
+    .getFilesInCurrentDir()
+    .then(() => {
+      const newHistory = new History(user.path);
+      user.setHistory(newHistory); // 바뀐 경로로부터 다시 디렉토리 정보 얻어오기
+
+      //재렌더링
+      res.redirect("/");
+    })
+    .catch((err) => {
+      user.path = temp; // 디렉터리 이동이 아닐 경우 경로 복원
+      res.status(400).send(err.code); // invalid request
+    });
 });
 
 app.get("/dirs/backward", (req, res) => {
@@ -74,24 +73,7 @@ app.post("/dirs/git/init", (req, res) => {
     });
 });
 
-app.post("/dirs/git/status", (req, res) => {
-  //test용 user path
-  const path = `/Users/wjsdP/${req.body.dirName}`;
-  user
-    .gitStatus(path)
-    .then((data) => {
-      gitManager.updateStatus(data, path);
-      res.status(200).json({
-        msg: "success",
-        staged: gitManager.staged,
-        unstaged: gitManager.unstaged,
-        untracked: gitManager.untracked,
-        branch: gitManager.branch,
-      });
-      gitManager.printAllManagerData();
-    })
-    .catch((err) => res.json({ msg: "fail" }));
-});
+app.get("/dirs/git/status", (req, res) => {});
 
 app.post("/dirs/git/add", (req, res) => {
   //untracked -> staged

@@ -6,11 +6,27 @@ import History from "./History.js";
 
 export default class Client {
   constructor() {
+    this._branch = null;
+    this._files = {};
     this._path = "/";
     this._history = new History("/");
+    this._isRepo = false;
   }
 
   getFilesInCurrentDir = () => {
+    this._isRepo = this.isDotGitExists(`${this._path}/.git`);
+
+    //레포일 경우 status 업데이트
+    if (this._isRepo) {
+      this.gitStatus(this._path)
+        .then((data) => {
+          this.updateStatus(data);
+        })
+        .catch((err) =>
+          console.log("something gone wrong while trying git status")
+        );
+    }
+
     return new Promise((resolve, reject) => {
       let files = [];
       fs.readdir(this._path, (err, fileList) => {
@@ -19,9 +35,11 @@ export default class Client {
         } else {
           Promise.all(
             fileList.map((file) => {
+              let cur = this._files[file];
+
               return new Promise((resolve, reject) => {
                 fs.stat(`${this._path}${file}`, (err, stats) => {
-                  //현재 디렉토리에 .git 이 존재하는지 확인
+                  //해당 디렉토리에 .git 이 존재하는지 확인
                   const isAlreadyInit = this.isDotGitExists(
                     `${this._path}${file}/.git`
                   );
@@ -39,17 +57,17 @@ export default class Client {
                         name: file,
                         initialized: isAlreadyInit,
                       });
-                    } else if (stats.isFile()) {
+                    } else {
                       files.push({
                         type: "file",
                         name: file,
                         initialized: false,
-                      });
-                    } else {
-                      files.push({
-                        type: "unknown",
-                        name: file,
-                        initialized: false,
+                        status: cur
+                          ? cur.status
+                          : this._isRepo
+                          ? "committed"
+                          : null,
+                        statusType: cur ? cur.type : null,
                       });
                     }
                   }
@@ -61,7 +79,9 @@ export default class Client {
             .then(() => {
               resolve(files);
             })
-            .catch(reject);
+            .catch((err) => {
+              reject(err);
+            });
         }
       });
     });
@@ -155,6 +175,46 @@ export default class Client {
     });
   };
 
+  updateStatus(statusLog) {
+    const lines = statusLog.toString().split("\n");
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+
+      if (line.startsWith("On branch ")) {
+        this._branch = line.substring("On branch ".length).trim();
+      } else if (line.startsWith("Changes to be committed:")) {
+        i += 2; // Skip the next line, which is a header
+        while (i < lines.length && lines[i] != "") {
+          const info = lines[i].split(":");
+          const type = info[0].trim();
+          const name = info[1].trim();
+          this._files[name] = { status: "staged", type: type };
+          i++;
+        }
+        i--; // Go back one line so we don't skip any lines
+      } else if (line.startsWith("Changes not staged for commit:")) {
+        i += 3; // Skip the next line, which is a header
+        while (i < lines.length && lines[i] != "") {
+          const info = lines[i].split(":");
+          const type = info[0].trim();
+          const name = info[1].trim();
+          this._files[name] = { status: "modified", type: type };
+          i++;
+        }
+        i--; // Go back one line so we don't skip any lines
+      } else if (line.startsWith("Untracked files:")) {
+        i += 2; // Skip the next line, which is a header
+        while (i < lines.length && lines[i] != "") {
+          const file = lines[i].trim();
+          this._files[file] = { status: "untracked", type: null };
+          i++;
+        }
+        i--; // Go back one line so we don't skip any lines
+      }
+    }
+  }
+
   setHistory = (newHistory) => {
     newHistory.prev = this._history;
     this._history = newHistory; //현재 위치 교체
@@ -177,5 +237,13 @@ export default class Client {
 
   get history() {
     return this._history;
+  }
+
+  get files() {
+    return this._files;
+  }
+
+  get branch() {
+    return this._branch;
   }
 }

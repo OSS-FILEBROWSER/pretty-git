@@ -15,8 +15,13 @@ directories.forEach((dir) => {
         switch (err.response.data) {
           case "ENOENT":
             alert("No such file or directory");
+            break;
           case "EPERM":
             alert("No permission to access this directory");
+            break;
+          case "ENOTDIR":
+            alert("It is not directory");
+            break;
         }
       });
   });
@@ -44,7 +49,7 @@ directories.forEach((dir) => {
             //클릭 이벤트 구현
             //event.srcElement는 click 이벤트를 발생시킨 원천 엘리먼트를 가르킨다.
             try {
-              const response = await axios.post("/dirs/gitinit", {
+              const response = await axios.post("/dirs/git/init", {
                 dirName: directoryName,
               });
               window.location.href = "/";

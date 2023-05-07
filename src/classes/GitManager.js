@@ -37,7 +37,7 @@ class GitManager {
           const info = lines[i].split(":");
           const type = info[0].trim();
           const name = info[1].trim();
-          this._unstaged.push({ type: type, name: name });
+          this._unstaged[name] = type;
           i++;
         }
         i--; // Go back one line so we don't skip any lines
