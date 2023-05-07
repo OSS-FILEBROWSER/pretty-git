@@ -8,7 +8,16 @@ const untrackedList = document.querySelector(".status-item.untracked ul");
 const modifiedList = document.querySelector(".status-item.modified ul");
 const stagedList = document.querySelector(".status-item.staged ul");
 const committedList = document.querySelector(".status-item.committed ul");
-const untracked = ["new.txt", "new2.txt"];
+const untracked = [
+  "new.txt",
+  "new2.txt",
+  "new2.txt",
+  "new2.txt",
+  "new2.txt",
+  "new2.txt",
+  "new2.txt",
+  "new2.txt",
+];
 const modified = ["new3.txt", "new4.txt", "new5.txt"];
 const staged = ["new6.txt", "new7.txt"];
 const committed = ["new8.txt"];
@@ -99,7 +108,6 @@ directories.forEach((dir) => {
   } else if (dir.childNodes[4] === "committed") {
     committed.push(dir.childNodes[2]);
   }
-
 });
 
 backButton.addEventListener("click", () => {
@@ -144,28 +152,26 @@ function renderContextMenuList(list) {
 
 //modal 구현
 openModalButton.addEventListener("click", () => {
-  gitStatusModal.style.display = 'block';
+  gitStatusModal.style.display = "block";
   disableBodyScroll();
 
   directories.forEach((dir) => {
-    dir.classList.add('modal-open');
-  })
+    dir.classList.add("modal-open");
+  });
 });
 
-closeModalButton.addEventListener('click', function() {
-  gitStatusModal.style.display = 'none';
+closeModalButton.addEventListener("click", function () {
+  gitStatusModal.style.display = "none";
   enableBodyScroll();
 });
 
 function disableBodyScroll() {
-  document.body.style.overflow = 'hidden';
+  document.body.style.overflow = "hidden";
 }
 
 function enableBodyScroll() {
-  document.body.style.overflow = 'visible';
+  document.body.style.overflow = "visible";
 }
-
-
 
 //root element event 관련
 rootElement.addEventListener("click", handleClearContextMenu);
