@@ -63,6 +63,7 @@ app.get("/dirs/backward", (req, res) => {
 });
 
 app.post("/dirs/git/init", (req, res) => {
+  user.path = user.path + `${req.body.dirName}/`;
   user
     .gitInit(user.path)
     .then((result) => {
@@ -78,8 +79,24 @@ app.get("/dirs/git/status", (req, res) => {
   res.send(user.files);
 });
 
+// 특정 파일을 git add 하는 기능
 app.post("/dirs/git/add", (req, res) => {
-  //untracked -> staged
+  user.path = user.path + `${req.body.dirName}/`;
+  fileName = req.body.fileName;
+  if (!dirName || !fileName) {
+    return res
+      .status(400)
+      .send("디렉토리 이름과 파일 이름을 모두 입력해주세요.");
+  }
+  const filePath = path.join(user.path, fileName);
+  user
+    .gitAdd(filePath)
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
 });
 
 app.post("/dirs/git/restore/:staged", (req, res) => {
