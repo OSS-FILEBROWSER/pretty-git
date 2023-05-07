@@ -73,7 +73,10 @@ app.post("/dirs/git/init", (req, res) => {
     });
 });
 
-app.get("/dirs/git/status", (req, res) => {});
+app.get("/dirs/git/status", (req, res) => {
+  user.updateStatus(user.path);
+  res.send(user.files);
+});
 
 app.post("/dirs/git/add", (req, res) => {
   //untracked -> staged

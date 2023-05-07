@@ -6,14 +6,16 @@ import History from "./History.js";
 
 export default class Client {
   constructor() {
-    this._branch = null;
-    this._files = {};
+    this._branch = undefined;
+    this._gitFiles = {};
+    this._files = [];
     this._path = "/";
     this._history = new History("/");
     this._isRepo = false;
   }
 
   getFilesInCurrentDir = () => {
+    this._files = [];
     this._isRepo = this.isDotGitExists(`${this._path}/.git`);
 
     //레포일 경우 status 업데이트
@@ -28,14 +30,13 @@ export default class Client {
     }
 
     return new Promise((resolve, reject) => {
-      let files = [];
       fs.readdir(this._path, (err, fileList) => {
         if (err) {
           reject(err);
         } else {
           Promise.all(
             fileList.map((file) => {
-              let cur = this._files[file];
+              let cur = this._gitFiles[file];
 
               return new Promise((resolve, reject) => {
                 fs.stat(`${this._path}${file}`, (err, stats) => {
@@ -45,20 +46,24 @@ export default class Client {
                   );
 
                   if (err) {
-                    files.push({
+                    this._files.push({
                       type: "unknown",
                       name: file,
                       initialized: false,
+                      status: undefined,
+                      statusType: undefined,
                     });
                   } else {
                     if (stats.isDirectory()) {
-                      files.push({
+                      this._files.push({
                         type: "directory",
                         name: file,
                         initialized: isAlreadyInit,
+                        status: undefined,
+                        statusType: undefined,
                       });
                     } else {
-                      files.push({
+                      this._files.push({
                         type: "file",
                         name: file,
                         initialized: false,
@@ -66,8 +71,8 @@ export default class Client {
                           ? cur.status
                           : this._isRepo
                           ? "committed"
-                          : null,
-                        statusType: cur ? cur.type : null,
+                          : undefined,
+                        statusType: cur ? cur.type : undefined,
                       });
                     }
                   }
@@ -77,7 +82,7 @@ export default class Client {
             })
           )
             .then(() => {
-              resolve(files);
+              resolve(this._files);
             })
             .catch((err) => {
               reject(err);
@@ -189,7 +194,7 @@ export default class Client {
           const info = lines[i].split(":");
           const type = info[0].trim();
           const name = info[1].trim();
-          this._files[name] = { status: "staged", type: type };
+          this._gitFiles[name] = { status: "staged", type: type };
           i++;
         }
         i--; // Go back one line so we don't skip any lines
@@ -199,7 +204,7 @@ export default class Client {
           const info = lines[i].split(":");
           const type = info[0].trim();
           const name = info[1].trim();
-          this._files[name] = { status: "modified", type: type };
+          this._gitFiles[name] = { status: "modified", type: type };
           i++;
         }
         i--; // Go back one line so we don't skip any lines
@@ -207,7 +212,7 @@ export default class Client {
         i += 2; // Skip the next line, which is a header
         while (i < lines.length && lines[i] != "") {
           const file = lines[i].trim();
-          this._files[file] = { status: "untracked", type: null };
+          this._gitFiles[file] = { status: "untracked", type: null };
           i++;
         }
         i--; // Go back one line so we don't skip any lines
@@ -237,6 +242,10 @@ export default class Client {
 
   get history() {
     return this._history;
+  }
+
+  get gitFiles() {
+    return this._gitFiles;
   }
 
   get files() {

@@ -8,19 +8,10 @@ const untrackedList = document.querySelector(".status-item.untracked ul");
 const modifiedList = document.querySelector(".status-item.modified ul");
 const stagedList = document.querySelector(".status-item.staged ul");
 const committedList = document.querySelector(".status-item.committed ul");
-const untracked = [
-  "new.txt",
-  "new2.txt",
-  "new2.txt",
-  "new2.txt",
-  "new2.txt",
-  "new2.txt",
-  "new2.txt",
-  "new2.txt",
-];
-const modified = ["new3.txt", "new4.txt", "new5.txt"];
-const staged = ["new6.txt", "new7.txt"];
-const committed = ["new8.txt"];
+let untracked = [];
+let modified = [];
+let staged = [];
+let committed = [];
 
 directories.forEach((dir) => {
   dir.addEventListener("dblclick", () => {
@@ -157,6 +148,41 @@ openModalButton.addEventListener("click", () => {
 
   directories.forEach((dir) => {
     dir.classList.add("modal-open");
+  });
+
+  //git status 요청
+  axios.get("/dirs/git/status").then((res) => {
+    //api로부터 받아온 파일 정보
+    const files = res.data;
+    //각각의 상태에 대한 임시 저장 배열들
+    const untrackedT = [];
+    const modifiedT = [];
+    const stagedT = [];
+    const committedT = [];
+    //switch를 통해 상태 구분, 각각의 상태에 해당하는 임시 배열 저장소로 push
+    files.forEach((file) => {
+      switch (file.status) {
+        case "untracked":
+          untrackedT.push(file.name);
+          break;
+        case "staged":
+          stagedT.push(file.name);
+          break;
+        case "unstaged":
+          modifiedT.push(file.name);
+          break;
+        case "committed":
+          committedT.push(file.name);
+          break;
+      }
+      //전역 배열을 임시 배열 주소로 교체
+      untracked = untrackedT;
+      staged = stagedT;
+      modified = modifiedT;
+      committed = committedT;
+
+      render();
+    });
   });
 });
 
