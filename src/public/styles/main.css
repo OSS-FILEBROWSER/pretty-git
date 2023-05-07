@@ -156,6 +156,32 @@ input[type="reset"] {
   height: inherit;
 }
 
+.git-status {
+  position: absolute;
+  top: -20px;
+  left: 10px;
+}
+
+.git-status-text {
+  font-weight: 700;
+}
+
+.committed {
+  color: #26a250;
+}
+
+.modified {
+  color: #f2ac34;
+}
+
+.staged {
+  color: #429ebd;
+}
+
+.untracked {
+  color: #cc2e05;
+}
+
 .disabled {
   pointer-events: none;
   opacity: 0.3;
