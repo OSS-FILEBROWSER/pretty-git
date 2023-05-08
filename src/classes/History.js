@@ -1,7 +1,8 @@
 //linked list 기반 디렉토리 히스토리 구현
 export default class History {
-  constructor(data, prev = null) {
-    this.data = data;
+  constructor(path, isRepo, prev = null) {
+    this.path = path;
+    this.isRepo = isRepo;
     this.prev = prev;
   }
 }
