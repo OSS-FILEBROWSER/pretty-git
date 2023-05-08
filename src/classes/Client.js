@@ -133,21 +133,20 @@ export default class Client {
     });
   };
 
-  // 특정 파일을 git add 하는 기능
-  gitAdd = (filePath) => {
+  gitAdd = (fileName) => {
     return new Promise((resolve, reject) => {
-      const child = spawn("git", ["add", filePath]);
+      const child = spawn("git", ["add", fileName], { cwd: this._path });
 
       child.on("exit", (code, signal) => {
         if (code === 0) {
-          resolve("git add 성공!");
+          resolve(`git add ${fileName} 성공!`);
         } else {
-          reject(`git add 실패. code: ${code}, signal: ${signal}`);
+          reject(`git add ${fileName} 실패. code: ${code}, signal: ${signal}`);
         }
       });
 
       child.on("error", (error) => {
-        reject(`git add 실행 중 오류 발생: ${error}`);
+        reject(`git add ${fileName} 실행 중 오류 발생: ${error}`);
       });
     });
   };
