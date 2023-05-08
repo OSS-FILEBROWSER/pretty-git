@@ -82,7 +82,7 @@ app.get("/dirs/backward", (req, res) => {
 
 app.post("/dirs/git/init", (req, res) => {
   user
-    .gitInit(user.path)
+    .gitInit(user.path + `${req.body.dirName}/`)
     .then((result) => {
       res.send(result);
     })
