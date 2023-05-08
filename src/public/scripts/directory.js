@@ -160,19 +160,20 @@ openModalButton.addEventListener("click", () => {
     const stagedT = [];
     const committedT = [];
     //switch를 통해 상태 구분, 각각의 상태에 해당하는 임시 배열 저장소로 push
-    files.forEach((file) => {
-      switch (file.status) {
+
+    for (let name in files) {
+      switch (files[name].status) {
         case "untracked":
-          untrackedT.push(file.name);
+          untrackedT.push(name);
           break;
         case "staged":
-          stagedT.push(file.name);
+          stagedT.push(name);
           break;
         case "unstaged":
-          modifiedT.push(file.name);
+          modifiedT.push(name);
           break;
         case "committed":
-          committedT.push(file.name);
+          committedT.push(name);
           break;
       }
       //전역 배열을 임시 배열 주소로 교체
@@ -182,7 +183,7 @@ openModalButton.addEventListener("click", () => {
       committed = committedT;
 
       render();
-    });
+    }
   });
 });
 

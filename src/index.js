@@ -26,6 +26,24 @@ app.use(express.static(path.join(__DIRNAME, "src/public")));
 
 // Routes
 app.get("/", async (req, res) => {
+  //repository의 하위 디렉토리를 repo안에 있는 것으로 인식하기 위한 조건문
+  if (user.isDotGitExists(`${user.path}/.git`)) {
+    user.history.isRepo = true;
+    user.isRepo = true;
+  }
+
+  //레포일 경우 status 업데이트
+  if (user.isRepo) {
+    user
+      .gitStatus(user.path)
+      .then((data) => {
+        user.updateStatus(data);
+      })
+      .catch((err) =>
+        console.log("something gone wrong while trying git status")
+      );
+  }
+
   const files = await user.getFilesInCurrentDir();
 
   res.render("index", {
@@ -37,11 +55,11 @@ app.get("/", async (req, res) => {
 app.post("/dirs/forward", (req, res) => {
   const temp = user.path; // 경로 복원용 임시 저장 변수
   user.path = user.path + `${req.body.dirName}/`; // 유저 경로 업데이트
+  const newHistory = new History(user.path, user.history.isRepo);
 
   user
-    .getFilesInCurrentDir()
+    .getFilesInCurrentDir(newHistory)
     .then(() => {
-      const newHistory = new History(user.path);
       user.setHistory(newHistory); // 바뀐 경로로부터 다시 디렉토리 정보 얻어오기
 
       //재렌더링
@@ -57,7 +75,7 @@ app.get("/dirs/backward", (req, res) => {
   user.popHistory(); // 이전 히스토리로 이동
   //재렌더링
   if (user.history) {
-    user.path = user.history.data; //현재 유저 경로를 이전 디렉토리로 업데이트
+    user.path = user.history.path; //현재 유저 경로를 이전 디렉토리로 업데이트
     res.redirect("/");
   }
 });
@@ -74,8 +92,7 @@ app.post("/dirs/git/init", (req, res) => {
 });
 
 app.get("/dirs/git/status", (req, res) => {
-  user.updateStatus(user.path);
-  res.send(user.files);
+  res.send(user.gitFiles);
 });
 
 app.post("/dirs/git/add", (req, res) => {
