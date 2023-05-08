@@ -1,18 +1,17 @@
 {
   "name": "pretty-git",
-  "version": "1.0.0",
-  "description": "",
+  "version": "0.2.0",
+  "description": "Make your git usage easier",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "dev": "nodemon src/index.js"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "codernineteen, devrocket, dogmania",
+  "license": "MIT license",
   "dependencies": {
     "axios": "^1.4.0",
-    "browserfs": "^1.4.3",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "pug": "^3.0.2"

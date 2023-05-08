@@ -1,32 +1,39 @@
 import fs from "fs";
 import path from "path";
 import { spawn } from "child_process";
-import Client from "../classes/Client";
 
 const gitStatus = (path) => {
   const repoDir = path; // the directory where you want to run `git status`
 
   // Check if the directory exists
   if (!fs.existsSync(repoDir)) {
-    console.error(`Error: ${repoDir} does not exist`);
-    return;
+    return Promise.reject(`Error: ${repoDir} does not exist`);
   }
 
-  // Spawn the `git status` command
-  const child = spawn("git", ["status"], { cwd: repoDir });
+  return new Promise((resolve, reject) => {
+    // Spawn the `git status` command
+    const child = spawn("git", ["status"], { cwd: repoDir });
 
-  // Log any output from the command to the console
-  child.stdout.on("data", (data) => {
-    console.log(`stdout: ${data}`);
-  });
+    let stdout = "";
+    let stderr = "";
 
-  child.stderr.on("data", (data) => {
-    console.error(`stderr: ${data}`);
-  });
+    // Log any output from the command to the console
+    child.stdout.on("data", (data) => {
+      stdout += data;
+    });
 
-  // Log the exit code when the command has finished running
-  child.on("close", (code) => {
-    console.log(`child process exited with code ${code}`);
+    child.stderr.on("data", (data) => {
+      stderr += data;
+    });
+
+    // Log the exit code when the command has finished running
+    child.on("close", (code) => {
+      if (code !== 0) {
+        reject(`child process exited with code ${code}\n${stderr}`);
+      } else {
+        resolve(stdout);
+      }
+    });
   });
 };
 
@@ -53,4 +60,4 @@ const getAllDirs = (dirPath = "/", arrayOfDirs) => {
   return arrayOfDirs;
 };
 
-export { gitStatus, gitInit, getFilesInCurrentDir, getAllDirs };
+export { gitStatus, getFilesInCurrentDir, getAllDirs };

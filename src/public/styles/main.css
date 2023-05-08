@@ -156,6 +156,32 @@ input[type="reset"] {
   height: inherit;
 }
 
+.git-status {
+  position: absolute;
+  top: -20px;
+  left: 10px;
+}
+
+.git-status-text {
+  font-weight: 700;
+}
+
+.committed {
+  color: #26a250;
+}
+
+.modified {
+  color: #f2ac34;
+}
+
+.staged {
+  color: #429ebd;
+}
+
+.untracked {
+  color: #cc2e05;
+}
+
 .disabled {
   pointer-events: none;
   opacity: 0.3;
@@ -165,4 +191,143 @@ input[type="reset"] {
   text-align: center;
   font-weight: 500;
   font-size: 20px;
+}
+
+/* modal */
+.git-status-modal {
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  display: none;
+
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 999;
+}
+
+.open-modal {
+  position: absolute;
+  top: 100px;
+  left: 250px;
+}
+
+.close-modal {
+  position: absolute;
+  top: 30px;
+  left: 30px;
+}
+
+.close-modal img {
+  width: 30px;
+  height: 30px;
+}
+
+.modal.show {
+  display: block;
+}
+
+.modal-body {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+
+  width: 1000px;
+  height: 400px;
+
+  padding: 30px;
+
+  text-align: center;
+
+  background-color: rgb(255, 255, 255);
+  border-radius: 10px;
+  box-shadow: 0 2px 3px 0 rgba(34, 36, 38, 0.15);
+
+  transform: translateX(-50%) translateY(-50%);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.file-section {
+  width: 20%;
+  height: 80%;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.file-section h3 {
+  font-size: 15px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.file-section ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.file-section li {
+  margin-bottom: 5px;
+}
+
+.status-list {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  height: 80%;
+}
+
+.status-item {
+  width: 23%;
+  background-color: #f4f4f4;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin: 10px;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow: scroll;
+}
+
+.untracked {
+  border-color: #e57373;
+}
+
+.deleted {
+  border-color: #3300cc;
+}
+
+.modified {
+  border-color: #ffb74d;
+}
+
+.staged {
+  border-color: #64b5f6;
+}
+
+.committed {
+  border-color: #4caf50;
+}
+
+.status-item h4 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.status-item ul {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+}
+
+.status-item ul li {
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: break-word;
 }
