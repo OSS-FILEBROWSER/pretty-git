@@ -39,9 +39,7 @@ app.get("/", async (req, res) => {
       .then((data) => {
         user.updateStatus(data);
       })
-      .catch((err) =>
-        console.log("something gone wrong while trying git status")
-      );
+      .catch((err) => (user.gitFiles = {}));
   }
 
   const files = await user.getFilesInCurrentDir();
