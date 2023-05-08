@@ -10,24 +10,12 @@ export default class Client {
     this._gitFiles = {};
     this._files = [];
     this._path = "/";
-    this._history = new History("/");
+    this._history = new History("/", false);
     this._isRepo = false;
   }
 
-  getFilesInCurrentDir = () => {
+  getFilesInCurrentDir = (history = null) => {
     this._files = [];
-    this._isRepo = this.isDotGitExists(`${this._path}/.git`);
-
-    //레포일 경우 status 업데이트
-    if (this._isRepo) {
-      this.gitStatus(this._path)
-        .then((data) => {
-          this.updateStatus(data);
-        })
-        .catch((err) =>
-          console.log("something gone wrong while trying git status")
-        );
-    }
 
     return new Promise((resolve, reject) => {
       fs.readdir(this._path, (err, fileList) => {
@@ -69,7 +57,7 @@ export default class Client {
                         initialized: false,
                         status: cur
                           ? cur.status
-                          : this._isRepo
+                          : this._history.isRepo
                           ? "committed"
                           : undefined,
                         statusType: cur ? cur.type : undefined,
@@ -200,6 +188,7 @@ export default class Client {
   };
 
   updateStatus(statusLog) {
+    this._gitFiles = {};
     const lines = statusLog.toString().split("\n");
 
     for (let i = 0; i < lines.length; i++) {
@@ -237,6 +226,8 @@ export default class Client {
         i--; // Go back one line so we don't skip any lines
       }
     }
+
+    console.log(this.gitFiles);
   }
 
   setHistory = (newHistory) => {
@@ -247,6 +238,7 @@ export default class Client {
   popHistory = () => {
     if (this._history.prev) {
       this._history = this._history.prev;
+      this._isRepo = this.history.isRepo;
     }
   };
 
@@ -265,6 +257,10 @@ export default class Client {
 
   get gitFiles() {
     return this._gitFiles;
+  }
+
+  set gitFiles(val) {
+    this._gitFiles = val;
   }
 
   get files() {
