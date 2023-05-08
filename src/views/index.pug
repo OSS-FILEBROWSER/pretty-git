@@ -29,7 +29,7 @@ block body
                             h4 Committed 
                             ul
             each file in files
-                div(class=`${file.type == "directory" ? "directory-item" : file.status ? "directory-item" : "directory-item disabled"}`)
+                div(class=`${file.type == "directory" ? "directory-item" : file.status ? "directory-item status-directory-item" : "directory-item disabled"}`)
                     //img 주소 및 크기 고정
                     div.file-image-container
                         div.git-status
