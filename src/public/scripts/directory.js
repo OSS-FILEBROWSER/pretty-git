@@ -1,6 +1,17 @@
 const rootElement = document.querySelector("#root");
 const directories = document.querySelectorAll(".directory-item");
 const backButton = document.querySelector("#back");
+const gitStatusModal = document.querySelector(".git-status-modal");
+const openModalButton = document.querySelector(".open-modal");
+const closeModalButton = document.querySelector(".close-modal");
+const untrackedList = document.querySelector(".status-item.untracked ul");
+const modifiedList = document.querySelector(".status-item.modified ul");
+const stagedList = document.querySelector(".status-item.staged ul");
+const committedList = document.querySelector(".status-item.committed ul");
+let untracked = [];
+let modified = [];
+let staged = [];
+let committed = [];
 
 directories.forEach((dir) => {
   dir.addEventListener("dblclick", () => {
@@ -15,8 +26,13 @@ directories.forEach((dir) => {
         switch (err.response.data) {
           case "ENOENT":
             alert("No such file or directory");
+            break;
           case "EPERM":
             alert("No permission to access this directory");
+            break;
+          case "ENOTDIR":
+            alert("It is not directory");
+            break;
         }
       });
   });
@@ -24,6 +40,7 @@ directories.forEach((dir) => {
   dir.addEventListener("contextmenu", (event) => {
     // 기본 Context Menu가 나오지 않게 차단
     event.preventDefault();
+    const directoryName = dir.childNodes[2].innerHTML;
 
     const ctxMenu = document.createElement("div");
 
@@ -43,10 +60,9 @@ directories.forEach((dir) => {
             //클릭 이벤트 구현
             //event.srcElement는 click 이벤트를 발생시킨 원천 엘리먼트를 가르킨다.
             try {
-              const response = await axios.post("/dirs/gitinit", {
+              const response = await axios.post("/dirs/git/init", {
                 dirName: directoryName,
               });
-              console.log(response);
               window.location.href = "/";
             } catch (error) {
               console.log(error);
@@ -72,6 +88,17 @@ directories.forEach((dir) => {
     // Body에 Context Menu를 추가.
     document.body.appendChild(ctxMenu);
   });
+
+  //파일의 상태가 untracked인지 modified인지 staged인지 분류
+  if (dir.childNodes[4] === "untracked") {
+    untracked.push(dir.childNodes[2]);
+  } else if (dir.childNodes[4] === "modified") {
+    modified.push(dir.childNodes[2]);
+  } else if (dir.childNodes[4] === "staged") {
+    staged.push(dir.childNodes[2]);
+  } else if (dir.childNodes[4] === "committed") {
+    committed.push(dir.childNodes[2]);
+  }
 });
 
 backButton.addEventListener("click", () => {
@@ -114,6 +141,64 @@ function renderContextMenuList(list) {
   return ctxMenuList;
 }
 
+//modal 구현
+openModalButton.addEventListener("click", () => {
+  gitStatusModal.style.display = "block";
+  disableBodyScroll();
+
+  directories.forEach((dir) => {
+    dir.classList.add("modal-open");
+  });
+
+  //git status 요청
+  axios.get("/dirs/git/status").then((res) => {
+    //api로부터 받아온 파일 정보
+    const files = res.data;
+    //각각의 상태에 대한 임시 저장 배열들
+    const untrackedT = [];
+    const modifiedT = [];
+    const stagedT = [];
+    const committedT = [];
+    //switch를 통해 상태 구분, 각각의 상태에 해당하는 임시 배열 저장소로 push
+
+    for (let name in files) {
+      switch (files[name].status) {
+        case "untracked":
+          untrackedT.push(name);
+          break;
+        case "staged":
+          stagedT.push(name);
+          break;
+        case "modified":
+          modifiedT.push(name);
+          break;
+        case "committed":
+          committedT.push(name);
+          break;
+      }
+      //전역 배열을 임시 배열 주소로 교체
+      untracked = untrackedT;
+      staged = stagedT;
+      modified = modifiedT;
+      committed = committedT;
+
+      render();
+    }
+  });
+});
+
+closeModalButton.addEventListener("click", function () {
+  gitStatusModal.style.display = "none";
+  enableBodyScroll();
+});
+
+function disableBodyScroll() {
+  document.body.style.overflow = "hidden";
+}
+
+function enableBodyScroll() {
+  document.body.style.overflow = "visible";
+}
+
 //root element event 관련
 rootElement.addEventListener("click", handleClearContextMenu);
-//document.addEventListener('contextmenu', handleCreateContextMenu, false);

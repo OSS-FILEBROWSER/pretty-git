@@ -6,50 +6,61 @@ import History from "./History.js";
 
 export default class Client {
   constructor() {
+    this._branch = undefined;
+    this._gitFiles = {};
+    this._files = [];
     this._path = "/";
-    this._history = new History("/");
+    this._history = new History("/", false);
+    this._isRepo = false;
   }
 
-  getFilesInCurrentDir = () => {
+  getFilesInCurrentDir = (history = null) => {
+    this._files = [];
+
     return new Promise((resolve, reject) => {
-      let files = [];
       fs.readdir(this._path, (err, fileList) => {
         if (err) {
           reject(err);
         } else {
           Promise.all(
             fileList.map((file) => {
+              let cur = this._gitFiles[file];
+
               return new Promise((resolve, reject) => {
                 fs.stat(`${this._path}${file}`, (err, stats) => {
-                  //현재 디렉토리에 .git 이 존재하는지 확인
+                  //해당 디렉토리에 .git 이 존재하는지 확인
                   const isAlreadyInit = this.isDotGitExists(
                     `${this._path}${file}/.git`
                   );
 
                   if (err) {
-                    files.push({
+                    this._files.push({
                       type: "unknown",
                       name: file,
                       initialized: false,
+                      status: undefined,
+                      statusType: undefined,
                     });
                   } else {
                     if (stats.isDirectory()) {
-                      files.push({
+                      this._files.push({
                         type: "directory",
                         name: file,
                         initialized: isAlreadyInit,
+                        status: undefined,
+                        statusType: undefined,
                       });
-                    } else if (stats.isFile()) {
-                      files.push({
+                    } else {
+                      this._files.push({
                         type: "file",
                         name: file,
                         initialized: false,
-                      });
-                    } else {
-                      files.push({
-                        type: "unknown",
-                        name: file,
-                        initialized: false,
+                        status: cur
+                          ? cur.status
+                          : this._history.isRepo
+                          ? "committed"
+                          : undefined,
+                        statusType: cur ? cur.type : undefined,
                       });
                     }
                   }
@@ -59,9 +70,11 @@ export default class Client {
             })
           )
             .then(() => {
-              resolve(files);
+              resolve(this._files);
             })
-            .catch(reject);
+            .catch((err) => {
+              reject(err);
+            });
         }
       });
     });
@@ -120,13 +133,94 @@ export default class Client {
     });
   };
 
+  gitStatus = (path) => {
+    const repoDir = path; // the directory where you want to run `git status`
+
+    // Check if the directory exists
+    if (!fs.existsSync(repoDir)) {
+      return Promise.reject(`Error: ${repoDir} does not exist`);
+    }
+
+    return new Promise((resolve, reject) => {
+      // Spawn the `git status` command
+      const child = spawn("git", ["status"], { cwd: repoDir });
+
+      let stdout = "";
+      let stderr = "";
+
+      // Log any output from the command to the console
+      child.stdout.on("data", (data) => {
+        stdout += data;
+      });
+
+      child.stderr.on("data", (data) => {
+        stderr += data;
+      });
+
+      // Log the exit code when the command has finished running
+      child.on("close", (code) => {
+        if (code !== 0) {
+          reject(`child process exited with code ${code}\n${stderr}`);
+        } else {
+          resolve(stdout);
+        }
+      });
+    });
+  };
+
+  updateStatus(statusLog) {
+    this._gitFiles = {};
+    const lines = statusLog.toString().split("\n");
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+
+      if (line.startsWith("On branch ")) {
+        this._branch = line.substring("On branch ".length).trim();
+      } else if (line.startsWith("Changes to be committed:")) {
+        i += 2; // Skip the next line, which is a header
+        while (i < lines.length && lines[i] != "") {
+          const info = lines[i].split(":");
+          const type = info[0].trim();
+          const name = info[1].trim();
+          this._gitFiles[name] = { status: "staged", type: type };
+          i++;
+        }
+        i--; // Go back one line so we don't skip any lines
+      } else if (line.startsWith("Changes not staged for commit:")) {
+        i += 3; // Skip the next line, which is a header
+        while (i < lines.length && lines[i] != "") {
+          const info = lines[i].split(":");
+          const type = info[0].trim();
+          const name = info[1].trim();
+          this._gitFiles[name] = { status: "modified", type: type };
+          i++;
+        }
+        i--; // Go back one line so we don't skip any lines
+      } else if (line.startsWith("Untracked files:")) {
+        i += 2; // Skip the next line, which is a header
+        while (i < lines.length && lines[i] != "") {
+          const file = lines[i].trim();
+          this._gitFiles[file] = { status: "untracked", type: null };
+          i++;
+        }
+        i--; // Go back one line so we don't skip any lines
+      }
+    }
+
+    console.log(this.gitFiles);
+  }
+
   setHistory = (newHistory) => {
     newHistory.prev = this._history;
     this._history = newHistory; //현재 위치 교체
   };
 
   popHistory = () => {
-    this._history = this._history.prev;
+    if (this._history.prev) {
+      this._history = this._history.prev;
+      this._isRepo = this.history.isRepo;
+    }
   };
 
   //data 조작의 오류를 막기 위해 getter, setter 설정.
@@ -140,5 +234,21 @@ export default class Client {
 
   get history() {
     return this._history;
+  }
+
+  get gitFiles() {
+    return this._gitFiles;
+  }
+
+  set gitFiles(val) {
+    this._gitFiles = val;
+  }
+
+  get files() {
+    return this._files;
+  }
+
+  get branch() {
+    return this._branch;
   }
 }
