@@ -123,11 +123,16 @@ app.post("/dirs/git/add", (req, res) => {
 });
 
 app.post("/dirs/git/rm/:cached", (req, res) => {
-  if (req.params.cached == 0) {
-    //committed -> staged(파일도 삭제)
-  } else {
-    //committed -> untracked
-  }
+  const fileName = req.body.fileName;
+  const staged = req.params.staged === "1";
+  user
+    .gitRemove(fileName, staged)
+    .then((message) => {
+      res.send(message);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
 });
 
 app.post("/dirs/git/mv", (req, res) => {
