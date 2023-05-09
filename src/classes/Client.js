@@ -346,7 +346,11 @@ export default class Client {
   checkIgnores(isRepo) {
     if (isRepo && this._ignoreList.length == 0) {
       //1. gitignore parsing
-      this._ignoreList = this.parseGitIgnore(`${this._repoSrc}/.gitignore`);
+      try { 
+        this._ignoreList = this.parseGitIgnore(`${this._repoSrc}.gitignore`);
+      } catch (error) {
+        console.log("No gitignore file inside this repo")
+      }
     }
 
     if (this._ignoreList.length != 0) {

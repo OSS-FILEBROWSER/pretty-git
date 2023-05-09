@@ -95,7 +95,6 @@ function handleDragDrop() {
   // });
 }
 
-
 function render() {
   untrackedList.innerHTML = "";
   modifiedList.innerHTML = "";

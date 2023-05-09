@@ -40,12 +40,12 @@ app.get("/", async (req, res) => {
       .gitStatus(user.path)
       .then((data) => {
         user.updateStatus(data);
-        //user.checkIgnores(user.isRepo);
       })
       .catch((err) => console.log(err));
   }
 
   const files = await user.getFilesInCurrentDir();
+  user.checkIgnores(user.isRepo);
 
   res.render("index", {
     title: "Pretty git, Make Your git usage Fancy",
