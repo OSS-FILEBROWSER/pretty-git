@@ -1,10 +1,9 @@
 import fs from "fs";
 import path from "path";
 import { spawn } from "child_process";
+import { minimatch } from "minimatch";
 //class import
 import History from "./History.js";
-
-import { error } from "console";
 
 export default class Client {
   constructor() {
@@ -14,6 +13,7 @@ export default class Client {
     this._path = "/";
     this._history = new History("/", false);
     this._isRepo = false;
+    this._ignoreList = [];
   }
 
   getFilesInCurrentDir = (history = null) => {
@@ -27,6 +27,7 @@ export default class Client {
           Promise.all(
             fileList.map((file) => {
               let cur = this._gitFiles[file];
+              console.log(this._gitFiles);
 
               return new Promise((resolve, reject) => {
                 fs.stat(`${this._path}${file}`, (err, stats) => {
@@ -81,6 +82,12 @@ export default class Client {
       });
     });
   };
+
+  /**
+   *
+   * Git 관련 멤버 함수
+   *
+   */
 
   isDotGitExists = (path) => {
     if (fs.existsSync(path) && fs.lstatSync(".git").isDirectory()) {
@@ -179,6 +186,57 @@ export default class Client {
     });
   };
 
+ gitRemove = (fileName, staged) => {
+    return new Promise((resolve, reject) => {
+      const command = staged ? ["rm", "--cached"] : ["rm"];
+      const args = [...command, fileName];
+
+      const child = spawn("git", args, { cwd: this._path });
+
+      child.on("exit", (code, signal) => {
+        if (code === 0) {
+          const message = `git ${command.join(" ")} ${fileName} 성공!`;
+          resolve(message);
+        } else {
+          const errorMessage = `git ${command.join(
+            " "
+          )} ${fileName} 실패. code: ${code}, signal: ${signal}`;
+          reject(errorMessage);
+        }
+      });
+
+      child.on("error", (error) => {
+        console.log("something wrong");
+        reject(`git ${command.join(" ")} 실행 중 오류 발생: ${error}`);
+      });
+    });
+  };
+
+  gitMove = (oldFileName, newFileName) => {
+    return new Promise((resolve, reject) => {
+      const args = ["mv", oldFileName, newFileName];
+
+      const child = spawn("git", args, { cwd: this._path });
+
+      child.on("exit", (code, signal) => {
+        if (code === 0) {
+          resolve(`git mv ${oldFileName} ${newFileName} 성공!`);
+        } else {
+          reject(
+            `git mv ${oldFileName} ${newFileName} 실패. code: ${code}, signal: ${signal}`
+          );
+        }
+      });
+
+      child.on("error", (error) => {
+        console.log("something wrong");
+        reject(
+          `git mv ${oldFileName} ${newFileName} 실행 중 오류 발생: ${error}`
+        );
+      });
+    });
+  };
+
   gitStatus = (path) => {
     const repoDir = path; // the directory where you want to run `git status`
 
@@ -228,7 +286,12 @@ export default class Client {
         while (i < lines.length && lines[i] != "") {
           const info = lines[i].split(":");
           const type = info[0].trim();
-          const name = info[1].trim();
+          let name = info[1].trim();
+          //renamed 상태일때는 화살표 제거
+          if (type == "renamed") {
+            name = name.split("->")[1].trim();
+          }
+
           this._gitFiles[name] = { status: "staged", type: type };
           i++;
         }
@@ -255,6 +318,41 @@ export default class Client {
     }
   }
 
+  //gitignore파일 파싱
+  parseGitIgnore(gitignorePath) {
+    const gitignoreContent = fs.readFileSync(gitignorePath, "utf8");
+    const ignorePatterns = gitignoreContent
+      .split("\n")
+      .filter((line) => line.trim() !== "" && !line.trim().startsWith("#"));
+
+    return ignorePatterns;
+  }
+  //ignored 인지 확인  - 정규표현식 매치 라이브러리
+  checkIgnores(isRepo) {
+    if (isRepo && this._ignoreList.length == 0) {
+      //1. gitignore parsing
+      this._ignoreList = this.parseGitIgnore(`${this._path}/.gitignore`);
+      console.log(this._ignoreList);
+    }
+
+    if (this._ignoreList.length != 0) {
+      console.log("Starting to find an ignored file..");
+      for (let ignorePattern of this._ignoreList) {
+        for (let file of this._files) {
+          const matchResult = minimatch(file, ignorePattern);
+          if (matchResult == true) {
+            console.log("Found an item matched with ignore pattern");
+            file.status = "ignored";
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   *
+   * History 관련 멤버 함수
+   */
   setHistory = (newHistory) => {
     newHistory.prev = this._history;
     this._history = newHistory; //현재 위치 교체

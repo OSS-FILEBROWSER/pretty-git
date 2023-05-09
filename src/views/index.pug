@@ -6,7 +6,7 @@ block body
             p.back-font="Go to previous"
             div.back-img-container
                 img(src='/icons/return.png')
-        button.open-modal
+        button.open-modal.hidden
             p="Check Git Status"
         div.git-status-modal
             div.modal-body
@@ -33,7 +33,7 @@ block body
                     //img 주소 및 크기 고정
                     div.file-image-container
                         div.git-status
-                            p(class=`git-status-text ${file.status}`)=file.status+'('+file.statusType+')'
+                            p(class=`git-status-text ${file.status}`)=file.status
                         if file.type == "directory"
                             if file.initialized
                                 div.git-image-container
