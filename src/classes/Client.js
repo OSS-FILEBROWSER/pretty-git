@@ -220,8 +220,6 @@ export default class Client {
         i--; // Go back one line so we don't skip any lines
       }
     }
-
-    console.log(this.gitFiles);
   }
 
   //gitignore파일 파싱

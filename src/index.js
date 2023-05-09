@@ -40,7 +40,7 @@ app.get("/", async (req, res) => {
         user.updateStatus(data);
         user.checkIgnores(user.isRepo);
       })
-      .catch((err) => console.log("Error[git status] : " + err));
+      .catch((err) => (user.gitFiles = {}));
   }
 
   const files = await user.getFilesInCurrentDir();
@@ -73,7 +73,7 @@ app.post("/dirs/forward", (req, res) => {
 app.get("/dirs/backward", (req, res) => {
   user.popHistory(); // 이전 히스토리로 이동
   //재렌더링
-  if (user.history) {
+  if (user.history.prev) {
     user.path = user.history.path; //현재 유저 경로를 이전 디렉토리로 업데이트
     res.redirect("/");
   }
