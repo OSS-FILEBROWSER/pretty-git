@@ -129,20 +129,22 @@ directories.forEach((dir) => {
               }
             },
           },
-          // {
-          //   label: "git commit",
-          //   onClick: async () => {
-          //     try {
-          //       const response = await axios.post("/dirs/git/commit", {
-          //         dirName: directoryName,
-          //       });
-          //       window.location.href = "/";
-          //     } catch (error) {
-          //       console.log(error);
-          //       alert("something gone wrong while processing git commit");
-          //     }
-          //   },
-          // },
+          {
+            label: "git commit",
+            onClick: async () => {
+              try {
+                const commitText = prompt("commit message 입력");
+                const response = await axios.post("/dirs/git/commit", {
+                  dirName: directoryName,
+                  commitText: commitText
+                });
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                alert("something gone wrong while processing git commit");
+              }
+            },
+          },
         ])
       );
     } else if (gitStatusText.textContent === "committed") {
