@@ -188,6 +188,57 @@ export default class Client {
     });
   };
 
+  gitRemove = (fileName, staged) => {
+    return new Promise((resolve, reject) => {
+      const command = staged ? ["rm", "--cached"] : ["rm"];
+      const args = [...command, fileName];
+
+      const child = spawn("git", args, { cwd: this._path });
+
+      child.on("exit", (code, signal) => {
+        if (code === 0) {
+          const message = `git ${command.join(" ")} ${fileName} 성공!`;
+          resolve(message);
+        } else {
+          const errorMessage = `git ${command.join(
+            " "
+          )} ${fileName} 실패. code: ${code}, signal: ${signal}`;
+          reject(errorMessage);
+        }
+      });
+
+      child.on("error", (error) => {
+        console.log("something wrong");
+        reject(`git ${command.join(" ")} 실행 중 오류 발생: ${error}`);
+      });
+    });
+  };
+
+  gitMove = (oldFileName, newFileName) => {
+    return new Promise((resolve, reject) => {
+      const args = ["mv", oldFileName, newFileName];
+
+      const child = spawn("git", args, { cwd: this._path });
+
+      child.on("exit", (code, signal) => {
+        if (code === 0) {
+          resolve(`git mv ${oldFileName} ${newFileName} 성공!`);
+        } else {
+          reject(
+            `git mv ${oldFileName} ${newFileName} 실패. code: ${code}, signal: ${signal}`
+          );
+        }
+      });
+
+      child.on("error", (error) => {
+        console.log("something wrong");
+        reject(
+          `git mv ${oldFileName} ${newFileName} 실행 중 오류 발생: ${error}`
+        );
+      });
+    });
+  };
+
   gitStatus = (path) => {
     const repoDir = path; // the directory where you want to run `git status`
 
