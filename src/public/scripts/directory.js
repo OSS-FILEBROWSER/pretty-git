@@ -13,6 +13,8 @@ let modified = [];
 let staged = [];
 let committed = [];
 
+
+
 directories.forEach((dir) => {
   const gitStatusText = dir.querySelector(".git-status-text");
 
@@ -135,8 +137,8 @@ directories.forEach((dir) => {
               try {
                 const commitText = prompt("commit message 입력");
                 const response = await axios.post("/dirs/git/commit", {
-                  dirName: directoryName,
-                  commitText: commitText
+                  fileName: directoryName,
+                  commitMessage: commitText
                 });
                 window.location.href = "/";
               } catch (error) {
@@ -245,13 +247,15 @@ function handleClearContextMenu(event) {
 function renderContextMenuList(list) {
   // List Element 생성
   const ctxMenuList = document.createElement("ul");
-
+  ctxMenuList.className = "custom-context-menu-ul";
   // List Item 생성
   list.forEach(function (item) {
     // Item Element 생성
     const ctxMenuItem = document.createElement("li");
     const ctxMenuItemAnchor = document.createElement("a");
     const ctxMenuItemAnchorText = document.createTextNode(item.label);
+
+    ctxMenuItem.className = "custom-context-menu-li"
 
     // 클릭 이벤트 설정
     if (item.onClick) {

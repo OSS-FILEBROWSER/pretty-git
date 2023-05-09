@@ -1,7 +1,8 @@
 import fs from "fs";
-import path from "path";
+// import path from "path";
 import { spawn } from "child_process";
 import { minimatch } from "minimatch";
+import path, { resolve } from "path";
 //class import
 import History from "./History.js";
 
@@ -171,6 +172,29 @@ export default class Client {
 
       child.on("error", (error) => {
         reject(`git add ${fileName} 실행 중 오류 발생: ${error}`);
+      });
+    });
+  };
+
+  gitCommit = (fileName, commitMessage) => {
+    return new Promise((resolve, reject) => {
+      const args = ["commit", "-m", commitMessage, fileName];
+
+      const child = spawn("git", args, { cwd: this._path });
+
+      child.on("exit", (code, signal) => {
+        if (code === 0) {
+          const commitMessage = `git commit ${fileName} 성공!`;
+          resolve(commitMessage);
+        } else {
+          const errorMessage = `git commit ${fileName} 실패. code: ${code}, signal: ${signal}`;
+          reject(errorMessage);
+        }
+      });
+
+      child.on("error", (error) => {
+        console.log("something wrong");
+        reject(`git commit ${fileName} 실행 중 오류 발생: ${error}`);
       });
     });
   };

@@ -129,5 +129,55 @@ function render() {
   //   committedList.appendChild(li);
   // });
 
-  handleDragDrop();
+  // handleDragDrop();
+  handleModal();
+}
+
+function handleModal() {
+  const temp = document.querySelectorAll(".status-item.staged");
+
+  temp.forEach((item) => {
+    item.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+  
+      const ctxMenu = document.createElement("div");
+  
+      ctxMenu.id = "context-menu";
+      ctxMenu.className = "custom-context-menu";
+  
+      //위치 설정
+      ctxMenu.style.top = event.pageY + "px";
+      ctxMenu.style.left = event.pageX + "px";
+  
+      ctxMenu.appendChild(
+        renderContextMenuList([
+          {
+            label: "git restore --staged",
+            onClick: async () => {
+              try {
+                const response = await axios.post("/dirs/git/restore/1", {
+                  fileName: directoryName,
+                });
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                alert(
+                  "something gone wrong while processing git restore --staged"
+                );
+              }
+            },
+          },
+        ])
+      );
+    })
+  })
+
+  // 이전 Element 삭제
+  const prevCtxMenu = document.getElementById("context-menu");
+  if (prevCtxMenu) {
+    prevCtxMenu.remove();
+  }
+
+  // Body에 Context Menu를 추가.
+  // temp2.appendChild(ctxMenu);
 }

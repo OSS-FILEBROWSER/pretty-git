@@ -114,6 +114,19 @@ app.post("/dirs/git/add", (req, res) => {
     });
 });
 
+app.post("/dirs/git/commit", (req, res) => {
+  const fileName = req.body.fileName;
+  const commitMessage = req.body.commitMessage;
+  user
+    .gitCommit(fileName, commitMessage)
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
+});
+
 app.post("/dirs/git/restore/:staged", (req, res) => {
   const fileName = req.body.fileName;
   const staged = req.params.staged === "1";
