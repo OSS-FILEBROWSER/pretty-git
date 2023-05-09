@@ -161,9 +161,9 @@ export default class Client {
     });
   };
 
-  gitCommit = (fileName, message) => {
+  gitCommit = (fileName, commitMessage) => {
     return new Promise((resolve, reject) => {
-      const args = ["commit", "-m", message, fileName];
+      const args = ["commit", "-m", commitMessage, fileName];
 
       const child = spawn("git", args, { cwd: this._path });
 
