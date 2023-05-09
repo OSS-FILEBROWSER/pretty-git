@@ -33,7 +33,7 @@ block body
                     //img 주소 및 크기 고정
                     div.file-image-container
                         div.git-status
-                            p(class=`git-status-text ${file.status}`)=file.status
+                            p(class=`git-status-text ${file.status}`)=file.status+'('+file.statusType+')'
                         if file.type == "directory"
                             if file.initialized
                                 div.git-image-container
