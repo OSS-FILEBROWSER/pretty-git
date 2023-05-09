@@ -141,7 +141,7 @@ function renderContextMenuList(list) {
   return ctxMenuList;
 }
 
-//modal 구현
+//modal 구현npm
 openModalButton.addEventListener("click", () => {
   gitStatusModal.style.display = "block";
   disableBodyScroll();
