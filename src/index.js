@@ -92,7 +92,7 @@ app.post("/dirs/git/init", (req, res) => {
 });
 
 app.get("/dirs/git/status", (req, res) => {
-  res.send(user.gitFiles);
+  res.json({files: user.files, isRepo: user.isRepo});
 });
 
 app.post("/dirs/git/add", (req, res) => {
