@@ -22,25 +22,25 @@
 
 # Feature3 (버전 컨트롤 지원)
 
-- 깃 레포가 생성된 디렉토리는 파일마다 다른 status를 시각적으로 표현
-  - ex. untracked: 빨강, modified: 주황 등등 색깔로 표현 + 짧은 글귀
-- 선택된 파일에 대한 깃 명령어 지원
-  - status기반으로 지원할 수 있는 명령어를 다르게 설정
-  - For untracked files:
-    - Adding the new files into a staging area (untracked -> staged; git add)
-  - For modified files
-    - Adding the modified files into a staging area (modified -> staged; git add)
-    - Undoing the modification (modified -> unmodified; git restore)
-  - For staged files
-    - Unstaging changes (staged -> modified or untracked; git restore --staged)
+- ~~깃 레포가 생성된 디렉토리는 파일마다 다른 status를 시각적으로 표현~~
+  - !!ex. untracked: 빨강, modified: 주황 등등 색깔로 표현 + 짧은 글귀~~
+- ~~선택된 파일에 대한 깃 명령어 지원~~
+  - ~~status기반으로 지원할 수 있는 명령어를 다르게 설정~~
+  - ~~For untracked files:~~
+    - ~~Adding the new files into a staging area (untracked -> staged; git add)~~
+  - ~~For modified files~~
+    - ~~Adding the modified files into a staging area (modified -> staged; git add)~~
+    - ~~Undoing the modification (modified -> unmodified; git restore)~~
+  - ~~For staged files~~
+    - ~~Unstaging changes (staged -> modified or untracked; git restore --staged)~~
   - For committed or unmodified files
     - Untracking files (committed -> untracked; git rm --cached)
     - Deleting files (committed -> staged; git rm)
     - Renaming files (committed -> staged; git mv)
   - 스테이징된 change를 커밋하기 위한 별도의 메뉴
-    - 커밋 메뉴 클릭 -> 스테이지 영역의 아이템 리스트 표시
-    - 커밋을 확정하면 -> 커밋 시작
-    - 커밋된 이후 파일을 committed 상태로 변경
+    - ~~커밋 메뉴 클릭 -> 스테이지 영역의 아이템 리스트 표시~~
+    - ~~커밋을 확정하면 -> 커밋 시작~~
+    - ~~커밋된 이후 파일을 committed 상태로 변경~~
 
 # Chore
 
