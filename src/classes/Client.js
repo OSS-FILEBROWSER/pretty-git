@@ -5,17 +5,22 @@ import { minimatch } from "minimatch";
 //class import
 import History from "./History.js";
 
-import { error } from "console";
-
 export default class Client {
   constructor() {
     this._branch = undefined;
-    this._gitFiles = {};
+    this._gitFiles = [];
     this._files = [];
     this._path = "/";
     this._history = new History("/", false);
     this._isRepo = false;
+    this._repoSrc = "none";
     this._ignoreList = [];
+
+    if (minimatch("node_modules/", "node_modules/|node_modules/eslint/")) {
+      console.log("Path matches ignore pattern.");
+    } else {
+      console.log("Path does not match ignore pattern.");
+    }
   }
 
   getFilesInCurrentDir = (history = null) => {
@@ -28,8 +33,12 @@ export default class Client {
         } else {
           Promise.all(
             fileList.map((file) => {
-              let cur = this._gitFiles[file];
-              console.log(this._gitFiles);
+              let cur = null;
+              this._gitFiles.forEach((item) => {
+                if (item.name == file) {
+                  cur = item;
+                }
+              });
 
               return new Promise((resolve, reject) => {
                 fs.stat(`${this._path}${file}`, (err, stats) => {
@@ -52,8 +61,12 @@ export default class Client {
                         type: "directory",
                         name: file,
                         initialized: isAlreadyInit,
-                        status: undefined,
-                        statusType: undefined,
+                        status: cur
+                          ? cur.status
+                          : this._history.isRepo
+                          ? "committed"
+                          : undefined,
+                        statusType: cur ? cur.type : undefined,
                       });
                     } else {
                       this._files.push({
@@ -224,7 +237,7 @@ export default class Client {
   };
 
   updateStatus(statusLog) {
-    this._gitFiles = {};
+    this._gitFiles = [];
     const lines = statusLog.toString().split("\n");
 
     for (let i = 0; i < lines.length; i++) {
@@ -243,7 +256,7 @@ export default class Client {
             name = name.split("->")[1].trim();
           }
 
-          this._gitFiles[name] = { status: "staged", type: type };
+          this._gitFiles.push({ name: name, status: "staged", type: type });
           i++;
         }
         i--; // Go back one line so we don't skip any lines
@@ -253,7 +266,7 @@ export default class Client {
           const info = lines[i].split(":");
           const type = info[0].trim();
           const name = info[1].trim();
-          this._gitFiles[name] = { status: "modified", type: type };
+          this._gitFiles.push({ name: name, status: "modified", type: type });
           i++;
         }
         i--; // Go back one line so we don't skip any lines
@@ -261,7 +274,7 @@ export default class Client {
         i += 2; // Skip the next line, which is a header
         while (i < lines.length && lines[i] != "") {
           const file = lines[i].trim();
-          this._gitFiles[file] = { status: "untracked", type: null };
+          this._gitFiles.push({ name: file, status: "untracked", type: null });
           i++;
         }
         i--; // Go back one line so we don't skip any lines
@@ -282,18 +295,26 @@ export default class Client {
   checkIgnores(isRepo) {
     if (isRepo && this._ignoreList.length == 0) {
       //1. gitignore parsing
-      this._ignoreList = this.parseGitIgnore(`${this._path}/.gitignore`);
-      console.log(this._ignoreList);
+      this._ignoreList = this.parseGitIgnore(`${this._repoSrc}/.gitignore`);
     }
 
     if (this._ignoreList.length != 0) {
       console.log("Starting to find an ignored file..");
+      console.log(this.repoSrc);
       for (let ignorePattern of this._ignoreList) {
         for (let file of this._files) {
-          const matchResult = minimatch(file, ignorePattern);
+          let relativePath = path.relative(
+            this._repoSrc,
+            `${this._path}${file.name}`
+          );
+          if (file.type == "directory") {
+            relativePath = relativePath + "/";
+          }
+          const matchResult = minimatch(relativePath, ignorePattern);
+
           if (matchResult == true) {
-            console.log("Found an item matched with ignore pattern");
             file.status = "ignored";
+            console.log(`${file.name} - ${file.status}`); // 성공적으로 ignored상태로 바뀌어진 파일들
           }
         }
       }
@@ -343,5 +364,21 @@ export default class Client {
 
   get branch() {
     return this._branch;
+  }
+
+  get repoSrc() {
+    return this._repoSrc;
+  }
+
+  set repoSrc(val) {
+    this._repoSrc = val;
+  }
+
+  get ignoreList() {
+    return this._ignoreList;
+  }
+
+  set ignoreList(val) {
+    this._ignoreList = val;
   }
 }

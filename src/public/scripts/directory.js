@@ -83,7 +83,7 @@ directories.forEach((dir) => {
             label: "git add",
             onClick: async () => {
               try {
-                const response = await axios.post("/dirs/git/init", {
+                const response = await axios.post("/dirs/git/add", {
                   filePath: directoryName,
                 });
                 window.location.href = "/";
@@ -283,21 +283,17 @@ openModalButton.addEventListener("click", () => {
     const untrackedT = [];
     const modifiedT = [];
     const stagedT = [];
-    const committedT = [];
 
-    for (let item of files) {
-      switch (item.status) {
+    for (let file of files) {
+      switch (file.status) {
         case "untracked":
-          untrackedT.push(item.name);
+          untrackedT.push(file.name);
           break;
         case "staged":
-          stagedT.push(item.name);
+          stagedT.push(file.name);
           break;
         case "modified":
-          modifiedT.push(item.name);
-          break;
-        case "committed":
-          committedT.push(item.name);
+          modifiedT.push(file.name);
           break;
       }
       //전역 배열을 임시 배열 주소로 교체
@@ -306,7 +302,6 @@ openModalButton.addEventListener("click", () => {
     untracked = untrackedT;
     staged = stagedT;
     modified = modifiedT;
-    committed = committedT;
 
     render();
   });
