@@ -17,39 +17,84 @@ let untracked1 = [];
 let modified1 = [];
 let staged1 = [];
 let committed1 = [];
+let directoryNames = [];
+
+directories.forEach((dir) => {
+  const directoryName = dir.childNodes[2].innerHTML;
+  directoryNames.push(directoryName);
+})
+
+if (!directoryNames.includes(".git")) {
+  openModalButton.style.display = "none";
+}
+
+// axios.get("/dirs/git/status").then((res) => {
+//   //api로부터 받아온 파일 정보
+//   const files = res.data;
+
+//   //각각의 상태에 대한 임시 저장 배열들
+//   const untrackedT = [];
+//   const modifiedT = [];
+//   const stagedT = [];
+//   const committedT = [];
+//   //switch를 통해 상태 구분, 각각의 상태에 해당하는 임시 배열 저장소로 push
+//   files.forEach((file) => {
+//     switch (file.status) {
+//       case "untracked":
+//         untrackedT.push(file.name);
+//         break;
+//       case "staged":
+//         stagedT.push(file.name);
+//         break;
+//       case "unstaged":
+//         modifiedT.push(file.name);
+//         break;
+//       case "committed":
+//         committedT.push(file.name);
+//         break;
+//     }
+//     //전역 배열을 임시 배열 주소로 교체
+//     untracked1 = untrackedT;
+//     staged1 = stagedT;
+//     modified1 = modifiedT;
+//     committed1 = committedT;
+//   });
+// });
 
 axios.get("/dirs/git/status").then((res) => {
   //api로부터 받아온 파일 정보
   const files = res.data;
-
   //각각의 상태에 대한 임시 저장 배열들
   const untrackedT = [];
   const modifiedT = [];
   const stagedT = [];
   const committedT = [];
   //switch를 통해 상태 구분, 각각의 상태에 해당하는 임시 배열 저장소로 push
-  files.forEach((file) => {
-    switch (file.status) {
+
+  for (let name in files) {
+    switch (files[name].status) {
       case "untracked":
-        untrackedT.push(file.name);
+        untrackedT.push(name);
         break;
       case "staged":
-        stagedT.push(file.name);
+        stagedT.push(name);
         break;
-      case "unstaged":
-        modifiedT.push(file.name);
+      case "modified":
+        modifiedT.push(name);
         break;
       case "committed":
-        committedT.push(file.name);
+        committedT.push(name);
         break;
     }
     //전역 배열을 임시 배열 주소로 교체
-    untracked1 = untrackedT;
-    staged1 = stagedT;
-    modified1 = modifiedT;
-    committed1 = committedT;
-  });
+  }
+  untracked1 = untrackedT;
+  staged1 = stagedT;
+  modified1 = modifiedT;
+  committed1 = committedT;
 });
+
+console.log(committed1);
 
 directories.forEach((dir) => {
   dir.addEventListener("dblclick", () => {
@@ -76,10 +121,6 @@ directories.forEach((dir) => {
       });
   });
 
-  
-});
-
-gitStatusDirectories.forEach((dir) => {
   dir.addEventListener("contextmenu", (event) => {
     // 기본 Context Menu가 나오지 않게 차단
     event.preventDefault();
@@ -200,7 +241,7 @@ gitStatusDirectories.forEach((dir) => {
             label: "git mv",
             onClick: async() => {
               try {
-                const response = await axios.post(("/dirs/git/mv"), {dirName: directoryName});
+                const response = await axios.post("/dirs/git/mv", {dirName: directoryName});
                 window.location.href = "/";
               } catch (error) {
                 console.log(error);
@@ -208,6 +249,23 @@ gitStatusDirectories.forEach((dir) => {
               }
             },
           },
+        ])
+      )
+    } else {
+      ctxMenu.appendChild(
+        renderContextMenuList([
+          {
+            label: "git init",
+            onClick: async () => {
+              try {
+                const response = await axios.post("/dirs/git/init", {dirName: directoryName});
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                alert("something gone wrong while processing git init");
+              }
+            }
+          }
         ])
       )
     }
@@ -221,6 +279,10 @@ gitStatusDirectories.forEach((dir) => {
     // Body에 Context Menu를 추가.
     document.body.appendChild(ctxMenu);
   });
+});
+
+gitStatusDirectories.forEach((dir) => {
+  
 })
 
 backButton.addEventListener("click", () => {
@@ -275,6 +337,7 @@ openModalButton.addEventListener("click", () => {
   //git status 요청
   axios.get("/dirs/git/status").then((res) => {
     //api로부터 받아온 파일 정보
+    console.log(res);
     const files = res.data;
     //각각의 상태에 대한 임시 저장 배열들
     const untrackedT = [];
@@ -282,7 +345,6 @@ openModalButton.addEventListener("click", () => {
     const stagedT = [];
     const committedT = [];
     //switch를 통해 상태 구분, 각각의 상태에 해당하는 임시 배열 저장소로 push
-
     for (let name in files) {
       switch (files[name].status) {
         case "untracked":
@@ -298,14 +360,14 @@ openModalButton.addEventListener("click", () => {
           committedT.push(name);
           break;
       }
-      //전역 배열을 임시 배열 주소로 교체
-      untracked = untrackedT;
-      staged = stagedT;
-      modified = modifiedT;
-      committed = committedT;
-
-      render();
     }
+    //전역 배열을 임시 배열 주소로 교체
+    untracked = untrackedT;
+    staged = stagedT;
+    modified = modifiedT;
+    committed = committedT;
+
+    render();
   });
 });
 
