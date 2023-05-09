@@ -7,8 +7,6 @@ import path from "path";
 //직접 작성한 모듈이나 클래스를 import하려면, 꼭 .js 확장자를 붙여줘야함.
 import Client from "./classes/Client.js";
 import History from "./classes/History.js";
-
-import { getFilesInCurrentDir } from "./modules/createGitRepo.js";
 //환경변수 설정
 dotenv.config();
 //환경변수
@@ -42,7 +40,7 @@ app.get("/", async (req, res) => {
         user.updateStatus(data);
         user.checkIgnores(user.isRepo);
       })
-      .catch((err) => (user.gitFiles = {}));
+      .catch((err) => console.log(err));
   }
 
   const files = await user.getFilesInCurrentDir();
@@ -92,13 +90,12 @@ app.post("/dirs/git/init", (req, res) => {
     });
 });
 
-app.get("/dirs/git/isRepo", (req,res) => {
-  console.log(user.isRepo);
+app.get("/dirs/git/isRepo", (req, res) => {
   res.send(user.isRepo);
-})
+});
 
 app.get("/dirs/git/status", (req, res) => {
-  res.json({files: user.files, isRepo: user.isRepo});
+  res.json({ files: user.files, isRepo: user.isRepo });
 });
 
 app.post("/dirs/git/add", (req, res) => {
@@ -113,7 +110,6 @@ app.post("/dirs/git/add", (req, res) => {
       res.status(500).send(error);
     });
 });
-
 
 // app.post("/dirs/git/restore/:staged", (req, res) => {
 //   if (req.params.staged == 0) {

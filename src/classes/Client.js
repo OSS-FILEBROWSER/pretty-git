@@ -29,6 +29,7 @@ export default class Client {
           Promise.all(
             fileList.map((file) => {
               let cur = this._gitFiles[file];
+              console.log(this._gitFiles);
 
               return new Promise((resolve, reject) => {
                 fs.stat(`${this._path}${file}`, (err, stats) => {

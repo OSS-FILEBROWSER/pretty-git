@@ -331,3 +331,7 @@ input[type="reset"] {
   line-height: 1.5;
   overflow-wrap: break-word;
 }
+
+.hidden {
+  display: none;
+}
