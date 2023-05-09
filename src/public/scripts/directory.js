@@ -13,6 +13,14 @@ let modified = [];
 let staged = [];
 let committed = [];
 
+
+const res = axios.get("/dirs/git/isRepo")
+  .then((res) => {
+  if(res.data) {
+    openModalButton.style.display = "block";
+  } 
+}).catch(err =>console.log(err));
+
 openModalButton.style.display = "none";
 
 directories.forEach((dir) => {
@@ -64,11 +72,11 @@ directories.forEach((dir) => {
             label: "git add",
             onClick: async () => {
               try {
-                const response = await axios.post("/dirs/git/init", {dirName: directoryName});
+                const response = await axios.post("/dirs/git/add", {filePath: directoryName});
                 window.location.href = "/";
               } catch (error) {
                 console.log(error);
-                alert("something gone wrong while processing git init");
+                alert("something gone wrong while processing git add");
               }
             },
           },
@@ -81,7 +89,7 @@ directories.forEach((dir) => {
             label: "git add",
             onClick: async () => {
               try {
-                const response = await axios.post("/dirs/git/init", {dirName: directoryName});
+                const response = await axios.post("/dirs/git/init", {filePath: directoryName});
                 window.location.href = "/";
               } catch (error) {
                 console.log(error);
@@ -93,7 +101,7 @@ directories.forEach((dir) => {
             label: "git restore",
             onClick: async() => {
               try {
-                const response = await axios.post("/dirs/git/restore/0", {dirName: directoryName});
+                const response = await axios.post("/dirs/git/restore/0", {fileName: directoryName});
                 window.location.href = "/";
               } catch (error) {
                 console.log(error);
@@ -110,7 +118,7 @@ directories.forEach((dir) => {
             label: "git restore --staged",
             onClick: async () => {
               try {
-                const response = await axios.post("/dirs/git/restore/1", {dirName: directoryName});
+                const response = await axios.post("/dirs/git/restore/1", {fileName: directoryName});
                 window.location.href = "/";
               } catch (error) {
                 console.log(error);

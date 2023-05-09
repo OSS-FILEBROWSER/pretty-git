@@ -4,6 +4,8 @@ import { spawn } from "child_process";
 //class import
 import History from "./History.js";
 
+import { error } from "console";
+
 export default class Client {
   constructor() {
     this._branch = undefined;
@@ -147,6 +149,32 @@ export default class Client {
 
       child.on("error", (error) => {
         reject(`git add ${fileName} 실행 중 오류 발생: ${error}`);
+      });
+    });
+  };
+
+  gitRestore = (fileName, staged) => {
+    return new Promise((resolve, reject) => {
+      const command = staged ? ["restore", "--staged"] : ["restore"];
+      const args = [...command, fileName];
+
+      const child = spawn("git", args, { cwd: this._path });
+
+      child.on("exit", (code, signal) => {
+        if (code === 0) {
+          const message = `git ${command.join(" ")} ${fileName} 성공!`;
+          resolve(message);
+        } else {
+          const errorMessage = `git ${command.join(
+            " "
+          )} ${fileName} 실패. code: ${code}, signal: ${signal}`;
+          reject(errorMessage);
+        }
+      });
+
+      child.on("error", (error) => {
+        console.log("something wrong");
+        reject(`git ${command.join(" ")} 실행 중 오류 발생: ${error}`);
       });
     });
   };
