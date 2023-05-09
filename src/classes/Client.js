@@ -3,6 +3,7 @@ import path from "path";
 import { spawn } from "child_process";
 //class import
 import History from "./History.js";
+import { error } from "console";
 
 export default class Client {
   constructor() {
@@ -147,6 +148,126 @@ export default class Client {
 
       child.on("error", (error) => {
         reject(`git add ${fileName} 실행 중 오류 발생: ${error}`);
+      });
+    });
+  };
+
+  // git restore : modified -> unmodified / staged -> modified or untracked
+  // gitRestore = (fileName, staged) => {
+  //   return new Promise((resolve, reject) => {
+  //     //const command = staged ? `git restore --staged ${fileName}` : `git restore ${fileName}`;
+  //     const restoreStaged = spawn("git", ["restore", "--staged", fileName], {
+  //       cwd: this._path,
+  //     });
+  //     const restore = spawn("git", ["restore", fileName], { cwd: this._path });
+
+  //     switch (staged) {
+  //       case 0:
+  //         restoreStaged.on("exit", (code, signal) => {
+  //           if (code === 0) {
+  //             console.log(signal);
+  //             const message = `git restore --staged ${fileName} 성공!`;
+  //             resolve(message);
+  //           } else {
+  //             console.log("failed");
+  //             const errorMessage = `git restore --staged ${fileName} 실패. code: ${code}, signal: ${signal}`;
+  //             reject(errorMessage);
+  //           }
+  //         });
+  //         break;
+
+  //       case 1:
+  //         restore.on("exit", (code, signal) => {
+  //           if (code === 0) {
+  //             const message = `git restore ${fileName} 성공!`;
+  //             resolve(message);
+  //           } else {
+  //             const errorMessage = `git restore ${fileName} 실패. code: ${code}, signal: ${signal}`;
+  //             reject(errorMessage);
+  //           }
+  //         });
+  //         break;
+  //     }
+
+  //     child.on("error", (error) => {
+  //       console.log("something wrong");
+  //       reject(`git restore 실행 중 오류 발생: ${error}`);
+  //     });
+  //   });
+  // };
+  // git restore : modified -> unmodified / staged -> modified or untracked
+  // gitRestore = (fileName, staged) => {
+  //   return new Promise((resolve, reject) => {
+  //     switch (staged) {
+  //       case 0:
+  //         const restoreStaged = spawn(
+  //           "git",
+  //           ["restore", "--staged", fileName],
+  //           {
+  //             cwd: this._path,
+  //           }
+  //         );
+
+  //         restoreStaged.on("exit", (code, signal) => {
+  //           if (code === 0) {
+  //             const message = `git restore --staged ${fileName} 성공!`;
+  //             resolve(message);
+  //           } else {
+  //             const errorMessage = `git restore --staged ${fileName} 실패. code: ${code}, signal: ${signal}`;
+  //             reject(errorMessage);
+  //           }
+  //         });
+
+  //         restoreStaged.on("error", (error) => {
+  //           console.log("something wrong");
+  //           reject(`git restore 실행 중 오류 발생: ${error}`);
+  //         });
+  //         break;
+
+  //       case 1:
+  //         const restore = spawn("git", ["restore", fileName], { cwd: this._path });
+
+  //         restore.on("exit", (code, signal) => {
+  //           if (code === 0) {
+  //             const message = `git restore ${fileName} 성공!`;
+  //             resolve(message);
+  //           } else {
+  //             const errorMessage = `git restore ${fileName} 실패. code: ${code}, signal: ${signal}`;
+  //             reject(errorMessage);
+  //           }
+  //         });
+
+  //         restore.on("error", (error) => {
+  //           console.log("something wrong");
+  //           reject(`git restore 실행 중 오류 발생: ${error}`);
+  //         });
+
+  //         break;
+  //     }
+  //   });
+  // };
+  gitRestore = (fileName, staged) => {
+    return new Promise((resolve, reject) => {
+      const command = staged ? ["restore", "--staged"] : ["restore"];
+      const args = [...command, fileName];
+
+      const child = spawn("git", args, { cwd: this._path });
+
+      child.on("exit", (code, signal) => {
+        if (code === 0) {
+          const message = `git ${command.join(" ")} ${fileName} 성공!`;
+          resolve(message);
+        } else {
+          const errorMessage = `git ${command.join(
+            " "
+          )} ${fileName} 실패. code: ${code}, signal: ${signal}`;
+          reject(errorMessage);
+        }
+      });
+
+      child.on("error", (error) => {
+        console.log("something wrong");
+        reject(`git ${command.join(" ")} 실행 중 오류 발생: ${error}`);
       });
     });
   };
