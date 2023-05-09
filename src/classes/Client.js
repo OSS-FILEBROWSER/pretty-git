@@ -133,6 +133,24 @@ export default class Client {
     });
   };
 
+  gitAdd = (fileName) => {
+    return new Promise((resolve, reject) => {
+      const child = spawn("git", ["add", fileName], { cwd: this._path });
+
+      child.on("exit", (code, signal) => {
+        if (code === 0) {
+          resolve(`git add ${fileName} 성공!`);
+        } else {
+          reject(`git add ${fileName} 실패. code: ${code}, signal: ${signal}`);
+        }
+      });
+
+      child.on("error", (error) => {
+        reject(`git add ${fileName} 실행 중 오류 발생: ${error}`);
+      });
+    });
+  };
+
   gitStatus = (path) => {
     const repoDir = path; // the directory where you want to run `git status`
 

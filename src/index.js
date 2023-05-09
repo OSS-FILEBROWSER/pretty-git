@@ -96,8 +96,18 @@ app.get("/dirs/git/status", (req, res) => {
 });
 
 app.post("/dirs/git/add", (req, res) => {
-  //untracked -> staged
+  const filePath = req.body.filePath;
+
+  user
+    .gitAdd(filePath)
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
 });
+
 
 app.post("/dirs/git/restore/:staged", (req, res) => {
   if (req.params.staged == 0) {
