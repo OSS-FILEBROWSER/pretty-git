@@ -169,7 +169,7 @@ openModalButton.addEventListener("click", () => {
         case "staged":
           stagedT.push(name);
           break;
-        case "unstaged":
+        case "modified":
           modifiedT.push(name);
           break;
         case "committed":
