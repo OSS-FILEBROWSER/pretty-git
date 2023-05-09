@@ -109,7 +109,7 @@ app.post("/dirs/git/add", (req, res) => {
     });
 });
 
-  app.post("/dirs/git/restore/:staged", (req, res) => {
+app.post("/dirs/git/restore/:staged", (req, res) => {
   const fileName = req.body.fileName;
   const staged = req.params.staged === "1";
   user
@@ -124,9 +124,9 @@ app.post("/dirs/git/add", (req, res) => {
 
 app.post("/dirs/git/rm/:cached", (req, res) => {
   const fileName = req.body.fileName;
-  const staged = req.params.staged === "1";
+  const staged2 = req.params.cached === "1";
   user
-    .gitRemove(fileName, staged)
+    .gitRemove(fileName, staged2)
     .then((message) => {
       res.send(message);
     })

@@ -180,21 +180,19 @@ export default class Client {
 
   // staged == 1 -> git rm --cached
   // staged == 0 -> git rm
-  gitRemove = (fileName, staged2) => {
+  gitRemove = (fileName, staged) => {
     return new Promise((resolve, reject) => {
-      const command2 = staged2 ? ["rm", "-cached"] : ["rm"];
-      const args = [...command2, fileName];
+      const command = staged ? ["rm", "--cached"] : ["rm"];
+      const args = [...command, fileName];
 
       const child = spawn("git", args, { cwd: this._path });
 
       child.on("exit", (code, signal) => {
         if (code === 0) {
-          const message = `git ${command2.join(" ")} ${fileName} 성공!`;
+          const message = `git ${command.join(" ")} ${fileName} 성공!`;
           resolve(message);
         } else {
-          const errorMessage = `git ${command2.join(
-            " "
-          )} ${fileName} 실패. code: ${code}, signal: ${signal}`;
+          const errorMessage = `git ${command.join(" ")} ${fileName} 실패. code: ${code}, signal: ${signal}`;
           reject(errorMessage);
         }
       });
