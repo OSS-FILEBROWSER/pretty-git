@@ -136,8 +136,17 @@ app.post("/dirs/git/rm/:cached", (req, res) => {
 });
 
 app.post("/dirs/git/mv", (req, res) => {
-  //rename file
-  //commited -> staged
+  const oldFileName = req.body.oldFileName;
+  const newFileName = req.body.newFileName;
+
+  user
+    .gitMove(oldFileName, newFileName)
+    .then((message) => {
+    res.send(message);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
 });
 
 // Server

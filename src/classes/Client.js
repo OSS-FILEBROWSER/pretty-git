@@ -205,7 +205,7 @@ export default class Client {
 
   gitMove = (oldFileName, newFileName) => {
   return new Promise((resolve, reject) => {
-    co anst args = ["mv", oldFileName, newFileName];
+    const args = ["mv", oldFileName, newFileName];
 
     const child = spawn("git", args, { cwd: this._path });
 
