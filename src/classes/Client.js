@@ -5,9 +5,6 @@ import { minimatch } from "minimatch";
 //class import
 import History from "./History.js";
 import { error } from "console";
-import { rejects } from "assert";
-
-import { error } from "console";
 
 export default class Client {
   constructor() {
@@ -190,7 +187,7 @@ export default class Client {
     });
   };
 
-  gitRemove = (fileName, staged) => {
+ gitRemove = (fileName, staged) => {
     return new Promise((resolve, reject) => {
       const command = staged ? ["rm", "--cached"] : ["rm"];
       const args = [...command, fileName];
