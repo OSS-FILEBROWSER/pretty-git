@@ -171,8 +171,18 @@ directories.forEach((dir) => {
             label: "git mv",
             onClick: async() => {
               try {
-                const response = await axios.post("/dirs/git/mv", {dirName: directoryName});
-                window.location.href = "/";
+                const currentName = dir.querySelector(".directory-name");
+                const input = document.createElement("input");
+                input.type = "text";
+                input.value = newName;
+                input.addEventListener("keydown", async(event) => {
+                  if (event.key === "Enter") {
+                    const response = await axios.post("/dirs/git/mv", {dirName: directoryName, newName: input.value});
+                    window.location.href = "/";
+                  }
+                })
+                currentName.textContent = input.value;
+                input.focus();
               } catch (error) {
                 console.log(error);
                 alert("something gone wrong while processing git mv");
@@ -265,6 +275,7 @@ openModalButton.addEventListener("click", () => {
   axios.get("/dirs/git/status").then((res) => {
     //api로부터 받아온 파일 정보
     const files = res.data.files;
+    console.log(res.data.files.status);
     //각각의 상태에 대한 임시 저장 배열들
     const untrackedT = [];
     const modifiedT = [];
