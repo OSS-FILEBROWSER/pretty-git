@@ -33,9 +33,9 @@
     - ~~Undoing the modification (modified -> unmodified; git restore)~~
   - ~~For staged files~~
     - ~~Unstaging changes (staged -> modified or untracked; git restore --staged)~~
-  - For committed or unmodified files
-    - Untracking files (committed -> untracked; git rm --cached)
-    - Deleting files (committed -> staged; git rm)
+  - ~~For committed or unmodified files~~
+    - ~~Untracking files (committed -> untracked; git rm --cached)~~
+    - ~~Deleting files (committed -> staged; git rm)~~
     - Renaming files (committed -> staged; git mv)
   - 스테이징된 change를 커밋하기 위한 별도의 메뉴
     - ~~커밋 메뉴 클릭 -> 스테이지 영역의 아이템 리스트 표시~~
