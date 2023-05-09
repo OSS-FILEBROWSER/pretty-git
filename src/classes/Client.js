@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { spawn } from "child_process";
+import { minimatch } from "minimatch";
 //class import
 import History from "./History.js";
 
@@ -12,6 +13,7 @@ export default class Client {
     this._path = "/";
     this._history = new History("/", false);
     this._isRepo = false;
+    this._ignoreList = [];
   }
 
   getFilesInCurrentDir = (history = null) => {
@@ -79,6 +81,12 @@ export default class Client {
       });
     });
   };
+
+  /**
+   *
+   * Git 관련 멤버 함수
+   *
+   */
 
   isDotGitExists = (path) => {
     if (fs.existsSync(path) && fs.lstatSync(".git").isDirectory()) {
@@ -182,7 +190,12 @@ export default class Client {
         while (i < lines.length && lines[i] != "") {
           const info = lines[i].split(":");
           const type = info[0].trim();
-          const name = info[1].trim();
+          let name = info[1].trim();
+          //renamed 상태일때는 화살표 제거
+          if (type == "renamed") {
+            name = name.split("->")[1].trim();
+          }
+
           this._gitFiles[name] = { status: "staged", type: type };
           i++;
         }
@@ -211,6 +224,41 @@ export default class Client {
     console.log(this.gitFiles);
   }
 
+  //gitignore파일 파싱
+  parseGitIgnore(gitignorePath) {
+    const gitignoreContent = fs.readFileSync(gitignorePath, "utf8");
+    const ignorePatterns = gitignoreContent
+      .split("\n")
+      .filter((line) => line.trim() !== "" && !line.trim().startsWith("#"));
+
+    return ignorePatterns;
+  }
+  //ignored 인지 확인  - 정규표현식 매치 라이브러리
+  checkIgnores(isRepo) {
+    if (isRepo && this._ignoreList.length == 0) {
+      //1. gitignore parsing
+      this._ignoreList = this.parseGitIgnore(`${this._path}/.gitignore`);
+      console.log(this._ignoreList);
+    }
+
+    if (this._ignoreList.length != 0) {
+      console.log("Starting to find an ignored file..");
+      for (let ignorePattern of this._ignoreList) {
+        for (let file of this._files) {
+          const matchResult = minimatch(file, ignorePattern);
+          if (matchResult == true) {
+            console.log("Found an item matched with ignore pattern");
+            file.status = "ignored";
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   *
+   * History 관련 멤버 함수
+   */
   setHistory = (newHistory) => {
     newHistory.prev = this._history;
     this._history = newHistory; //현재 위치 교체
