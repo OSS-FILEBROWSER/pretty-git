@@ -195,7 +195,7 @@ input[type="reset"] {
 
 /* modal */
 .git-status-modal {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
 

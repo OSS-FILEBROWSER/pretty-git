@@ -7,6 +7,8 @@ import path from "path";
 //직접 작성한 모듈이나 클래스를 import하려면, 꼭 .js 확장자를 붙여줘야함.
 import Client from "./classes/Client.js";
 import History from "./classes/History.js";
+
+import { getFilesInCurrentDir } from "./modules/createGitRepo.js";
 //환경변수 설정
 dotenv.config();
 //환경변수
@@ -90,20 +92,50 @@ app.post("/dirs/git/init", (req, res) => {
     });
 });
 
+app.get("/dirs/git/isRepo", (req,res) => {
+  console.log(user.isRepo);
+  res.send(user.isRepo);
+})
+
 app.get("/dirs/git/status", (req, res) => {
-  res.send(user.gitFiles);
+  res.json({files: user.files, isRepo: user.isRepo});
 });
 
 app.post("/dirs/git/add", (req, res) => {
-  //untracked -> staged
+  const filePath = req.body.filePath;
+
+  user
+    .gitAdd(filePath)
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
 });
 
+
+// app.post("/dirs/git/restore/:staged", (req, res) => {
+//   if (req.params.staged == 0) {
+//     //modified -> unmodified
+//   } else {
+//     //staged -> modified or untracked(deleted일때)
+//   }
+
+// });
+
 app.post("/dirs/git/restore/:staged", (req, res) => {
-  if (req.params.staged == 0) {
-    //modified -> unmodified
-  } else {
-    //staged -> modified or untracked(deleted일때)
-  }
+  const fileName = req.body.fileName;
+  console.log(fileName);
+  const staged = req.params.staged === "1";
+  user
+    .gitRestore(fileName, staged)
+    .then((message) => {
+      res.send(message);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
 });
 
 app.post("/dirs/git/rm/:cached", (req, res) => {

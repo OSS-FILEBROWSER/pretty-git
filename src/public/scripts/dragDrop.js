@@ -47,7 +47,7 @@ function handleDragDrop() {
   addDragListeners(untrackedList, untracked);
   addDragListeners(modifiedList, modified);
   addDragListeners(stagedList, staged);
-  addDragListeners(committedList, committed);
+  // addDragListeners(committedList, committed);
 
   modifiedList.addEventListener("dragover", (e) => {
     e.preventDefault();
@@ -100,35 +100,35 @@ function render() {
   untrackedList.innerHTML = "";
   modifiedList.innerHTML = "";
   stagedList.innerHTML = "";
-  committedList.innerHTML = "";
+  // committedList.innerHTML = "";
 
   untracked.forEach((fileName) => {
     const li = document.createElement("li");
     li.textContent = fileName;
-    li.setAttribute("draggable", "true");
+    // li.setAttribute("draggable", "true");
     untrackedList.appendChild(li);
   });
 
   modified.forEach((fileName) => {
     const li = document.createElement("li");
     li.textContent = fileName;
-    li.setAttribute("draggable", "true");
+    // li.setAttribute("draggable", "true");
     modifiedList.appendChild(li);
   });
 
   staged.forEach((fileName) => {
     const li = document.createElement("li");
     li.textContent = fileName;
-    li.setAttribute("draggable", "true");
+    // li.setAttribute("draggable", "true");
     stagedList.appendChild(li);
   });
 
-  committed.forEach((fileName) => {
-    const li = document.createElement("li");
-    li.textContent = fileName;
-    li.setAttribute("draggable", "true");
-    committedList.appendChild(li);
-  });
+  // committed.forEach((fileName) => {
+  //   const li = document.createElement("li");
+  //   li.textContent = fileName;
+  //   li.setAttribute("draggable", "true");
+  //   committedList.appendChild(li);
+  // });
 
   handleDragDrop();
 }
