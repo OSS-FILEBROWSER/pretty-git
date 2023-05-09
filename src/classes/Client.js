@@ -4,6 +4,7 @@ import { spawn } from "child_process";
 //class import
 import History from "./History.js";
 import { error } from "console";
+import { rejects } from "assert";
 
 export default class Client {
   constructor() {
@@ -178,8 +179,6 @@ export default class Client {
     });
   };
 
-  // staged == 1 -> git rm --cached
-  // staged == 0 -> git rm
   gitRemove = (fileName, staged) => {
     return new Promise((resolve, reject) => {
       const command = staged ? ["rm", "--cached"] : ["rm"];
@@ -203,6 +202,27 @@ export default class Client {
       });
     });
   };
+
+  gitMove = (oldFileName, newFileName) => {
+  return new Promise((resolve, reject) => {
+    co anst args = ["mv", oldFileName, newFileName];
+
+    const child = spawn("git", args, { cwd: this._path });
+
+    child.on("exit", (code, signal) => {
+      if (code === 0) {
+        resolve(`git mv ${oldFileName} ${newFileName} 성공!`);
+      } else {
+        reject(`git mv ${oldFileName} ${newFileName} 실패. code: ${code}, signal: ${signal}`);
+      }
+    });
+
+    child.on("error", (error) => {
+      console.log("something wrong");
+      reject(`git mv ${oldFileName} ${newFileName} 실행 중 오류 발생: ${error}`);
+    });
+  });
+};
 
   gitStatus = (path) => {
     const repoDir = path; // the directory where you want to run `git status`
