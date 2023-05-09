@@ -39,10 +39,9 @@ app.get("/", async (req, res) => {
       .gitStatus(user.path)
       .then((data) => {
         user.updateStatus(data);
+        user.checkIgnores(user.isRepo);
       })
-      .catch((err) =>
-        console.log("something gone wrong while trying git status")
-      );
+      .catch((err) => console.log(err));
   }
 
   const files = await user.getFilesInCurrentDir();
@@ -75,7 +74,7 @@ app.post("/dirs/forward", (req, res) => {
 app.get("/dirs/backward", (req, res) => {
   user.popHistory(); // 이전 히스토리로 이동
   //재렌더링
-  if (user.history) {
+  if (user.history.prev) {
     user.path = user.history.path; //현재 유저 경로를 이전 디렉토리로 업데이트
     res.redirect("/");
   }
@@ -92,8 +91,12 @@ app.post("/dirs/git/init", (req, res) => {
     });
 });
 
+app.get("/dirs/git/isRepo", (req, res) => {
+  res.send(user.isRepo);
+});
+
 app.get("/dirs/git/status", (req, res) => {
-  res.send(user.gitFiles);
+  res.json({ files: user.files, isRepo: user.isRepo });
 });
 
 app.post("/dirs/git/add", (req, res) => {
@@ -142,7 +145,7 @@ app.post("/dirs/git/mv", (req, res) => {
   user
     .gitMove(oldFileName, newFileName)
     .then((message) => {
-    res.send(message);
+      res.send(message);
     })
     .catch((error) => {
       res.status(500).send(error);
