@@ -31,6 +31,7 @@ app.get("/", async (req, res) => {
   if (user.isDotGitExists(`${user.path}/.git`)) {
     user.history.isRepo = true;
     user.isRepo = true;
+    user.repoSrc = user.path;
   }
 
   //레포일 경우 status 업데이트
@@ -76,6 +77,7 @@ app.get("/dirs/backward", (req, res) => {
   //재렌더링
   if (user.history.prev) {
     user.path = user.history.path; //현재 유저 경로를 이전 디렉토리로 업데이트
+    user.ignoreList = [];
     res.redirect("/");
   }
 });
