@@ -4,6 +4,7 @@ import { spawn } from "child_process";
 import { minimatch } from "minimatch";
 //class import
 import History from "./History.js";
+import File from "./File.js"; // 기존에 객체로 생성하던 파일을, 클래스로 분리
 export default class Client {
   constructor() {
     this._branch = undefined;
@@ -14,12 +15,6 @@ export default class Client {
     this._isRepo = false;
     this._repoSrc = "none";
     this._ignoreList = [];
-
-    if (minimatch("node_modules/", "node_modules/|node_modules/eslint/")) {
-      console.log("Path matches ignore pattern.");
-    } else {
-      console.log("Path does not match ignore pattern.");
-    }
   }
 
   getFilesInCurrentDir = (history = null) => {
@@ -33,11 +28,23 @@ export default class Client {
           Promise.all(
             fileList.map((file) => {
               let cur = null;
+              //git status에서 파싱된 파일과 겹치는지 확인
               this._gitFiles.forEach((item) => {
                 if (item.name == file) {
                   cur = item;
                 }
               });
+
+              //status 업데이트
+              let status = "none";
+              let statusType = "none";
+              if (cur) {
+                status = cur.status;
+              } else {
+                if (this._history.isRepo) {
+                  status = "committed";
+                }
+              }
 
               return new Promise((resolve, reject) => {
                 fs.stat(`${this._path}${file}`, (err, stats) => {
@@ -47,38 +54,24 @@ export default class Client {
                   );
 
                   if (err) {
-                    this._files.push({
-                      type: "unknown",
-                      name: file,
-                      initialized: false,
-                      status: undefined,
-                      statusType: undefined,
-                    });
+                    this._files.push(
+                      new File("unknown", file, false, status, statusType)
+                    );
                   } else {
                     if (stats.isDirectory()) {
-                      this._files.push({
-                        type: "directory",
-                        name: file,
-                        initialized: isAlreadyInit,
-                        status: cur
-                          ? cur.status
-                          : this._history.isRepo
-                          ? "committed"
-                          : undefined,
-                        statusType: cur ? cur.type : undefined,
-                      });
+                      this._files.push(
+                        new File(
+                          "directory",
+                          file,
+                          isAlreadyInit,
+                          status,
+                          statusType
+                        )
+                      );
                     } else {
-                      this._files.push({
-                        type: "file",
-                        name: file,
-                        initialized: false,
-                        status: cur
-                          ? cur.status
-                          : this._history.isRepo
-                          ? "committed"
-                          : undefined,
-                        statusType: cur ? cur.type : undefined,
-                      });
+                      this._files.push(
+                        new File("file", file, false, status, statusType)
+                      );
                     }
                   }
                   resolve();
@@ -136,154 +129,6 @@ export default class Client {
     }
 
     return true;
-  };
-
-  gitInit = (path) => {
-    return new Promise((resolve, reject) => {
-      const child = spawn("git", ["init"], { cwd: path });
-
-      child.on("exit", (code, signal) => {
-        if (code === 0) {
-          resolve("git init 성공!");
-        } else {
-          reject(`git init 실패. code: ${code}, signal: ${signal}`);
-        }
-      });
-
-      child.on("error", (error) => {
-        reject(`git init 실행 중 오류 발생: ${error}`);
-      });
-    });
-  };
-
-  gitAdd = (fileName) => {
-    return new Promise((resolve, reject) => {
-      const child = spawn("git", ["add", fileName], { cwd: this._path });
-
-      child.on("exit", (code, signal) => {
-        if (code === 0) {
-          resolve(`git add ${fileName} 성공!`);
-        } else {
-          reject(`git add ${fileName} 실패. code: ${code}, signal: ${signal}`);
-        }
-      });
-
-      child.on("error", (error) => {
-        reject(`git add ${fileName} 실행 중 오류 발생: ${error}`);
-      });
-    });
-  };
-
-  gitRestore = (fileName, staged) => {
-    return new Promise((resolve, reject) => {
-      const command = staged ? ["restore", "--staged"] : ["restore"];
-      const args = [...command, fileName];
-
-      const child = spawn("git", args, { cwd: this._path });
-
-      child.on("exit", (code, signal) => {
-        if (code === 0) {
-          const message = `git ${command.join(" ")} ${fileName} 성공!`;
-          resolve(message);
-        } else {
-          const errorMessage = `git ${command.join(
-            " "
-          )} ${fileName} 실패. code: ${code}, signal: ${signal}`;
-          reject(errorMessage);
-        }
-      });
-
-      child.on("error", (error) => {
-        console.log("something wrong");
-        reject(`git ${command.join(" ")} 실행 중 오류 발생: ${error}`);
-      });
-    });
-  };
-
-  gitRemove = (fileName, staged) => {
-    return new Promise((resolve, reject) => {
-      const command = staged ? ["rm", "--cached"] : ["rm"];
-      const args = [...command, fileName];
-
-      const child = spawn("git", args, { cwd: this._path });
-
-      child.on("exit", (code, signal) => {
-        if (code === 0) {
-          const message = `git ${command.join(" ")} ${fileName} 성공!`;
-          resolve(message);
-        } else {
-          const errorMessage = `git ${command.join(
-            " "
-          )} ${fileName} 실패. code: ${code}, signal: ${signal}`;
-          reject(errorMessage);
-        }
-      });
-
-      child.on("error", (error) => {
-        console.log("something wrong");
-        reject(`git ${command.join(" ")} 실행 중 오류 발생: ${error}`);
-      });
-    });
-  };
-
-  gitMove = (oldFileName, newFileName) => {
-    return new Promise((resolve, reject) => {
-      const args = ["mv", oldFileName, newFileName];
-
-      const child = spawn("git", args, { cwd: this._path });
-
-      child.on("exit", (code, signal) => {
-        if (code === 0) {
-          resolve(`git mv ${oldFileName} ${newFileName} 성공!`);
-        } else {
-          reject(
-            `git mv ${oldFileName} ${newFileName} 실패. code: ${code}, signal: ${signal}`
-          );
-        }
-      });
-
-      child.on("error", (error) => {
-        console.log("something wrong");
-        reject(
-          `git mv ${oldFileName} ${newFileName} 실행 중 오류 발생: ${error}`
-        );
-      });
-    });
-  };
-
-  gitStatus = (path) => {
-    const repoDir = path; // the directory where you want to run `git status`
-
-    // Check if the directory exists
-    if (!fs.existsSync(repoDir)) {
-      return Promise.reject(`Error: ${repoDir} does not exist`);
-    }
-
-    return new Promise((resolve, reject) => {
-      // Spawn the `git status` command
-      const child = spawn("git", ["status"], { cwd: repoDir });
-
-      let stdout = "";
-      let stderr = "";
-
-      // Log any output from the command to the console
-      child.stdout.on("data", (data) => {
-        stdout += data;
-      });
-
-      child.stderr.on("data", (data) => {
-        stderr += data;
-      });
-
-      // Log the exit code when the command has finished running
-      child.on("close", (code) => {
-        if (code !== 0) {
-          reject(`child process exited with code ${code}\n${stderr}`);
-        } else {
-          resolve(stdout);
-        }
-      });
-    });
   };
 
   updateStatus(statusLog) {

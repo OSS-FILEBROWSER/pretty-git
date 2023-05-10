@@ -7,7 +7,15 @@ import path from "path";
 //직접 작성한 모듈이나 클래스를 import하려면, 꼭 .js 확장자를 붙여줘야함.
 import Client from "./classes/Client.js";
 import History from "./classes/History.js";
-import { getFilesInCurrentDir } from "./modules/createGitRepo.js";
+import {
+  gitAdd,
+  gitInit,
+  gitMove,
+  gitRemove,
+  gitRestore,
+  gitStatus,
+} from "./modules/gitCommand.js";
+
 //환경변수 설정
 dotenv.config();
 //환경변수
@@ -36,8 +44,7 @@ app.get("/", async (req, res) => {
 
   //레포일 경우 status 업데이트
   if (user.isRepo) {
-    user
-      .gitStatus(user.path)
+    gitStatus(user.path)
       .then((data) => {
         user.updateStatus(data);
         user.checkIgnores(user.isRepo);
@@ -83,8 +90,7 @@ app.get("/dirs/backward", (req, res) => {
 });
 
 app.post("/dirs/git/init", (req, res) => {
-  user
-    .gitInit(user.path + `${req.body.dirName}/`)
+  gitInit(user.path + `${req.body.dirName}/`)
     .then((result) => {
       res.send(result);
     })
@@ -104,8 +110,7 @@ app.get("/dirs/git/status", (req, res) => {
 app.post("/dirs/git/add", (req, res) => {
   const filePath = req.body.filePath;
 
-  user
-    .gitAdd(filePath)
+  gitAdd(filePath, user.path)
     .then((result) => {
       res.send(result);
     })
@@ -117,8 +122,7 @@ app.post("/dirs/git/add", (req, res) => {
 app.post("/dirs/git/restore/:staged", (req, res) => {
   const fileName = req.body.fileName;
   const staged = req.params.staged === "1";
-  user
-    .gitRestore(fileName, staged)
+  gitRestore(fileName, staged, user.path)
     .then((message) => {
       res.send(message);
     })
@@ -129,9 +133,9 @@ app.post("/dirs/git/restore/:staged", (req, res) => {
 
 app.post("/dirs/git/rm/:cached", (req, res) => {
   const fileName = req.body.fileName;
+  console.log(fileName);
   const staged2 = req.params.cached === "1";
-  user
-    .gitRemove(fileName, staged2)
+  gitRemove(fileName, staged2, user.path)
     .then((message) => {
       res.send(message);
     })
@@ -144,8 +148,7 @@ app.post("/dirs/git/mv", (req, res) => {
   const oldFileName = req.body.oldFileName;
   const newFileName = req.body.newFileName;
 
-  user
-    .gitMove(oldFileName, newFileName)
+  gitMove(oldFileName, newFileName, user.path)
     .then((message) => {
       res.send(message);
     })

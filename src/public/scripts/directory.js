@@ -134,7 +134,7 @@ directories.forEach((dir) => {
             onClick: async () => {
               try {
                 const response = await axios.post("/dirs/git/commit", {
-                  dirName: directoryName,
+                  fileName: directoryName,
                 });
                 window.location.href = "/";
               } catch (error) {
@@ -154,7 +154,7 @@ directories.forEach((dir) => {
             onClick: async () => {
               try {
                 const response = await axios.post("/dirs/git/rm/0", {
-                  dirName: directoryName,
+                  fileName: directoryName,
                 });
                 window.location.href = "/";
               } catch (error) {
@@ -168,7 +168,7 @@ directories.forEach((dir) => {
             onClick: async () => {
               try {
                 const response = await axios.post("/dirs/git/rm/1", {
-                  dirName: directoryName,
+                  fileName: directoryName,
                 });
                 window.location.href = "/";
               } catch (error) {
@@ -182,7 +182,7 @@ directories.forEach((dir) => {
             onClick: async () => {
               try {
                 const response = await axios.post("/dirs/git/mv", {
-                  dirName: directoryName,
+                  fileName: directoryName,
                 });
                 window.location.href = "/";
               } catch (error) {
