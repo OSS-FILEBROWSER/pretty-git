@@ -134,9 +134,72 @@ function render() {
 }
 
 function handleModal() {
-  const temp = document.querySelectorAll(".status-item.staged");
+  const untrackedItem = document.querySelectorAll("div.status-item.untracked ul li");
+  const modifiedItem = document.querySelectorAll("div.status-item.modified ul li");
+  const stagedItem = document.querySelectorAll("div.status-item.staged ul li");
 
-  temp.forEach((item) => {
+  untrackedItem.forEach((item) => {
+    item.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+
+      const ctxMenu = document.createElement("div");
+  
+      ctxMenu.id = "context-menu";
+      ctxMenu.className = "custom-context-menu";
+  
+      //위치 설정
+      ctxMenu.style.top = event.pageY;
+      ctxMenu.style.left = event.pageX;
+
+      // ctxMenu.appendChild(
+      //   renderContextMenuList([
+      //     {
+      //       //구현
+      //     }
+      //   ])
+      // )
+      // 이전 Element 삭제
+      const prevCtxMenu = document.getElementById("context-menu");
+      if (prevCtxMenu) {
+        prevCtxMenu.remove();
+      }
+      // document.body.appendChild(ctxMenu);
+      item.appendChild(ctxMenu);
+    })
+  })
+
+  modifiedItem.forEach((item) => {
+    item.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+
+      const ctxMenu = document.createElement("div");
+  
+      ctxMenu.id = "context-menu";
+      ctxMenu.className = "custom-context-menu";
+  
+      //위치 설정
+      ctxMenu.style.top = event.pageY;
+      ctxMenu.style.left = event.pageX;
+
+      // ctxMenu.appendChild(
+      //   renderContextMenuList([
+      //     {
+      //       //구현
+      //     }
+      //   ])
+      // )
+
+      // 이전 Element 삭제
+      const prevCtxMenu = document.getElementById("context-menu");
+      if (prevCtxMenu) {
+        prevCtxMenu.remove();
+      }
+      // document.body.appendChild(ctxMenu);
+      item.appendChild(ctxMenu);
+    })
+  })
+
+  stagedItem.forEach((item) => {
     item.addEventListener("contextmenu", (event) => {
       event.preventDefault();
   
@@ -146,9 +209,9 @@ function handleModal() {
       ctxMenu.className = "custom-context-menu";
   
       //위치 설정
-      ctxMenu.style.top = event.pageY + "px";
-      ctxMenu.style.left = event.pageX + "px";
-  
+      ctxMenu.style.top = event.pageY;
+      ctxMenu.style.left = event.pageX;
+      
       ctxMenu.appendChild(
         renderContextMenuList([
           {
@@ -168,16 +231,16 @@ function handleModal() {
             },
           },
         ])
-      );
+      )
+      // 이전 Element 삭제
+      const prevCtxMenu = document.getElementById("context-menu");
+      if (prevCtxMenu) {
+        prevCtxMenu.remove();
+      }
+      // document.body.appendChild(ctxMenu);
+      item.appendChild(ctxMenu);
     })
   })
-
-  // 이전 Element 삭제
-  const prevCtxMenu = document.getElementById("context-menu");
-  if (prevCtxMenu) {
-    prevCtxMenu.remove();
-  }
-
-  // Body에 Context Menu를 추가.
-  // temp2.appendChild(ctxMenu);
 }
+
+gitStatusModal.addEventListener("show.bs.modal", handleModal);

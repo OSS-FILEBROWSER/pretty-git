@@ -330,9 +330,10 @@ input[type="reset"] {
   padding: 0;
 }
 
-.status-item ul li {
+.status-item-ul-li {
   font-size: 14px;
   line-height: 1.5;
+  margin-top: 3px;
   overflow-wrap: break-word;
 }
 
