@@ -142,6 +142,8 @@ function handleModal() {
     item.addEventListener("contextmenu", (event) => {
       event.preventDefault();
 
+      const directoryName = item.textContent;
+
       const ctxMenu = document.createElement("div");
   
       ctxMenu.id = "context-menu";
@@ -151,13 +153,25 @@ function handleModal() {
       ctxMenu.style.top = event.pageY;
       ctxMenu.style.left = event.pageX;
 
-      // ctxMenu.appendChild(
-      //   renderContextMenuList([
-      //     {
-      //       //구현
-      //     }
-      //   ])
-      // )
+      ctxMenu.appendChild(
+        renderContextMenuList([
+          {
+            label: "git add",
+            onClick: async () => {
+              try {
+                const response = await axios.post("/dirs/git/add", {
+                  filePath: directoryName,
+                });
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                alert("something gone wrong while processing git add");
+              }
+            },
+          }
+        ])
+      )
+
       // 이전 Element 삭제
       const prevCtxMenu = document.getElementById("context-menu");
       if (prevCtxMenu) {
@@ -172,6 +186,8 @@ function handleModal() {
     item.addEventListener("contextmenu", (event) => {
       event.preventDefault();
 
+      const directoryName = item.textContent;
+
       const ctxMenu = document.createElement("div");
   
       ctxMenu.id = "context-menu";
@@ -181,13 +197,38 @@ function handleModal() {
       ctxMenu.style.top = event.pageY;
       ctxMenu.style.left = event.pageX;
 
-      // ctxMenu.appendChild(
-      //   renderContextMenuList([
-      //     {
-      //       //구현
-      //     }
-      //   ])
-      // )
+      ctxMenu.appendChild(
+        renderContextMenuList([
+          {
+            label: "git add",
+            onClick: async () => {
+              try {
+                const response = await axios.post("/dirs/git/add", {
+                  filePath: directoryName,
+                });
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                alert("something gone wrong while processing git init");
+              }
+            },
+          },
+          {
+            label: "git restore",
+            onClick: async () => {
+              try {
+                const response = await axios.post("/dirs/git/restore/0", {
+                  fileName: directoryName,
+                });
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                alert("something gone wrong while processing git restore");
+              }
+            },
+          },
+        ])
+      )
 
       // 이전 Element 삭제
       const prevCtxMenu = document.getElementById("context-menu");
@@ -202,6 +243,8 @@ function handleModal() {
   stagedItem.forEach((item) => {
     item.addEventListener("contextmenu", (event) => {
       event.preventDefault();
+
+      const directoryName = item.textContent;
   
       const ctxMenu = document.createElement("div");
   
@@ -227,6 +270,22 @@ function handleModal() {
                 alert(
                   "something gone wrong while processing git restore --staged"
                 );
+              }
+            },
+          },
+          {
+            label: "git commit",
+            onClick: async () => {
+              try {
+                const commitText = prompt("commit message 입력");
+                const response = await axios.post("/dirs/git/commit", {
+                  fileName: directoryName,
+                  commitMessage: commitText
+                });
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                alert("something gone wrong while processing git commit");
               }
             },
           },
