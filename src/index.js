@@ -7,7 +7,7 @@ import path from "path";
 //직접 작성한 모듈이나 클래스를 import하려면, 꼭 .js 확장자를 붙여줘야함.
 import Client from "./classes/Client.js";
 import History from "./classes/History.js";
-import { getFilesInCurrentDir } from "./modules/createGitRepo.js";
+
 //환경변수 설정
 dotenv.config();
 //환경변수
