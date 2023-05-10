@@ -101,6 +101,10 @@ app.get("/dirs/git/status", (req, res) => {
   res.json({ files: user.gitFiles, isRepo: user.isRepo });
 });
 
+app.get("/dirs/files", (req, res) => {
+  res.send(user.gitFiles);
+})
+
 app.post("/dirs/git/add", (req, res) => {
   const filePath = req.body.filePath;
 

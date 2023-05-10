@@ -101,26 +101,69 @@ function render() {
   stagedList.innerHTML = "";
   // committedList.innerHTML = "";
 
-  untracked.forEach((fileName) => {
-    const li = document.createElement("li");
-    li.textContent = fileName;
-    // li.setAttribute("draggable", "true");
-    untrackedList.appendChild(li);
+  //각각의 상태에 대한 임시 저장 배열들
+  const untrackedT = [];
+  const modifiedT = [];
+  const stagedT = [];
+  
+  axios.get("/dirs/files").then((res) => {
+    //api로부터 받아온 파일 정보
+    const files = res.data;
+
+    for (let file of files) {
+      const li = document.createElement("li");
+      switch (file.status) {
+        case "untracked":
+          if(file.type) {
+            li.textContent = file.name + '(' + file.type + ')';
+            untrackedList.appendChild(li);
+          } else {
+            li.textContent = file.name;
+            untrackedList.appendChild(li);
+          }
+          break;
+        case "staged":
+          if(file.type) {
+            li.textContent = file.name + '(' + file.type + ')';
+            stagedList.appendChild(li);
+          } else {
+            li.textContent = file.name;
+            stagedList.appendChild(li);
+          }
+          break;
+        case "modified":
+          if(file.type) {
+            li.textContent = file.name + '(' + file.type + ')';
+            modifiedList.appendChild(li);
+          } else {
+            li.textContent = file.name;
+            modifiedList.appendChild(li);
+          }
+          break;
+      }
+    }
   });
 
-  modified.forEach((fileName) => {
-    const li = document.createElement("li");
-    li.textContent = fileName;
-    // li.setAttribute("draggable", "true");
-    modifiedList.appendChild(li);
-  });
+  // untracked.forEach((fileName) => {
+  //   const li = document.createElement("li");
+  //   li.textContent = fileName;
+  //   // li.setAttribute("draggable", "true");
+  //   untrackedList.appendChild(li);
+  // });
 
-  staged.forEach((fileName) => {
-    const li = document.createElement("li");
-    li.textContent = fileName;
-    // li.setAttribute("draggable", "true");
-    stagedList.appendChild(li);
-  });
+  // modified.forEach((fileName) => {
+  //   const li = document.createElement("li");
+  //   li.textContent = fileName;
+  //   // li.setAttribute("draggable", "true");
+  //   modifiedList.appendChild(li);
+  // });
+
+  // staged.forEach((fileName) => {
+  //   const li = document.createElement("li");
+  //   li.textContent = fileName;
+  //   // li.setAttribute("draggable", "true");
+  //   stagedList.appendChild(li);
+  // });
 
   // committed.forEach((fileName) => {
   //   const li = document.createElement("li");
