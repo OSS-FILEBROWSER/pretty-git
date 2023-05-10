@@ -7,14 +7,15 @@
     box-shadow: 0 0 1px 2px lightgrey;
   }
   
-  .custom-context-menu ul {
+  .custom-context-menu-ul {
     list-style: none;
     padding: 0;
     background-color: transparent;
   }
   
-  .custom-context-menu li {
+  .custom-context-menu-li {
     padding: 3px 5px;
+    margin-top: 5px;
     cursor: pointer;
   }
   

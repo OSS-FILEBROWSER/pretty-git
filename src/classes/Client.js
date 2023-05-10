@@ -1,10 +1,12 @@
 import fs from "fs";
-import path from "path";
+// import path from "path";
 import { spawn } from "child_process";
 import { minimatch } from "minimatch";
+import path, { resolve } from "path";
 //class import
 import History from "./History.js";
 import File from "./File.js"; // 기존에 객체로 생성하던 파일을, 클래스로 분리
+
 export default class Client {
   constructor() {
     this._branch = undefined;
@@ -190,7 +192,11 @@ export default class Client {
   checkIgnores(isRepo) {
     if (isRepo && this._ignoreList.length == 0) {
       //1. gitignore parsing
-      this._ignoreList = this.parseGitIgnore(`${this._repoSrc}/.gitignore`);
+      try {
+        this._ignoreList = this.parseGitIgnore(`${this._repoSrc}.gitignore`);
+      } catch (error) {
+        console.log("No gitignore file inside this repo");
+      }
     }
 
     if (this._ignoreList.length != 0) {

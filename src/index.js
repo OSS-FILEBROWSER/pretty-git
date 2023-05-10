@@ -47,12 +47,12 @@ app.get("/", async (req, res) => {
     gitStatus(user.path)
       .then((data) => {
         user.updateStatus(data);
-        user.checkIgnores(user.isRepo);
       })
       .catch((err) => console.log(err));
   }
 
   const files = await user.getFilesInCurrentDir();
+  user.checkIgnores(user.isRepo);
 
   res.render("index", {
     title: "Pretty git, Make Your git usage Fancy",
@@ -111,6 +111,19 @@ app.post("/dirs/git/add", (req, res) => {
   const filePath = req.body.filePath;
 
   gitAdd(filePath, user.path)
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
+});
+
+app.post("/dirs/git/commit", (req, res) => {
+  const fileName = req.body.fileName;
+  const commitMessage = req.body.commitMessage;
+  user
+    .gitCommit(fileName, commitMessage)
     .then((result) => {
       res.send(result);
     })

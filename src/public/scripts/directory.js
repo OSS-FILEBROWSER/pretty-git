@@ -133,8 +133,10 @@ directories.forEach((dir) => {
             label: "git commit",
             onClick: async () => {
               try {
+                const commitText = prompt("commit message 입력");
                 const response = await axios.post("/dirs/git/commit", {
                   fileName: directoryName,
+                  commitMessage: commitText,
                 });
                 window.location.href = "/";
               } catch (error) {
@@ -181,10 +183,15 @@ directories.forEach((dir) => {
             label: "git mv",
             onClick: async () => {
               try {
+                const input = prompt("바꿀 이름은?");
+                const currentName = dir.querySelector(".directory-name");
                 const response = await axios.post("/dirs/git/mv", {
-                  fileName: directoryName,
+                  oldFileName: directoryName,
+                  newFileName: input,
                 });
+
                 window.location.href = "/";
+                currentName.textContent = input;
               } catch (error) {
                 console.log(error);
                 alert("something gone wrong while processing git mv");
@@ -242,13 +249,15 @@ function handleClearContextMenu(event) {
 function renderContextMenuList(list) {
   // List Element 생성
   const ctxMenuList = document.createElement("ul");
-
+  ctxMenuList.className = "custom-context-menu-ul";
   // List Item 생성
   list.forEach(function (item) {
     // Item Element 생성
     const ctxMenuItem = document.createElement("li");
     const ctxMenuItemAnchor = document.createElement("a");
     const ctxMenuItemAnchorText = document.createTextNode(item.label);
+
+    ctxMenuItem.className = "custom-context-menu-li";
 
     // 클릭 이벤트 설정
     if (item.onClick) {
@@ -278,7 +287,7 @@ openModalButton.addEventListener("click", () => {
   axios.get("/dirs/git/status").then((res) => {
     //api로부터 받아온 파일 정보
     const files = res.data.files;
-    console.log(files);
+
     //각각의 상태에 대한 임시 저장 배열들
     const untrackedT = [];
     const modifiedT = [];
