@@ -114,18 +114,18 @@ const gitMove = (oldFileName, newFileName, curPath) => {
   });
 };
 
-const gitCommit = (fileName, commitMessage, userPath) => {
+const gitCommit = (commitMessage, userPath) => {
   return new Promise((resolve, reject) => {
-    const args = ["commit", "-m", commitMessage, fileName];
+    const args = ["commit", "-m", commitMessage];
 
     const child = spawn("git", args, { cwd: userPath });
 
     child.on("exit", (code, signal) => {
       if (code === 0) {
-        const message = `git commit ${fileName} 성공!`;
+        const message = `git commit  성공!`;
         resolve(message);
       } else {
-        const error = `git commit ${fileName} 실패. code: ${code}, signal: ${signal}`;
+        const error = `git commit 실패. code: ${code}, signal: ${signal}`;
         reject(error);
       }
     });

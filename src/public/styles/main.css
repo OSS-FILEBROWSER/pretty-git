@@ -379,3 +379,20 @@ input[type="reset"] {
 .hidden {
   display: none;
 }
+
+.commit-button {
+  position: absolute;
+  top: 30px;
+  right: 20px;
+  font-weight: 700;
+  font-size: 20px;
+  border-radius: 15px;
+  border: 2px solid black;
+  width: 150px;
+  padding: 5px 5px;
+  transition: all 0.3s;
+}
+
+.commit-button:hover {
+  background-color: rgba(133, 120, 120, 0.2);
+}
