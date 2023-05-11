@@ -13,7 +13,7 @@ let modified = [];
 let staged = [];
 let committed = [];
 
-directories.forEach((dir) => {
+directories.forEach(async (dir) => {
   const imageContainer = dir.querySelector(".file-image-container");
   const imageSrc = imageContainer.querySelector("img").src;
   const statusString = imageSrc.split("/")[4].split(".")[0];
@@ -43,17 +43,18 @@ directories.forEach((dir) => {
   });
 
   //특정 상태에 대해서는 context menu를 띄우지 않음
+  const isTracked = await axios.get("/dirs/git/isTracked");
   if (
     statusString != "ignored" &&
     statusString != "folder" &&
-    statusString != "documents"
+    statusString != "documents" &&
+    isTracked.data != "untracked"
   ) {
     dir.addEventListener("contextmenu", (event) => {
       // 기본 Context Menu가 나오지 않게 차단
       event.preventDefault();
 
       const directoryName = dir.childNodes[2].innerHTML;
-
       const ctxMenu = document.createElement("div");
 
       ctxMenu.id = "context-menu";
