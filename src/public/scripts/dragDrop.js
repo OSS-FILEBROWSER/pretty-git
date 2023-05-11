@@ -15,12 +15,12 @@ render();
 //   modifiedList.addEventListener("dragover", (e) => {
 //     e.preventDefault();
 //   });
-  
+
 //   modifiedList.addEventListener("drop", (e) => {
 //     e.preventDefault();
 //     const fileName = e.dataTransfer.getData("text/plain");
 //     modified.push(fileName);
-    
+
 //     const index = untracked.indexOf(fileName);
 //     untracked.splice(index, 1);
 
@@ -43,69 +43,65 @@ function addDragListeners(list, state) {
   });
 }
 
-function handleDragDrop() {
-  addDragListeners(untrackedList, untracked);
-  addDragListeners(modifiedList, modified);
-  addDragListeners(stagedList, staged);
-  // addDragListeners(committedList, committed);
+// function handleDragDrop() {
+//   addDragListeners(untrackedList, untracked);
+//   addDragListeners(modifiedList, modified);
+//   addDragListeners(stagedList, staged);
+//   // addDragListeners(committedList, committed);
 
-  modifiedList.addEventListener("dragover", (e) => {
-    e.preventDefault();
-  });
+//   modifiedList.addEventListener("dragover", (e) => {
+//     e.preventDefault();
+//   });
 
-  modifiedList.addEventListener("drop", (e) => {
-    e.preventDefault();
-    const fileName = e.dataTransfer.getData("text/plain");
-    modified.push(fileName);
+//   modifiedList.addEventListener("drop", (e) => {
+//     e.preventDefault();
+//     const fileName = e.dataTransfer.getData("text/plain");
+//     modified.push(fileName);
 
-    const index = untracked.indexOf(fileName);
-    untracked.splice(index, 1);
+//     const index = untracked.indexOf(fileName);
+//     untracked.splice(index, 1);
 
-    //untrackedList에서 옮겨진 li 태그를 삭제
-    const liToDelete = untrackedList.querySelector(`li:nth-child(${index + 1})`);
-    untrackedList.removeChild(liToDelete);
+//     //untrackedList에서 옮겨진 li 태그를 삭제
+//     const liToDelete = untrackedList.querySelector(
+//       `li:nth-child(${index + 1})`
+//     );
+//     untrackedList.removeChild(liToDelete);
 
-    untrackedList.querySelectorAll("li").forEach((li, i) => {
-      li.dataset.index = i;
-    });
+//     untrackedList.querySelectorAll("li").forEach((li, i) => {
+//       li.dataset.index = i;
+//     });
 
-    render();
-  });
+//     render();
+//   });
 
-  // stagedList.addEventListener("dragover", (e) => {
-  //   e.preventDefault();
-  // });
+//   // stagedList.addEventListener("dragover", (e) => {
+//   //   e.preventDefault();
+//   // });
 
-  // stagedList.addEventListener("drop", (e) => {
-  //   e.preventDefault();
-  //   const fileName = e.dataTransfer.getData("text/plain");
-  //   staged.push(fileName);
+//   // stagedList.addEventListener("drop", (e) => {
+//   //   e.preventDefault();
+//   //   const fileName = e.dataTransfer.getData("text/plain");
+//   //   staged.push(fileName);
 
-  //   const index = modified.indexOf(fileName);
-  //   modified.splice(index, 1);
+//   //   const index = modified.indexOf(fileName);
+//   //   modified.splice(index, 1);
 
-  //   const liToDelete = modifiedList.querySelector(`li:nth-child(${index + 1})`);
-  //   modifiedList.removeChild(liToDelete);
+//   //   const liToDelete = modifiedList.querySelector(`li:nth-child(${index + 1})`);
+//   //   modifiedList.removeChild(liToDelete);
 
-  //   modifiedList.querySelectorAll("li").forEach((li, i) => {
-  //     li.dataset.index = i;
-  //   });
+//   //   modifiedList.querySelectorAll("li").forEach((li, i) => {
+//   //     li.dataset.index = i;
+//   //   });
 
-  //   render();
-  // });
-}
+//   //   render();
+//   // });
+// }
 
 function render() {
   untrackedList.innerHTML = "";
   modifiedList.innerHTML = "";
   stagedList.innerHTML = "";
-  // committedList.innerHTML = "";
 
-  //각각의 상태에 대한 임시 저장 배열들
-  const untrackedT = [];
-  const modifiedT = [];
-  const stagedT = [];
-  
   axios.get("/dirs/files").then((res) => {
     //api로부터 받아온 파일 정보
     const files = res.data;
@@ -114,8 +110,8 @@ function render() {
       const li = document.createElement("li");
       switch (file.status) {
         case "untracked":
-          if(file.type) {
-            li.textContent = file.name + '(' + file.type + ')';
+          if (file.type) {
+            li.textContent = file.name + "(" + file.type + ")";
             untrackedList.appendChild(li);
           } else {
             li.textContent = file.name;
@@ -123,8 +119,9 @@ function render() {
           }
           break;
         case "staged":
-          if(file.type) {
-            li.textContent = file.name + '(' + file.type + ')';
+          if (file.type) {
+            console.log(file.type);
+            li.textContent = file.name + "(" + file.type + ")";
             stagedList.appendChild(li);
           } else {
             li.textContent = file.name;
@@ -132,8 +129,8 @@ function render() {
           }
           break;
         case "modified":
-          if(file.type) {
-            li.textContent = file.name + '(' + file.type + ')';
+          if (file.type) {
+            li.textContent = file.name + "(" + file.type + ")";
             modifiedList.appendChild(li);
           } else {
             li.textContent = file.name;
@@ -143,42 +140,16 @@ function render() {
       }
     }
   });
-
-  // untracked.forEach((fileName) => {
-  //   const li = document.createElement("li");
-  //   li.textContent = fileName;
-  //   // li.setAttribute("draggable", "true");
-  //   untrackedList.appendChild(li);
-  // });
-
-  // modified.forEach((fileName) => {
-  //   const li = document.createElement("li");
-  //   li.textContent = fileName;
-  //   // li.setAttribute("draggable", "true");
-  //   modifiedList.appendChild(li);
-  // });
-
-  // staged.forEach((fileName) => {
-  //   const li = document.createElement("li");
-  //   li.textContent = fileName;
-  //   // li.setAttribute("draggable", "true");
-  //   stagedList.appendChild(li);
-  // });
-
-  // committed.forEach((fileName) => {
-  //   const li = document.createElement("li");
-  //   li.textContent = fileName;
-  //   li.setAttribute("draggable", "true");
-  //   committedList.appendChild(li);
-  // });
-
-  // handleDragDrop();
   handleModal();
 }
 
 function handleModal() {
-  const untrackedItem = document.querySelectorAll("div.status-item.untracked ul li");
-  const modifiedItem = document.querySelectorAll("div.status-item.modified ul li");
+  const untrackedItem = document.querySelectorAll(
+    "div.status-item.untracked ul li"
+  );
+  const modifiedItem = document.querySelectorAll(
+    "div.status-item.modified ul li"
+  );
   const stagedItem = document.querySelectorAll("div.status-item.staged ul li");
 
   untrackedItem.forEach((item) => {
@@ -188,10 +159,10 @@ function handleModal() {
       const directoryName = item.textContent;
 
       const ctxMenu = document.createElement("div");
-  
+
       ctxMenu.id = "context-menu";
       ctxMenu.className = "custom-context-menu";
-  
+
       //위치 설정
       ctxMenu.style.top = event.pageY;
       ctxMenu.style.left = event.pageX;
@@ -211,9 +182,9 @@ function handleModal() {
                 alert("something gone wrong while processing git add");
               }
             },
-          }
+          },
         ])
-      )
+      );
 
       // 이전 Element 삭제
       const prevCtxMenu = document.getElementById("context-menu");
@@ -222,8 +193,8 @@ function handleModal() {
       }
       // document.body.appendChild(ctxMenu);
       item.appendChild(ctxMenu);
-    })
-  })
+    });
+  });
 
   modifiedItem.forEach((item) => {
     item.addEventListener("contextmenu", (event) => {
@@ -232,10 +203,10 @@ function handleModal() {
       const directoryName = item.textContent;
 
       const ctxMenu = document.createElement("div");
-  
+
       ctxMenu.id = "context-menu";
       ctxMenu.className = "custom-context-menu";
-  
+
       //위치 설정
       ctxMenu.style.top = event.pageY;
       ctxMenu.style.left = event.pageX;
@@ -271,7 +242,7 @@ function handleModal() {
             },
           },
         ])
-      )
+      );
 
       // 이전 Element 삭제
       const prevCtxMenu = document.getElementById("context-menu");
@@ -280,24 +251,24 @@ function handleModal() {
       }
       // document.body.appendChild(ctxMenu);
       item.appendChild(ctxMenu);
-    })
-  })
+    });
+  });
 
   stagedItem.forEach((item) => {
     item.addEventListener("contextmenu", (event) => {
       event.preventDefault();
 
       const directoryName = item.textContent;
-  
+
       const ctxMenu = document.createElement("div");
-  
+
       ctxMenu.id = "context-menu";
       ctxMenu.className = "custom-context-menu";
-  
+
       //위치 설정
       ctxMenu.style.top = event.pageY;
       ctxMenu.style.left = event.pageX;
-      
+
       ctxMenu.appendChild(
         renderContextMenuList([
           {
@@ -323,7 +294,7 @@ function handleModal() {
                 const commitText = prompt("commit message 입력");
                 const response = await axios.post("/dirs/git/commit", {
                   fileName: directoryName,
-                  commitMessage: commitText
+                  commitMessage: commitText,
                 });
                 window.location.href = "/";
               } catch (error) {
@@ -333,7 +304,7 @@ function handleModal() {
             },
           },
         ])
-      )
+      );
       // 이전 Element 삭제
       const prevCtxMenu = document.getElementById("context-menu");
       if (prevCtxMenu) {
@@ -341,8 +312,8 @@ function handleModal() {
       }
       // document.body.appendChild(ctxMenu);
       item.appendChild(ctxMenu);
-    })
-  })
+    });
+  });
 }
 
 gitStatusModal.addEventListener("show.bs.modal", handleModal);

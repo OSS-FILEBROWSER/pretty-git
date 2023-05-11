@@ -361,11 +361,19 @@ input[type="reset"] {
   padding: 0;
 }
 
-.status-item-ul-li {
+.status-item ul li {
   font-size: 14px;
   line-height: 1.5;
   margin-top: 3px;
   overflow-wrap: break-word;
+  font-weight: 700;
+  pointer-events: auto;
+  border-bottom: 1px solid rgba(133, 120, 120, 0.2);
+}
+
+.status-item ul li:hover {
+  background-color: #f0f0f0;
+  border-radius: 10px;
 }
 
 .hidden {

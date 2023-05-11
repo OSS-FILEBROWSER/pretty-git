@@ -108,7 +108,7 @@ app.get("/dirs/git/status", (req, res) => {
 });
 
 app.get("/dirs/files", (req, res) => {
-  res.send(user.files);
+  res.send(user.gitManager.gitFiles);
 });
 
 app.post("/dirs/git/add", async (req, res) => {
