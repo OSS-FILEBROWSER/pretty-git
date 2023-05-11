@@ -1,4 +1,5 @@
 import fs from "fs";
+import { minimatch } from "minimatch";
 //class import
 import History from "./History.js";
 import File from "./File.js"; // 기존에 객체로 생성하던 파일을, 클래스로 분리
@@ -8,7 +9,7 @@ export default class Client {
   constructor() {
     this._files = [];
     this._path = "/";
-    this._history = new History("/", false);
+    this._history = new History("/", false, "none");
     this._gitManager = new GitManager();
   }
 
@@ -25,7 +26,8 @@ export default class Client {
               let cur = null;
               //git status에서 파싱된 파일과 겹치는지 확인
               this._gitManager.gitFiles.forEach((item) => {
-                if (item.name == file) {
+                //디렉토리도 이름 체크를 위해, 단순 문자열 비교에서 정규표현식으로 변경
+                if (minimatch(item.name, file)) {
                   cur = item;
                 }
               });
@@ -33,11 +35,16 @@ export default class Client {
               //status 업데이트
               let status = "none";
               let statusType = "none";
+
               if (cur) {
                 status = cur.status;
               } else {
                 if (this._history.isRepo) {
-                  status = "committed";
+                  if (this._history.directoryStatus != "none") {
+                    status = this._history.directoryStatus;
+                  } else {
+                    status = "committed";
+                  }
                 }
               }
 
@@ -126,95 +133,6 @@ export default class Client {
     return true;
   };
 
-  // updateStatus(statusLog) {
-  //   this._gitFiles = [];
-  //   const lines = statusLog.toString().split("\n");
-
-  //   for (let i = 0; i < lines.length; i++) {
-  //     const line = lines[i].trim();
-
-  //     if (line.startsWith("On branch ")) {
-  //       this._branch = line.substring("On branch ".length).trim();
-  //     } else if (line.startsWith("Changes to be committed:")) {
-  //       i += 2; // Skip the next line, which is a header
-  //       while (i < lines.length && lines[i] != "") {
-  //         const info = lines[i].split(":");
-  //         const type = info[0].trim();
-  //         let name = info[1].trim();
-  //         //renamed 상태일때는 화살표 제거
-  //         if (type == "renamed") {
-  //           name = name.split("->")[1].trim();
-  //         }
-
-  //         this._gitFiles.push({ name: name, status: "staged", type: type });
-  //         i++;
-  //       }
-  //       i--; // Go back one line so we don't skip any lines
-  //     } else if (line.startsWith("Changes not staged for commit:")) {
-  //       i += 3; // Skip the next line, which is a header
-  //       while (i < lines.length && lines[i] != "") {
-  //         const info = lines[i].split(":");
-  //         const type = info[0].trim();
-  //         const name = info[1].trim();
-  //         this._gitFiles.push({ name: name, status: "modified", type: type });
-  //         i++;
-  //       }
-  //       i--; // Go back one line so we don't skip any lines
-  //     } else if (line.startsWith("Untracked files:")) {
-  //       i += 2; // Skip the next line, which is a header
-  //       while (i < lines.length && lines[i] != "") {
-  //         const file = lines[i].trim();
-  //         this._gitFiles.push({ name: file, status: "untracked", type: null });
-  //         i++;
-  //       }
-  //       i--; // Go back one line so we don't skip any lines
-  //     }
-  //   }
-  // }
-
-  // //gitignore파일 파싱
-  // parseGitIgnore(gitignorePath) {
-  //   const gitignoreContent = fs.readFileSync(gitignorePath, "utf8");
-  //   const ignorePatterns = gitignoreContent
-  //     .split("\n")
-  //     .filter((line) => line.trim() !== "" && !line.trim().startsWith("#"));
-
-  //   return ignorePatterns;
-  // }
-  // //ignored 인지 확인  - 정규표현식 매치 라이브러리
-  // checkIgnores(isRepo) {
-  //   if (isRepo && this._ignoreList.length == 0) {
-  //     //1. gitignore parsing
-  //     try {
-  //       this._ignoreList = this.parseGitIgnore(`${this._repoSrc}.gitignore`);
-  //     } catch (error) {
-  //       console.log("No gitignore file inside this repo");
-  //     }
-  //   }
-
-  //   if (this._ignoreList.length != 0) {
-  //     console.log("Starting to find an ignored file..");
-  //     console.log(this.repoSrc);
-  //     for (let ignorePattern of this._ignoreList) {
-  //       for (let file of this._files) {
-  //         let relativePath = path.relative(
-  //           this._repoSrc,
-  //           `${this._path}${file.name}`
-  //         );
-  //         if (file.type == "directory") {
-  //           relativePath = relativePath + "/";
-  //         }
-  //         const matchResult = minimatch(relativePath, ignorePattern);
-
-  //         if (matchResult == true) {
-  //           file.status = "ignored";
-  //           console.log(`${file.name} - ${file.status}`); // 성공적으로 ignored상태로 바뀌어진 파일들
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
-
   /**
    *
    * History 관련 멤버 함수
@@ -244,14 +162,6 @@ export default class Client {
     return this._history;
   }
 
-  // get gitFiles() {
-  //   return this._gitFiles;
-  // }
-
-  // set gitFiles(val) {
-  //   this._gitFiles = val;
-  // }
-
   get files() {
     return this._files;
   }
@@ -259,24 +169,4 @@ export default class Client {
   get gitManager() {
     return this._gitManager;
   }
-
-  // get branch() {
-  //   return this._branch;
-  // }
-
-  // get repoSrc() {
-  //   return this._repoSrc;
-  // }
-
-  // set repoSrc(val) {
-  //   this._repoSrc = val;
-  // }
-
-  // get ignoreList() {
-  //   return this._ignoreList;
-  // }
-
-  // set ignoreList(val) {
-  //   this._ignoreList = val;
-  // }
 }
