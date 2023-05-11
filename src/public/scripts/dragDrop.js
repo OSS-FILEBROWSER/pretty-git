@@ -101,26 +101,69 @@ function render() {
   stagedList.innerHTML = "";
   // committedList.innerHTML = "";
 
-  untracked.forEach((fileName) => {
-    const li = document.createElement("li");
-    li.textContent = fileName;
-    // li.setAttribute("draggable", "true");
-    untrackedList.appendChild(li);
+  //각각의 상태에 대한 임시 저장 배열들
+  const untrackedT = [];
+  const modifiedT = [];
+  const stagedT = [];
+  
+  axios.get("/dirs/files").then((res) => {
+    //api로부터 받아온 파일 정보
+    const files = res.data;
+
+    for (let file of files) {
+      const li = document.createElement("li");
+      switch (file.status) {
+        case "untracked":
+          if(file.type) {
+            li.textContent = file.name + '(' + file.type + ')';
+            untrackedList.appendChild(li);
+          } else {
+            li.textContent = file.name;
+            untrackedList.appendChild(li);
+          }
+          break;
+        case "staged":
+          if(file.type) {
+            li.textContent = file.name + '(' + file.type + ')';
+            stagedList.appendChild(li);
+          } else {
+            li.textContent = file.name;
+            stagedList.appendChild(li);
+          }
+          break;
+        case "modified":
+          if(file.type) {
+            li.textContent = file.name + '(' + file.type + ')';
+            modifiedList.appendChild(li);
+          } else {
+            li.textContent = file.name;
+            modifiedList.appendChild(li);
+          }
+          break;
+      }
+    }
   });
 
-  modified.forEach((fileName) => {
-    const li = document.createElement("li");
-    li.textContent = fileName;
-    // li.setAttribute("draggable", "true");
-    modifiedList.appendChild(li);
-  });
+  // untracked.forEach((fileName) => {
+  //   const li = document.createElement("li");
+  //   li.textContent = fileName;
+  //   // li.setAttribute("draggable", "true");
+  //   untrackedList.appendChild(li);
+  // });
 
-  staged.forEach((fileName) => {
-    const li = document.createElement("li");
-    li.textContent = fileName;
-    // li.setAttribute("draggable", "true");
-    stagedList.appendChild(li);
-  });
+  // modified.forEach((fileName) => {
+  //   const li = document.createElement("li");
+  //   li.textContent = fileName;
+  //   // li.setAttribute("draggable", "true");
+  //   modifiedList.appendChild(li);
+  // });
+
+  // staged.forEach((fileName) => {
+  //   const li = document.createElement("li");
+  //   li.textContent = fileName;
+  //   // li.setAttribute("draggable", "true");
+  //   stagedList.appendChild(li);
+  // });
 
   // committed.forEach((fileName) => {
   //   const li = document.createElement("li");
@@ -134,11 +177,117 @@ function render() {
 }
 
 function handleModal() {
-  const temp = document.querySelectorAll(".status-item.staged");
+  const untrackedItem = document.querySelectorAll("div.status-item.untracked ul li");
+  const modifiedItem = document.querySelectorAll("div.status-item.modified ul li");
+  const stagedItem = document.querySelectorAll("div.status-item.staged ul li");
 
-  temp.forEach((item) => {
+  untrackedItem.forEach((item) => {
     item.addEventListener("contextmenu", (event) => {
       event.preventDefault();
+
+      const directoryName = item.textContent;
+
+      const ctxMenu = document.createElement("div");
+  
+      ctxMenu.id = "context-menu";
+      ctxMenu.className = "custom-context-menu";
+  
+      //위치 설정
+      ctxMenu.style.top = event.pageY;
+      ctxMenu.style.left = event.pageX;
+
+      ctxMenu.appendChild(
+        renderContextMenuList([
+          {
+            label: "git add",
+            onClick: async () => {
+              try {
+                const response = await axios.post("/dirs/git/add", {
+                  filePath: directoryName,
+                });
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                alert("something gone wrong while processing git add");
+              }
+            },
+          }
+        ])
+      )
+
+      // 이전 Element 삭제
+      const prevCtxMenu = document.getElementById("context-menu");
+      if (prevCtxMenu) {
+        prevCtxMenu.remove();
+      }
+      // document.body.appendChild(ctxMenu);
+      item.appendChild(ctxMenu);
+    })
+  })
+
+  modifiedItem.forEach((item) => {
+    item.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+
+      const directoryName = item.textContent;
+
+      const ctxMenu = document.createElement("div");
+  
+      ctxMenu.id = "context-menu";
+      ctxMenu.className = "custom-context-menu";
+  
+      //위치 설정
+      ctxMenu.style.top = event.pageY;
+      ctxMenu.style.left = event.pageX;
+
+      ctxMenu.appendChild(
+        renderContextMenuList([
+          {
+            label: "git add",
+            onClick: async () => {
+              try {
+                const response = await axios.post("/dirs/git/add", {
+                  filePath: directoryName,
+                });
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                alert("something gone wrong while processing git init");
+              }
+            },
+          },
+          {
+            label: "git restore",
+            onClick: async () => {
+              try {
+                const response = await axios.post("/dirs/git/restore/0", {
+                  fileName: directoryName,
+                });
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                alert("something gone wrong while processing git restore");
+              }
+            },
+          },
+        ])
+      )
+
+      // 이전 Element 삭제
+      const prevCtxMenu = document.getElementById("context-menu");
+      if (prevCtxMenu) {
+        prevCtxMenu.remove();
+      }
+      // document.body.appendChild(ctxMenu);
+      item.appendChild(ctxMenu);
+    })
+  })
+
+  stagedItem.forEach((item) => {
+    item.addEventListener("contextmenu", (event) => {
+      event.preventDefault();
+
+      const directoryName = item.textContent;
   
       const ctxMenu = document.createElement("div");
   
@@ -146,9 +295,9 @@ function handleModal() {
       ctxMenu.className = "custom-context-menu";
   
       //위치 설정
-      ctxMenu.style.top = event.pageY + "px";
-      ctxMenu.style.left = event.pageX + "px";
-  
+      ctxMenu.style.top = event.pageY;
+      ctxMenu.style.left = event.pageX;
+      
       ctxMenu.appendChild(
         renderContextMenuList([
           {
@@ -167,17 +316,33 @@ function handleModal() {
               }
             },
           },
+          {
+            label: "git commit",
+            onClick: async () => {
+              try {
+                const commitText = prompt("commit message 입력");
+                const response = await axios.post("/dirs/git/commit", {
+                  fileName: directoryName,
+                  commitMessage: commitText
+                });
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                alert("something gone wrong while processing git commit");
+              }
+            },
+          },
         ])
-      );
+      )
+      // 이전 Element 삭제
+      const prevCtxMenu = document.getElementById("context-menu");
+      if (prevCtxMenu) {
+        prevCtxMenu.remove();
+      }
+      // document.body.appendChild(ctxMenu);
+      item.appendChild(ctxMenu);
     })
   })
-
-  // 이전 Element 삭제
-  const prevCtxMenu = document.getElementById("context-menu");
-  if (prevCtxMenu) {
-    prevCtxMenu.remove();
-  }
-
-  // Body에 Context Menu를 추가.
-  // temp2.appendChild(ctxMenu);
 }
+
+gitStatusModal.addEventListener("show.bs.modal", handleModal);

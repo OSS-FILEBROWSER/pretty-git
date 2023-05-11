@@ -320,7 +320,6 @@ openModalButton.addEventListener("click", () => {
           modifiedT.push(file.name);
           break;
       }
-      //전역 배열을 임시 배열 주소로 교체
     }
     //전역 배열을 임시 배열 주소로 교체
     untracked = untrackedT;
