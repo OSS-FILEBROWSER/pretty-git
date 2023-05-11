@@ -14,7 +14,9 @@ let staged = [];
 let committed = [];
 
 directories.forEach((dir) => {
-  const gitStatusText = dir.querySelector(".git-status-text");
+  const imageContainer = dir.querySelector(".file-image-container");
+  const imageSrc = imageContainer.querySelector("img").src;
+  const statusString = imageSrc.split("/")[4].split(".")[0];
 
   dir.addEventListener("dblclick", () => {
     const directoryName = dir.childNodes[2].innerHTML; // 현재 디렉토리 이름
@@ -55,7 +57,7 @@ directories.forEach((dir) => {
     ctxMenu.style.top = event.pageY + "px";
     ctxMenu.style.left = event.pageX + "px";
 
-    if (gitStatusText.textContent === "untracked") {
+    if (statusString === "untracked") {
       //untracked
       ctxMenu.appendChild(
         renderContextMenuList([
@@ -75,7 +77,7 @@ directories.forEach((dir) => {
           },
         ])
       );
-    } else if (gitStatusText.textContent === "modified") {
+    } else if (statusString === "modified") {
       //modified
       ctxMenu.appendChild(
         renderContextMenuList([
@@ -109,7 +111,7 @@ directories.forEach((dir) => {
           },
         ])
       );
-    } else if (gitStatusText.textContent === "staged") {
+    } else if (statusString === "staged") {
       //staged
       ctxMenu.appendChild(
         renderContextMenuList([
@@ -147,7 +149,7 @@ directories.forEach((dir) => {
           },
         ])
       );
-    } else if (gitStatusText.textContent === "committed") {
+    } else if (statusString === "committed") {
       //committed
       ctxMenu.appendChild(
         renderContextMenuList([
@@ -155,9 +157,10 @@ directories.forEach((dir) => {
             label: "git rm",
             onClick: async () => {
               try {
-                const response = await axios.post("/dirs/git/rm/0", {
+                const res = await axios.post("/dirs/git/rm/0", {
                   fileName: directoryName,
                 });
+                console.log(res.data);
                 window.location.href = "/";
               } catch (error) {
                 console.log(error);
@@ -169,21 +172,22 @@ directories.forEach((dir) => {
             label: "git rm --cached",
             onClick: async () => {
               try {
-                const response = await axios.post("/dirs/git/rm/1", {
+                const res = await axios.post("/dirs/git/rm/1", {
                   fileName: directoryName,
                 });
-                window.location.href = "/";
               } catch (error) {
                 console.log(error);
                 alert("something gone wrong while processing git rm --cached");
               }
+
+              window.location.href = "/";
             },
           },
           {
             label: "git mv",
             onClick: async () => {
               try {
-                const input = prompt("바꿀 이름은?");
+                const input = prompt("Type new file name");
                 const currentName = dir.querySelector(".directory-name");
                 const response = await axios.post("/dirs/git/mv", {
                   oldFileName: directoryName,
@@ -207,10 +211,15 @@ directories.forEach((dir) => {
             label: "git init",
             onClick: async () => {
               try {
-                const response = await axios.post("/dirs/git/init", {
-                  dirName: directoryName,
-                });
-                window.location.href = "/";
+                axios
+                  .post("/dirs/git/init", {
+                    dirName: directoryName,
+                  })
+                  .then((res) => {
+                    if (res.status == 200) {
+                      window.location.reload();
+                    }
+                  });
               } catch (error) {
                 console.log(error);
                 alert("something gone wrong while processing git init");
@@ -233,9 +242,15 @@ directories.forEach((dir) => {
 });
 
 backButton.addEventListener("click", () => {
-  axios.get("/dirs/backward").then((res) => {
-    window.location.href = "/";
-  });
+  try {
+    axios.get("/dirs/backward").then((res) => {
+      if (res.status == 200) {
+        window.location.reload();
+      }
+    });
+  } catch (error) {
+    console.log(`Error[go back] : ${error}`);
+  }
 });
 
 // context menu 없애기

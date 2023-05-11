@@ -114,6 +114,29 @@ const gitMove = (oldFileName, newFileName, curPath) => {
   });
 };
 
+const gitCommit = (fileName, commitMessage, userPath) => {
+  return new Promise((resolve, reject) => {
+    const args = ["commit", "-m", commitMessage, fileName];
+
+    const child = spawn("git", args, { cwd: userPath });
+
+    child.on("exit", (code, signal) => {
+      if (code === 0) {
+        const message = `git commit ${fileName} 성공!`;
+        resolve(message);
+      } else {
+        const error = `git commit ${fileName} 실패. code: ${code}, signal: ${signal}`;
+        reject(error);
+      }
+    });
+
+    child.on("error", (error) => {
+      console.log("something wrong");
+      reject(`git commit ${fileName} 실행 중 오류 발생: ${error}`);
+    });
+  });
+};
+
 const gitStatus = (path) => {
   const repoDir = path; // the directory where you want to run `git status`
 
@@ -149,4 +172,12 @@ const gitStatus = (path) => {
   });
 };
 
-export { gitAdd, gitInit, gitMove, gitRemove, gitRestore, gitStatus };
+export {
+  gitAdd,
+  gitInit,
+  gitMove,
+  gitRemove,
+  gitRestore,
+  gitStatus,
+  gitCommit,
+};

@@ -14,6 +14,7 @@ import {
   gitRemove,
   gitRestore,
   gitStatus,
+  gitCommit,
 } from "./modules/gitCommand.js";
 
 //환경변수 설정
@@ -38,21 +39,21 @@ app.get("/", async (req, res) => {
   //repository의 하위 디렉토리를 repo안에 있는 것으로 인식하기 위한 조건문
   if (user.isDotGitExists(`${user.path}/.git`)) {
     user.history.isRepo = true;
-    user.isRepo = true;
-    user.repoSrc = user.path;
+    user.gitManager.isRepo = true;
+    user.gitManager.repoSrc = user.path;
   }
 
   //레포일 경우 status 업데이트
-  if (user.isRepo) {
+  if (user.history.isRepo === true) {
     gitStatus(user.path)
       .then((data) => {
-        user.updateStatus(data);
+        user.gitManager.updateStatus(data);
       })
       .catch((err) => console.log(err));
   }
 
   const files = await user.getFilesInCurrentDir();
-  user.checkIgnores(user.isRepo);
+  user.gitManager.checkIgnores(files, user.path);
 
   res.render("index", {
     title: "Pretty git, Make Your git usage Fancy",
@@ -71,7 +72,7 @@ app.post("/dirs/forward", (req, res) => {
       user.setHistory(newHistory); // 바뀐 경로로부터 다시 디렉토리 정보 얻어오기
 
       //재렌더링
-      res.redirect("/");
+      res.status(200).redirect("/");
     })
     .catch((err) => {
       user.path = temp; // 디렉터리 이동이 아닐 경우 경로 복원
@@ -80,19 +81,18 @@ app.post("/dirs/forward", (req, res) => {
 });
 
 app.get("/dirs/backward", (req, res) => {
-  user.popHistory(); // 이전 히스토리로 이동
-  //재렌더링
   if (user.history.prev) {
+    user.popHistory(); // 이전 히스토리로 이동
     user.path = user.history.path; //현재 유저 경로를 이전 디렉토리로 업데이트
     user.ignoreList = [];
-    res.redirect("/");
+    res.status(200).redirect("/"); //재렌더링
   }
 });
 
 app.post("/dirs/git/init", (req, res) => {
   gitInit(user.path + `${req.body.dirName}/`)
     .then((result) => {
-      res.send(result);
+      res.status(200).send(result);
     })
     .catch((error) => {
       res.status(500).send(error);
@@ -100,74 +100,105 @@ app.post("/dirs/git/init", (req, res) => {
 });
 
 app.get("/dirs/git/isRepo", (req, res) => {
-  res.send(user.isRepo);
+  res.send(user.history.isRepo);
 });
 
 app.get("/dirs/git/status", (req, res) => {
-  res.json({ files: user.gitFiles, isRepo: user.isRepo });
+  res.json({ files: user.gitManager.gitFiles, isRepo: user.gitManager.isRepo });
 });
 
-app.post("/dirs/git/add", (req, res) => {
+app.post("/dirs/git/add", async (req, res) => {
   const filePath = req.body.filePath;
 
-  gitAdd(filePath, user.path)
-    .then((result) => {
-      res.send(result);
-    })
-    .catch((error) => {
-      res.status(500).send(error);
-    });
+  try {
+    const result = await gitAdd(filePath, user.path);
+    try {
+      const logData = await gitStatus(user.path);
+      user.gitManager.updateStatus(logData);
+      res.status(200).send(result);
+    } catch (error) {
+      console.log(`Error[git status] :  ${error}`);
+    }
+  } catch (error) {
+    console.log(`Error[git add] :  ${error}`);
+    res.status(500).send(error);
+  }
 });
 
-app.post("/dirs/git/commit", (req, res) => {
+app.post("/dirs/git/commit", async (req, res) => {
   const fileName = req.body.fileName;
   const commitMessage = req.body.commitMessage;
-  user
-    .gitCommit(fileName, commitMessage)
-    .then((result) => {
-      res.send(result);
-    })
-    .catch((error) => {
-      res.status(500).send(error);
-    });
+
+  try {
+    const result = await gitCommit(fileName, commitMessage, user.path);
+    try {
+      const logData = await gitStatus(user.path);
+      user.gitManager.updateStatus(logData);
+      res.status(200).send(result);
+    } catch (error) {
+      console.log(`Error[git status] :  ${error}`);
+    }
+  } catch (error) {
+    console.log(`Error[git commit] :  ${error}`);
+    res.status(500).send(error);
+  }
 });
 
-app.post("/dirs/git/restore/:staged", (req, res) => {
+app.post("/dirs/git/restore/:staged", async (req, res) => {
   const fileName = req.body.fileName;
   const staged = req.params.staged === "1";
-  gitRestore(fileName, staged, user.path)
-    .then((message) => {
-      res.send(message);
-    })
-    .catch((error) => {
-      res.status(500).send(error);
-    });
+
+  try {
+    const message = await gitRestore(fileName, staged, user.path);
+    try {
+      const logData = await gitStatus(user.path);
+      user.gitManager.updateStatus(logData);
+      res.status(200).send(message);
+    } catch (error) {
+      console.log(`Error[git status] :  ${error}`);
+    }
+  } catch (error) {
+    console.log(`Error[git restore staged] :  ${error}`);
+    res.status(500).send(error);
+  }
 });
 
-app.post("/dirs/git/rm/:cached", (req, res) => {
+app.post("/dirs/git/rm/:cached", async (req, res) => {
   const fileName = req.body.fileName;
-  console.log(fileName);
   const staged2 = req.params.cached === "1";
-  gitRemove(fileName, staged2, user.path)
-    .then((message) => {
-      res.send(message);
-    })
-    .catch((error) => {
-      res.status(500).send(error);
-    });
+
+  try {
+    const message = await gitRemove(fileName, staged2, user.path);
+    try {
+      const logData = await gitStatus(user.path);
+      user.gitManager.updateStatus(logData);
+      res.status(200).send(message);
+    } catch (error) {
+      console.log(`Error[git status] :  ${error}`);
+    }
+  } catch (error) {
+    console.log(`Error[git cached] :  ${error}`);
+    res.status(500).send(error);
+  }
 });
 
-app.post("/dirs/git/mv", (req, res) => {
+app.post("/dirs/git/mv", async (req, res) => {
   const oldFileName = req.body.oldFileName;
   const newFileName = req.body.newFileName;
 
-  gitMove(oldFileName, newFileName, user.path)
-    .then((message) => {
-      res.send(message);
-    })
-    .catch((error) => {
-      res.status(500).send(error);
-    });
+  try {
+    const message = await gitMove(oldFileName, newFileName, user.path);
+    try {
+      const logData = await gitStatus(user.path);
+      user.gitManager.updateStatus(logData);
+      res.status(200).send(message);
+    } catch (error) {
+      console.log(`Error[git status] :  ${error}`);
+    }
+  } catch (error) {
+    console.log(`Error[git move] :  ${error}`);
+    res.status(500).send(error);
+  }
 });
 
 // Server
