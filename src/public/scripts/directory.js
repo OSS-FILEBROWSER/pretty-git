@@ -7,15 +7,20 @@ const closeModalButton = document.querySelector(".close-modal");
 const untrackedList = document.querySelector(".status-item.untracked ul");
 const modifiedList = document.querySelector(".status-item.modified ul");
 const stagedList = document.querySelector(".status-item.staged ul");
-const committedList = document.querySelector(".status-item.committed ul");
+// const committedList = document.querySelector(".status-item.committed ul");
 let untracked = [];
 let modified = [];
 let staged = [];
 let committed = [];
 
 directories.forEach((dir) => {
+  const imageContainer = dir.querySelector(".file-image-container");
+  const imageSrc = imageContainer.querySelector("img").src;
+  const statusString = imageSrc.split("/")[4].split(".")[0];
+
   dir.addEventListener("dblclick", () => {
     const directoryName = dir.childNodes[2].innerHTML; // 현재 디렉토리 이름
+
     //서버로 request 보내는 방법 - axios 사용
     axios
       .post("/dirs/forward", { dirName: directoryName })
@@ -40,6 +45,7 @@ directories.forEach((dir) => {
   dir.addEventListener("contextmenu", (event) => {
     // 기본 Context Menu가 나오지 않게 차단
     event.preventDefault();
+
     const directoryName = dir.childNodes[2].innerHTML;
 
     const ctxMenu = document.createElement("div");
@@ -51,33 +57,178 @@ directories.forEach((dir) => {
     ctxMenu.style.top = event.pageY + "px";
     ctxMenu.style.left = event.pageX + "px";
 
-    // 메뉴 목록 생성
-    ctxMenu.appendChild(
-      renderContextMenuList([
-        {
-          label: "git init",
-          onClick: async () => {
-            //클릭 이벤트 구현
-            //event.srcElement는 click 이벤트를 발생시킨 원천 엘리먼트를 가르킨다.
-            try {
-              const response = await axios.post("/dirs/git/init", {
-                dirName: directoryName,
-              });
+    if (statusString === "untracked") {
+      //untracked
+      ctxMenu.appendChild(
+        renderContextMenuList([
+          {
+            label: "git add",
+            onClick: async () => {
+              try {
+                const response = await axios.post("/dirs/git/add", {
+                  filePath: directoryName,
+                });
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                alert("something gone wrong while processing git add");
+              }
+            },
+          },
+        ])
+      );
+    } else if (statusString === "modified") {
+      //modified
+      ctxMenu.appendChild(
+        renderContextMenuList([
+          {
+            label: "git add",
+            onClick: async () => {
+              try {
+                const response = await axios.post("/dirs/git/add", {
+                  filePath: directoryName,
+                });
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                alert("something gone wrong while processing git init");
+              }
+            },
+          },
+          {
+            label: "git restore",
+            onClick: async () => {
+              try {
+                const response = await axios.post("/dirs/git/restore/0", {
+                  fileName: directoryName,
+                });
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                alert("something gone wrong while processing git restore");
+              }
+            },
+          },
+        ])
+      );
+    } else if (statusString === "staged") {
+      //staged
+      ctxMenu.appendChild(
+        renderContextMenuList([
+          {
+            label: "git restore --staged",
+            onClick: async () => {
+              try {
+                const response = await axios.post("/dirs/git/restore/1", {
+                  fileName: directoryName,
+                });
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                alert(
+                  "something gone wrong while processing git restore --staged"
+                );
+              }
+            },
+          },
+          {
+            label: "git commit",
+            onClick: async () => {
+              try {
+                const commitText = prompt("commit message 입력");
+                const response = await axios.post("/dirs/git/commit", {
+                  fileName: directoryName,
+                  commitMessage: commitText,
+                });
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                alert("something gone wrong while processing git commit");
+              }
+            },
+          },
+        ])
+      );
+    } else if (statusString === "committed") {
+      //committed
+      ctxMenu.appendChild(
+        renderContextMenuList([
+          {
+            label: "git rm",
+            onClick: async () => {
+              try {
+                const res = await axios.post("/dirs/git/rm/0", {
+                  fileName: directoryName,
+                });
+                console.log(res.data);
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                alert("something gone wrong while processing git rm");
+              }
+            },
+          },
+          {
+            label: "git rm --cached",
+            onClick: async () => {
+              try {
+                const res = await axios.post("/dirs/git/rm/1", {
+                  fileName: directoryName,
+                });
+              } catch (error) {
+                console.log(error);
+                alert("something gone wrong while processing git rm --cached");
+              }
+
               window.location.href = "/";
-            } catch (error) {
-              console.log(error);
-              alert("something gone wrong while processing git init");
-            }
+            },
           },
-        },
-        {
-          label: "git commit",
-          onClick: async () => {
-            //클릭 이벤트 구현
+          {
+            label: "git mv",
+            onClick: async () => {
+              try {
+                const input = prompt("Type new file name");
+                const currentName = dir.querySelector(".directory-name");
+                const response = await axios.post("/dirs/git/mv", {
+                  oldFileName: directoryName,
+                  newFileName: input,
+                });
+
+                window.location.href = "/";
+                currentName.textContent = input;
+              } catch (error) {
+                console.log(error);
+                alert("something gone wrong while processing git mv");
+              }
+            },
           },
-        },
-      ])
-    );
+        ])
+      );
+    } else {
+      ctxMenu.appendChild(
+        renderContextMenuList([
+          {
+            label: "git init",
+            onClick: async () => {
+              try {
+                axios
+                  .post("/dirs/git/init", {
+                    dirName: directoryName,
+                  })
+                  .then((res) => {
+                    if (res.status == 200) {
+                      window.location.reload();
+                    }
+                  });
+              } catch (error) {
+                console.log(error);
+                alert("something gone wrong while processing git init");
+              }
+            },
+          },
+        ])
+      );
+    }
 
     // 이전 Element 삭제
     const prevCtxMenu = document.getElementById("context-menu");
@@ -88,23 +239,18 @@ directories.forEach((dir) => {
     // Body에 Context Menu를 추가.
     document.body.appendChild(ctxMenu);
   });
-
-  //파일의 상태가 untracked인지 modified인지 staged인지 분류
-  if (dir.childNodes[4] === "untracked") {
-    untracked.push(dir.childNodes[2]);
-  } else if (dir.childNodes[4] === "modified") {
-    modified.push(dir.childNodes[2]);
-  } else if (dir.childNodes[4] === "staged") {
-    staged.push(dir.childNodes[2]);
-  } else if (dir.childNodes[4] === "committed") {
-    committed.push(dir.childNodes[2]);
-  }
 });
 
 backButton.addEventListener("click", () => {
-  axios.get("/dirs/backward").then((res) => {
-    window.location.href = "/";
-  });
+  try {
+    axios.get("/dirs/backward").then((res) => {
+      if (res.status == 200) {
+        window.location.reload();
+      }
+    });
+  } catch (error) {
+    console.log(`Error[go back] : ${error}`);
+  }
 });
 
 // context menu 없애기
@@ -118,13 +264,15 @@ function handleClearContextMenu(event) {
 function renderContextMenuList(list) {
   // List Element 생성
   const ctxMenuList = document.createElement("ul");
-
+  ctxMenuList.className = "custom-context-menu-ul";
   // List Item 생성
   list.forEach(function (item) {
     // Item Element 생성
     const ctxMenuItem = document.createElement("li");
     const ctxMenuItemAnchor = document.createElement("a");
     const ctxMenuItemAnchorText = document.createTextNode(item.label);
+
+    ctxMenuItem.className = "custom-context-menu-li";
 
     // 클릭 이벤트 설정
     if (item.onClick) {
@@ -153,37 +301,32 @@ openModalButton.addEventListener("click", () => {
   //git status 요청
   axios.get("/dirs/git/status").then((res) => {
     //api로부터 받아온 파일 정보
-    const files = res.data;
+    const files = res.data.files;
+
     //각각의 상태에 대한 임시 저장 배열들
     const untrackedT = [];
     const modifiedT = [];
     const stagedT = [];
-    const committedT = [];
-    //switch를 통해 상태 구분, 각각의 상태에 해당하는 임시 배열 저장소로 push
 
-    for (let name in files) {
-      switch (files[name].status) {
+    for (let file of files) {
+      switch (file.status) {
         case "untracked":
-          untrackedT.push(name);
+          untrackedT.push(file.name);
           break;
         case "staged":
-          stagedT.push(name);
+          stagedT.push(file.name);
           break;
-        case "unstaged":
-          modifiedT.push(name);
-          break;
-        case "committed":
-          committedT.push(name);
+        case "modified":
+          modifiedT.push(file.name);
           break;
       }
-      //전역 배열을 임시 배열 주소로 교체
-      untracked = untrackedT;
-      staged = stagedT;
-      modified = modifiedT;
-      committed = committedT;
-
-      render();
     }
+    //전역 배열을 임시 배열 주소로 교체
+    untracked = untrackedT;
+    staged = stagedT;
+    modified = modifiedT;
+
+    render();
   });
 });
 
@@ -202,3 +345,13 @@ function enableBodyScroll() {
 
 //root element event 관련
 rootElement.addEventListener("click", handleClearContextMenu);
+
+//git status button update
+const res = axios
+  .get("/dirs/git/isRepo")
+  .then((res) => {
+    if (res.data) {
+      openModalButton.classList.remove("hidden");
+    }
+  })
+  .catch((err) => console.log(err));

@@ -1,17 +1,15 @@
 import fs from "fs";
-import path from "path";
-import { spawn } from "child_process";
 //class import
 import History from "./History.js";
+import File from "./File.js"; // 기존에 객체로 생성하던 파일을, 클래스로 분리
+import GitManager from "./GitManager.js";
 
 export default class Client {
   constructor() {
-    this._branch = undefined;
-    this._gitFiles = {};
     this._files = [];
     this._path = "/";
     this._history = new History("/", false);
-    this._isRepo = false;
+    this._gitManager = new GitManager();
   }
 
   getFilesInCurrentDir = (history = null) => {
@@ -24,7 +22,24 @@ export default class Client {
         } else {
           Promise.all(
             fileList.map((file) => {
-              let cur = this._gitFiles[file];
+              let cur = null;
+              //git status에서 파싱된 파일과 겹치는지 확인
+              this._gitManager.gitFiles.forEach((item) => {
+                if (item.name == file) {
+                  cur = item;
+                }
+              });
+
+              //status 업데이트
+              let status = "none";
+              let statusType = "none";
+              if (cur) {
+                status = cur.status;
+              } else {
+                if (this._history.isRepo) {
+                  status = "committed";
+                }
+              }
 
               return new Promise((resolve, reject) => {
                 fs.stat(`${this._path}${file}`, (err, stats) => {
@@ -34,34 +49,24 @@ export default class Client {
                   );
 
                   if (err) {
-                    this._files.push({
-                      type: "unknown",
-                      name: file,
-                      initialized: false,
-                      status: undefined,
-                      statusType: undefined,
-                    });
+                    this._files.push(
+                      new File("unknown", file, false, status, statusType)
+                    );
                   } else {
                     if (stats.isDirectory()) {
-                      this._files.push({
-                        type: "directory",
-                        name: file,
-                        initialized: isAlreadyInit,
-                        status: undefined,
-                        statusType: undefined,
-                      });
+                      this._files.push(
+                        new File(
+                          "directory",
+                          file,
+                          isAlreadyInit,
+                          status,
+                          statusType
+                        )
+                      );
                     } else {
-                      this._files.push({
-                        type: "file",
-                        name: file,
-                        initialized: false,
-                        status: cur
-                          ? cur.status
-                          : this._history.isRepo
-                          ? "committed"
-                          : undefined,
-                        statusType: cur ? cur.type : undefined,
-                      });
+                      this._files.push(
+                        new File("file", file, false, status, statusType)
+                      );
                     }
                   }
                   resolve();
@@ -79,6 +84,12 @@ export default class Client {
       });
     });
   };
+
+  /**
+   *
+   * Git 관련 멤버 함수
+   *
+   */
 
   isDotGitExists = (path) => {
     if (fs.existsSync(path) && fs.lstatSync(".git").isDirectory()) {
@@ -115,102 +126,99 @@ export default class Client {
     return true;
   };
 
-  gitInit = (path) => {
-    return new Promise((resolve, reject) => {
-      const child = spawn("git", ["init"], { cwd: path });
+  // updateStatus(statusLog) {
+  //   this._gitFiles = [];
+  //   const lines = statusLog.toString().split("\n");
 
-      child.on("exit", (code, signal) => {
-        if (code === 0) {
-          resolve("git init 성공!");
-        } else {
-          reject(`git init 실패. code: ${code}, signal: ${signal}`);
-        }
-      });
+  //   for (let i = 0; i < lines.length; i++) {
+  //     const line = lines[i].trim();
 
-      child.on("error", (error) => {
-        reject(`git init 실행 중 오류 발생: ${error}`);
-      });
-    });
-  };
+  //     if (line.startsWith("On branch ")) {
+  //       this._branch = line.substring("On branch ".length).trim();
+  //     } else if (line.startsWith("Changes to be committed:")) {
+  //       i += 2; // Skip the next line, which is a header
+  //       while (i < lines.length && lines[i] != "") {
+  //         const info = lines[i].split(":");
+  //         const type = info[0].trim();
+  //         let name = info[1].trim();
+  //         //renamed 상태일때는 화살표 제거
+  //         if (type == "renamed") {
+  //           name = name.split("->")[1].trim();
+  //         }
 
-  gitStatus = (path) => {
-    const repoDir = path; // the directory where you want to run `git status`
+  //         this._gitFiles.push({ name: name, status: "staged", type: type });
+  //         i++;
+  //       }
+  //       i--; // Go back one line so we don't skip any lines
+  //     } else if (line.startsWith("Changes not staged for commit:")) {
+  //       i += 3; // Skip the next line, which is a header
+  //       while (i < lines.length && lines[i] != "") {
+  //         const info = lines[i].split(":");
+  //         const type = info[0].trim();
+  //         const name = info[1].trim();
+  //         this._gitFiles.push({ name: name, status: "modified", type: type });
+  //         i++;
+  //       }
+  //       i--; // Go back one line so we don't skip any lines
+  //     } else if (line.startsWith("Untracked files:")) {
+  //       i += 2; // Skip the next line, which is a header
+  //       while (i < lines.length && lines[i] != "") {
+  //         const file = lines[i].trim();
+  //         this._gitFiles.push({ name: file, status: "untracked", type: null });
+  //         i++;
+  //       }
+  //       i--; // Go back one line so we don't skip any lines
+  //     }
+  //   }
+  // }
 
-    // Check if the directory exists
-    if (!fs.existsSync(repoDir)) {
-      return Promise.reject(`Error: ${repoDir} does not exist`);
-    }
+  // //gitignore파일 파싱
+  // parseGitIgnore(gitignorePath) {
+  //   const gitignoreContent = fs.readFileSync(gitignorePath, "utf8");
+  //   const ignorePatterns = gitignoreContent
+  //     .split("\n")
+  //     .filter((line) => line.trim() !== "" && !line.trim().startsWith("#"));
 
-    return new Promise((resolve, reject) => {
-      // Spawn the `git status` command
-      const child = spawn("git", ["status"], { cwd: repoDir });
+  //   return ignorePatterns;
+  // }
+  // //ignored 인지 확인  - 정규표현식 매치 라이브러리
+  // checkIgnores(isRepo) {
+  //   if (isRepo && this._ignoreList.length == 0) {
+  //     //1. gitignore parsing
+  //     try {
+  //       this._ignoreList = this.parseGitIgnore(`${this._repoSrc}.gitignore`);
+  //     } catch (error) {
+  //       console.log("No gitignore file inside this repo");
+  //     }
+  //   }
 
-      let stdout = "";
-      let stderr = "";
+  //   if (this._ignoreList.length != 0) {
+  //     console.log("Starting to find an ignored file..");
+  //     console.log(this.repoSrc);
+  //     for (let ignorePattern of this._ignoreList) {
+  //       for (let file of this._files) {
+  //         let relativePath = path.relative(
+  //           this._repoSrc,
+  //           `${this._path}${file.name}`
+  //         );
+  //         if (file.type == "directory") {
+  //           relativePath = relativePath + "/";
+  //         }
+  //         const matchResult = minimatch(relativePath, ignorePattern);
 
-      // Log any output from the command to the console
-      child.stdout.on("data", (data) => {
-        stdout += data;
-      });
+  //         if (matchResult == true) {
+  //           file.status = "ignored";
+  //           console.log(`${file.name} - ${file.status}`); // 성공적으로 ignored상태로 바뀌어진 파일들
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 
-      child.stderr.on("data", (data) => {
-        stderr += data;
-      });
-
-      // Log the exit code when the command has finished running
-      child.on("close", (code) => {
-        if (code !== 0) {
-          reject(`child process exited with code ${code}\n${stderr}`);
-        } else {
-          resolve(stdout);
-        }
-      });
-    });
-  };
-
-  updateStatus(statusLog) {
-    this._gitFiles = {};
-    const lines = statusLog.toString().split("\n");
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-
-      if (line.startsWith("On branch ")) {
-        this._branch = line.substring("On branch ".length).trim();
-      } else if (line.startsWith("Changes to be committed:")) {
-        i += 2; // Skip the next line, which is a header
-        while (i < lines.length && lines[i] != "") {
-          const info = lines[i].split(":");
-          const type = info[0].trim();
-          const name = info[1].trim();
-          this._gitFiles[name] = { status: "staged", type: type };
-          i++;
-        }
-        i--; // Go back one line so we don't skip any lines
-      } else if (line.startsWith("Changes not staged for commit:")) {
-        i += 3; // Skip the next line, which is a header
-        while (i < lines.length && lines[i] != "") {
-          const info = lines[i].split(":");
-          const type = info[0].trim();
-          const name = info[1].trim();
-          this._gitFiles[name] = { status: "modified", type: type };
-          i++;
-        }
-        i--; // Go back one line so we don't skip any lines
-      } else if (line.startsWith("Untracked files:")) {
-        i += 2; // Skip the next line, which is a header
-        while (i < lines.length && lines[i] != "") {
-          const file = lines[i].trim();
-          this._gitFiles[file] = { status: "untracked", type: null };
-          i++;
-        }
-        i--; // Go back one line so we don't skip any lines
-      }
-    }
-
-    console.log(this.gitFiles);
-  }
-
+  /**
+   *
+   * History 관련 멤버 함수
+   */
   setHistory = (newHistory) => {
     newHistory.prev = this._history;
     this._history = newHistory; //현재 위치 교체
@@ -236,19 +244,39 @@ export default class Client {
     return this._history;
   }
 
-  get gitFiles() {
-    return this._gitFiles;
-  }
+  // get gitFiles() {
+  //   return this._gitFiles;
+  // }
 
-  set gitFiles(val) {
-    this._gitFiles = val;
-  }
+  // set gitFiles(val) {
+  //   this._gitFiles = val;
+  // }
 
   get files() {
     return this._files;
   }
 
-  get branch() {
-    return this._branch;
+  get gitManager() {
+    return this._gitManager;
   }
+
+  // get branch() {
+  //   return this._branch;
+  // }
+
+  // get repoSrc() {
+  //   return this._repoSrc;
+  // }
+
+  // set repoSrc(val) {
+  //   this._repoSrc = val;
+  // }
+
+  // get ignoreList() {
+  //   return this._ignoreList;
+  // }
+
+  // set ignoreList(val) {
+  //   this._ignoreList = val;
+  // }
 }
