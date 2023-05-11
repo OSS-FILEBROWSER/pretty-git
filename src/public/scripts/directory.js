@@ -47,7 +47,6 @@ directories.forEach((dir) => {
     event.preventDefault();
 
     const directoryName = dir.childNodes[2].innerHTML;
-
     const ctxMenu = document.createElement("div");
 
     ctxMenu.id = "context-menu";
@@ -236,14 +235,6 @@ backButton.addEventListener("click", () => {
   });
 });
 
-// context menu 없애기
-function handleClearContextMenu(event) {
-  const ctxMenu = document.getElementById("context-menu");
-  if (ctxMenu) {
-    ctxMenu.remove();
-  }
-}
-
 function renderContextMenuList(list) {
   // List Element 생성
   const ctxMenuList = document.createElement("ul");
@@ -326,9 +317,6 @@ function enableBodyScroll() {
   document.body.style.overflow = "visible";
 }
 
-//root element event 관련
-rootElement.addEventListener("click", handleClearContextMenu);
-
 //git status button update
 const res = axios
   .get("/dirs/git/isRepo")
@@ -338,3 +326,10 @@ const res = axios
     }
   })
   .catch((err) => console.log(err));
+
+window.addEventListener("click", (event) => {
+  const contextMenu = document.getElementById("context-menu");
+  if (contextMenu && !contextMenu.contains(event.target)) {
+    contextMenu.remove();
+  }
+});
