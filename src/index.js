@@ -55,6 +55,8 @@ app.get("/", async (req, res) => {
   const files = await user.getFilesInCurrentDir();
   user.gitManager.checkIgnores(files, user.path);
 
+  console.log(user.history);
+
   res.render("index", {
     title: "Pretty git, Make Your git usage Fancy",
     files: files,
@@ -121,6 +123,10 @@ app.post("/dirs/git/init", (req, res) => {
 
 app.get("/dirs/git/isRepo", (req, res) => {
   res.send(user.history.isRepo);
+});
+
+app.get("/dirs/git/isTracked", (req, res) => {
+  res.send(user.history.directoryStatus);
 });
 
 app.get("/dirs/git/status", (req, res) => {
