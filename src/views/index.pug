@@ -2,47 +2,64 @@ include head.pug
 block body
     div#root
         include header
-        button.back-button(id="back")
-            p.back-font="Go to previous"
-            div.back-img-container
-                img(src='/icons/return.png')
+        div.button-section
+            button.back-button(id="back")
+                p.back-font="Go Back"
+                div.back-img-container
+                    img(src='/icons/return.png')
+            button.open-modal.hidden
+                p="Git Status"
+                div.status-img-container
+                    img(src="/icons/check-list.png")
+
+        div.git-status-modal
+            div.modal-body
+                h3 Current Git Status
+                button.close-modal 
+                    img(src='icons/return.png')
+                div.status-list
+                    div.status-item.untracked
+                        h4 Untracked
+                        ul
+                    div.status-item.modified
+                        h4 Modified
+                        ul 
+                    div.status-item.staged
+                        h4 Staged
+                        ul
+                    //- div.status-item.committed 
+                    //-     h4 Committed 
+                    //-     ul
                 
         div#directory-container
-            button.open-modal
-                p="Check Git Status"
-            div.git-status-modal
-                div.modal-body
-                    h3 Current Git Status
-                    button.close-modal 
-                        img(src='icons/return.png')
-                    div.status-list
-                        div.status-item.untracked
-                            h4 Untracked
-                            ul 
-                        div.status-item.modified
-                            h4 Modified
-                            ul 
-                        div.status-item.staged
-                            h4 Staged
-                            ul 
-                        div.status-item.committed 
-                            h4 Committed 
-                            ul
             each file in files
-                div(class=`${file.type == "directory" ? "directory-item" : file.status ? "directory-item" : "directory-item disabled"}`)
+                div(class=`${file.type == "directory" ? "directory-item" : file.status != "none" ? "directory-item status-directory-item" : "directory-item disabled"} ${file.status == "ignored" ? "disabled" : ""}`)
                     //img 주소 및 크기 고정
                     div.file-image-container
-                        div.git-status
-                            p(class=`git-status-text ${file.status}`)=file.status
+                        //- div.git-status
+                        //-     p(class=`git-status-text ${file.status}`)=file.status
                         if file.type == "directory"
                             if file.initialized
                                 div.git-image-container
                                     img(src='/icons/git.png')
                                 img(src='/icons/folder.png')
+                            else if file.status != "none"
+                                div.git-image-container
+                                    img(src=`/icons/${file.status}.png`)
+                                img(src='/icons/folder.png')
                             else
                                 img(src='/icons/folder.png')
                         else if file.type == "file"
-                            img(src='/icons/documents.png')
+                            if file.initialized
+                                div.git-image-container
+                                    img(src='/icons/git.png')
+                                img(src='/icons/documents.png')
+                            else if file.status != "none"
+                                div.git-image-container
+                                    img(src=`/icons/${file.status}.png`)
+                                img(src='/icons/documents.png')
+                            else 
+                                img(src='/icons/documents.png')
                         else
                             img(src='/icons/prohibited.png')
                     p.directory-name=file.name
