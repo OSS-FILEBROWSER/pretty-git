@@ -14,7 +14,9 @@ let staged = [];
 let committed = [];
 
 directories.forEach((dir) => {
-  const gitStatusText = dir.querySelector(".git-status-text");
+  const imageContainer = dir.querySelector(".file-image-container");
+  const imageSrc = imageContainer.querySelector("img").src;
+  const statusString = imageSrc.split("/")[4].split(".")[0];
 
   dir.addEventListener("dblclick", () => {
     const directoryName = dir.childNodes[2].innerHTML; // 현재 디렉토리 이름
@@ -55,7 +57,7 @@ directories.forEach((dir) => {
     ctxMenu.style.top = event.pageY + "px";
     ctxMenu.style.left = event.pageX + "px";
 
-    if (gitStatusText.textContent === "untracked") {
+    if (statusString === "untracked") {
       //untracked
       ctxMenu.appendChild(
         renderContextMenuList([
@@ -75,7 +77,7 @@ directories.forEach((dir) => {
           },
         ])
       );
-    } else if (gitStatusText.textContent === "modified") {
+    } else if (statusString === "modified") {
       //modified
       ctxMenu.appendChild(
         renderContextMenuList([
@@ -109,7 +111,7 @@ directories.forEach((dir) => {
           },
         ])
       );
-    } else if (gitStatusText.textContent === "staged") {
+    } else if (statusString === "staged") {
       //staged
       ctxMenu.appendChild(
         renderContextMenuList([
@@ -133,8 +135,10 @@ directories.forEach((dir) => {
             label: "git commit",
             onClick: async () => {
               try {
+                const commitText = prompt("commit message 입력");
                 const response = await axios.post("/dirs/git/commit", {
-                  dirName: directoryName,
+                  fileName: directoryName,
+                  commitMessage: commitText,
                 });
                 window.location.href = "/";
               } catch (error) {
@@ -145,7 +149,7 @@ directories.forEach((dir) => {
           },
         ])
       );
-    } else if (gitStatusText.textContent === "committed") {
+    } else if (statusString === "committed") {
       //committed
       ctxMenu.appendChild(
         renderContextMenuList([
@@ -153,9 +157,10 @@ directories.forEach((dir) => {
             label: "git rm",
             onClick: async () => {
               try {
-                const response = await axios.post("/dirs/git/rm/0", {
-                  dirName: directoryName,
+                const res = await axios.post("/dirs/git/rm/0", {
+                  fileName: directoryName,
                 });
+                console.log(res.data);
                 window.location.href = "/";
               } catch (error) {
                 console.log(error);
@@ -167,24 +172,30 @@ directories.forEach((dir) => {
             label: "git rm --cached",
             onClick: async () => {
               try {
-                const response = await axios.post("/dirs/git/rm/1", {
-                  dirName: directoryName,
+                const res = await axios.post("/dirs/git/rm/1", {
+                  fileName: directoryName,
                 });
-                window.location.href = "/";
               } catch (error) {
                 console.log(error);
                 alert("something gone wrong while processing git rm --cached");
               }
+
+              window.location.href = "/";
             },
           },
           {
             label: "git mv",
             onClick: async () => {
               try {
+                const input = prompt("Type new file name");
+                const currentName = dir.querySelector(".directory-name");
                 const response = await axios.post("/dirs/git/mv", {
-                  dirName: directoryName,
+                  oldFileName: directoryName,
+                  newFileName: input,
                 });
+
                 window.location.href = "/";
+                currentName.textContent = input;
               } catch (error) {
                 console.log(error);
                 alert("something gone wrong while processing git mv");
@@ -200,10 +211,15 @@ directories.forEach((dir) => {
             label: "git init",
             onClick: async () => {
               try {
-                const response = await axios.post("/dirs/git/init", {
-                  dirName: directoryName,
-                });
-                window.location.href = "/";
+                axios
+                  .post("/dirs/git/init", {
+                    dirName: directoryName,
+                  })
+                  .then((res) => {
+                    if (res.status == 200) {
+                      window.location.reload();
+                    }
+                  });
               } catch (error) {
                 console.log(error);
                 alert("something gone wrong while processing git init");
@@ -226,9 +242,15 @@ directories.forEach((dir) => {
 });
 
 backButton.addEventListener("click", () => {
-  axios.get("/dirs/backward").then((res) => {
-    window.location.href = "/";
-  });
+  try {
+    axios.get("/dirs/backward").then((res) => {
+      if (res.status == 200) {
+        window.location.reload();
+      }
+    });
+  } catch (error) {
+    console.log(`Error[go back] : ${error}`);
+  }
 });
 
 // context menu 없애기
@@ -242,13 +264,15 @@ function handleClearContextMenu(event) {
 function renderContextMenuList(list) {
   // List Element 생성
   const ctxMenuList = document.createElement("ul");
-
+  ctxMenuList.className = "custom-context-menu-ul";
   // List Item 생성
   list.forEach(function (item) {
     // Item Element 생성
     const ctxMenuItem = document.createElement("li");
     const ctxMenuItemAnchor = document.createElement("a");
     const ctxMenuItemAnchorText = document.createTextNode(item.label);
+
+    ctxMenuItem.className = "custom-context-menu-li";
 
     // 클릭 이벤트 설정
     if (item.onClick) {
@@ -278,7 +302,7 @@ openModalButton.addEventListener("click", () => {
   axios.get("/dirs/git/status").then((res) => {
     //api로부터 받아온 파일 정보
     const files = res.data.files;
-    console.log(files);
+
     //각각의 상태에 대한 임시 저장 배열들
     const untrackedT = [];
     const modifiedT = [];
@@ -296,7 +320,6 @@ openModalButton.addEventListener("click", () => {
           modifiedT.push(file.name);
           break;
       }
-      //전역 배열을 임시 배열 주소로 교체
     }
     //전역 배열을 임시 배열 주소로 교체
     untracked = untrackedT;
