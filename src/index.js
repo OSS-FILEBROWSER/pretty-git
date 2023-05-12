@@ -17,10 +17,8 @@ import {
   gitCommit,
 } from "./modules/gitCommand.js";
 
-//환경변수 설정
-dotenv.config();
-//환경변수
-const PORT = process.env.PORT || 3000;
+//Constant
+const PORT = 3000;
 const __DIRNAME = path.resolve();
 
 // 로컬 서버 인스턴스
