@@ -65,7 +65,7 @@ When you right-click a file image, git commands that can be executed for each st
   For the untracked file, you can add the file into staged area.
   Clickk 'git add' option.
 <div align="center">
-<div style="display:flex; justify-content: center;"><img width ="250px" height="250px" src="src/public/readmeimg/gitadd.png" alt="browsing action"/></div></div>
+<div style="display:flex; justify-content: center;"><img width ="300px" height="300px" src="src/public/readmeimg/gitadd.png" alt="browsing action"/></div></div>
 
 - for [modified file]
 
@@ -77,7 +77,7 @@ When you right-click a file image, git commands that can be executed for each st
      Click 'git add' option.
  <div align="center">
   <div style="display: flex; justify-content: center;">
-    <img width="250px" height="250px" src="src/public/readmeimg/modified.png" alt="browsing action" style="display: block; margin: 0 auto;">
+    <img width="300px" height="300px" src="src/public/readmeimg/modified.png" alt="browsing action" style="display: block; margin: 0 auto;">
   </div>
 </div>
 
@@ -91,7 +91,7 @@ When you right-click a file image, git commands that can be executed for each st
   2. If you want to commit your staged file?<br/>
      Click 'git commit' button.
   <div align="center">
-  <div style="display:flex; justify-content: center;"><img width ="250px" height="250px" src="src/public/readmeimg/staged.png" alt="browsing action"/></div></div>
+  <div style="display:flex; justify-content: center;"><img width ="300px" height="300px" src="src/public/readmeimg/staged.png" alt="browsing action"/></div></div>
 
 - for [committed and unmodified items]
 
