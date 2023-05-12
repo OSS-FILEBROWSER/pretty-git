@@ -1,27 +1,16 @@
 import fs from "fs";
-// import path from "path";
-import { spawn } from "child_process";
 import { minimatch } from "minimatch";
-import path, { resolve } from "path";
 //class import
 import History from "./History.js";
+import File from "./File.js"; // 기존에 객체로 생성하던 파일을, 클래스로 분리
+import GitManager from "./GitManager.js";
 
 export default class Client {
   constructor() {
-    this._branch = undefined;
-    this._gitFiles = [];
     this._files = [];
     this._path = "/";
-    this._history = new History("/", false);
-    this._isRepo = false;
-    this._repoSrc = "none";
-    this._ignoreList = [];
-
-    if (minimatch("node_modules/", "node_modules/|node_modules/eslint/")) {
-      console.log("Path matches ignore pattern.");
-    } else {
-      console.log("Path does not match ignore pattern.");
-    }
+    this._history = new History("/", false, "none");
+    this._gitManager = new GitManager();
   }
 
   getFilesInCurrentDir = (history = null) => {
@@ -35,11 +24,29 @@ export default class Client {
           Promise.all(
             fileList.map((file) => {
               let cur = null;
-              this._gitFiles.forEach((item) => {
-                if (item.name == file) {
+              //git status에서 파싱된 파일과 겹치는지 확인
+              this._gitManager.gitFiles.forEach((item) => {
+                //디렉토리도 이름 체크를 위해, 단순 문자열 비교에서 정규표현식으로 변경
+                if (minimatch(item.name, file)) {
                   cur = item;
                 }
               });
+
+              //status 업데이트
+              let status = "none";
+              let statusType = "none";
+
+              if (cur) {
+                status = cur.status;
+              } else {
+                if (this._history.isRepo) {
+                  if (this._history.directoryStatus != "none") {
+                    status = this._history.directoryStatus;
+                  } else {
+                    status = "committed";
+                  }
+                }
+              }
 
               return new Promise((resolve, reject) => {
                 fs.stat(`${this._path}${file}`, (err, stats) => {
@@ -49,38 +56,24 @@ export default class Client {
                   );
 
                   if (err) {
-                    this._files.push({
-                      type: "unknown",
-                      name: file,
-                      initialized: false,
-                      status: undefined,
-                      statusType: undefined,
-                    });
+                    this._files.push(
+                      new File("unknown", file, false, status, statusType)
+                    );
                   } else {
                     if (stats.isDirectory()) {
-                      this._files.push({
-                        type: "directory",
-                        name: file,
-                        initialized: isAlreadyInit,
-                        status: cur
-                          ? cur.status
-                          : this._history.isRepo
-                          ? "committed"
-                          : undefined,
-                        statusType: cur ? cur.type : undefined,
-                      });
+                      this._files.push(
+                        new File(
+                          "directory",
+                          file,
+                          isAlreadyInit,
+                          status,
+                          statusType
+                        )
+                      );
                     } else {
-                      this._files.push({
-                        type: "file",
-                        name: file,
-                        initialized: false,
-                        status: cur
-                          ? cur.status
-                          : this._history.isRepo
-                          ? "committed"
-                          : undefined,
-                        statusType: cur ? cur.type : undefined,
-                      });
+                      this._files.push(
+                        new File("file", file, false, status, statusType)
+                      );
                     }
                   }
                   resolve();
@@ -140,266 +133,6 @@ export default class Client {
     return true;
   };
 
-  gitInit = (path) => {
-    return new Promise((resolve, reject) => {
-      const child = spawn("git", ["init"], { cwd: path });
-
-      child.on("exit", (code, signal) => {
-        if (code === 0) {
-          resolve("git init 성공!");
-        } else {
-          reject(`git init 실패. code: ${code}, signal: ${signal}`);
-        }
-      });
-
-      child.on("error", (error) => {
-        reject(`git init 실행 중 오류 발생: ${error}`);
-      });
-    });
-  };
-
-  gitAdd = (fileName) => {
-    return new Promise((resolve, reject) => {
-      const child = spawn("git", ["add", fileName], { cwd: this._path });
-
-      child.on("exit", (code, signal) => {
-        if (code === 0) {
-          resolve(`git add ${fileName} 성공!`);
-        } else {
-          reject(`git add ${fileName} 실패. code: ${code}, signal: ${signal}`);
-        }
-      });
-
-      child.on("error", (error) => {
-        reject(`git add ${fileName} 실행 중 오류 발생: ${error}`);
-      });
-    });
-  };
-
-  gitCommit = (fileName, commitMessage) => {
-    return new Promise((resolve, reject) => {
-      const args = ["commit", "-m", commitMessage, fileName];
-
-      const child = spawn("git", args, { cwd: this._path });
-
-      child.on("exit", (code, signal) => {
-        if (code === 0) {
-          const commitMessage = `git commit ${fileName} 성공!`;
-          resolve(commitMessage);
-        } else {
-          const errorMessage = `git commit ${fileName} 실패. code: ${code}, signal: ${signal}`;
-          reject(errorMessage);
-        }
-      });
-
-      child.on("error", (error) => {
-        console.log("something wrong");
-        reject(`git commit ${fileName} 실행 중 오류 발생: ${error}`);
-      });
-    });
-  };
-
-  gitRestore = (fileName, staged) => {
-    return new Promise((resolve, reject) => {
-      const command = staged ? ["restore", "--staged"] : ["restore"];
-      const args = [...command, fileName];
-
-      const child = spawn("git", args, { cwd: this._path });
-
-      child.on("exit", (code, signal) => {
-        if (code === 0) {
-          const message = `git ${command.join(" ")} ${fileName} 성공!`;
-          resolve(message);
-        } else {
-          const errorMessage = `git ${command.join(
-            " "
-          )} ${fileName} 실패. code: ${code}, signal: ${signal}`;
-          reject(errorMessage);
-        }
-      });
-
-      child.on("error", (error) => {
-        console.log("something wrong");
-        reject(`git ${command.join(" ")} 실행 중 오류 발생: ${error}`);
-      });
-    });
-  };
-
-  gitRemove = (fileName, staged) => {
-    return new Promise((resolve, reject) => {
-      const command = staged ? ["rm", "--cached"] : ["rm"];
-      const args = [...command, fileName];
-
-      const child = spawn("git", args, { cwd: this._path });
-
-      child.on("exit", (code, signal) => {
-        if (code === 0) {
-          const message = `git ${command.join(" ")} ${fileName} 성공!`;
-          resolve(message);
-        } else {
-          const errorMessage = `git ${command.join(
-            " "
-          )} ${fileName} 실패. code: ${code}, signal: ${signal}`;
-          reject(errorMessage);
-        }
-      });
-
-      child.on("error", (error) => {
-        console.log("something wrong");
-        reject(`git ${command.join(" ")} 실행 중 오류 발생: ${error}`);
-      });
-    });
-  };
-
-  gitMove = (oldFileName, newFileName) => {
-    return new Promise((resolve, reject) => {
-      const args = ["mv", oldFileName, newFileName];
-
-      const child = spawn("git", args, { cwd: this._path });
-
-      child.on("exit", (code, signal) => {
-        if (code === 0) {
-          resolve(`git mv ${oldFileName} ${newFileName} 성공!`);
-        } else {
-          reject(
-            `git mv ${oldFileName} ${newFileName} 실패. code: ${code}, signal: ${signal}`
-          );
-        }
-      });
-
-      child.on("error", (error) => {
-        console.log("something wrong");
-        reject(
-          `git mv ${oldFileName} ${newFileName} 실행 중 오류 발생: ${error}`
-        );
-      });
-    });
-  };
-
-  gitStatus = (path) => {
-    const repoDir = path; // the directory where you want to run `git status`
-
-    // Check if the directory exists
-    if (!fs.existsSync(repoDir)) {
-      return Promise.reject(`Error: ${repoDir} does not exist`);
-    }
-
-    return new Promise((resolve, reject) => {
-      // Spawn the `git status` command
-      const child = spawn("git", ["status"], { cwd: repoDir });
-
-      let stdout = "";
-      let stderr = "";
-
-      // Log any output from the command to the console
-      child.stdout.on("data", (data) => {
-        stdout += data;
-      });
-
-      child.stderr.on("data", (data) => {
-        stderr += data;
-      });
-
-      // Log the exit code when the command has finished running
-      child.on("close", (code) => {
-        if (code !== 0) {
-          reject(`child process exited with code ${code}\n${stderr}`);
-        } else {
-          resolve(stdout);
-        }
-      });
-    });
-  };
-
-  updateStatus(statusLog) {
-    this._gitFiles = [];
-    const lines = statusLog.toString().split("\n");
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-
-      if (line.startsWith("On branch ")) {
-        this._branch = line.substring("On branch ".length).trim();
-      } else if (line.startsWith("Changes to be committed:")) {
-        i += 2; // Skip the next line, which is a header
-        while (i < lines.length && lines[i] != "") {
-          const info = lines[i].split(":");
-          const type = info[0].trim();
-          let name = info[1].trim();
-          //renamed 상태일때는 화살표 제거
-          if (type == "renamed") {
-            name = name.split("->")[1].trim();
-          }
-
-          this._gitFiles.push({ name: name, status: "staged", type: type });
-          i++;
-        }
-        i--; // Go back one line so we don't skip any lines
-      } else if (line.startsWith("Changes not staged for commit:")) {
-        i += 3; // Skip the next line, which is a header
-        while (i < lines.length && lines[i] != "") {
-          const info = lines[i].split(":");
-          const type = info[0].trim();
-          const name = info[1].trim();
-          this._gitFiles.push({ name: name, status: "modified", type: type });
-          i++;
-        }
-        i--; // Go back one line so we don't skip any lines
-      } else if (line.startsWith("Untracked files:")) {
-        i += 2; // Skip the next line, which is a header
-        while (i < lines.length && lines[i] != "") {
-          const file = lines[i].trim();
-          this._gitFiles.push({ name: file, status: "untracked", type: null });
-          i++;
-        }
-        i--; // Go back one line so we don't skip any lines
-      }
-    }
-  }
-
-  //gitignore파일 파싱
-  parseGitIgnore(gitignorePath) {
-    const gitignoreContent = fs.readFileSync(gitignorePath, "utf8");
-    const ignorePatterns = gitignoreContent
-      .split("\n")
-      .filter((line) => line.trim() !== "" && !line.trim().startsWith("#"));
-
-    return ignorePatterns;
-  }
-  //ignored 인지 확인  - 정규표현식 매치 라이브러리
-  checkIgnores(isRepo) {
-    if (isRepo && this._ignoreList.length == 0) {
-      //1. gitignore parsing
-      try { 
-        this._ignoreList = this.parseGitIgnore(`${this._repoSrc}.gitignore`);
-      } catch (error) {
-        console.log("No gitignore file inside this repo")
-      }
-    }
-
-    if (this._ignoreList.length != 0) {
-      console.log("Starting to find an ignored file..");
-      console.log(this.repoSrc);
-      for (let ignorePattern of this._ignoreList) {
-        for (let file of this._files) {
-          let relativePath = path.relative(
-            this._repoSrc,
-            `${this._path}${file.name}`
-          );
-          if (file.type == "directory") {
-            relativePath = relativePath + "/";
-          }
-          const matchResult = minimatch(relativePath, ignorePattern);
-
-          if (matchResult == true) {
-            file.status = "ignored";
-            console.log(`${file.name} - ${file.status}`); // 성공적으로 ignored상태로 바뀌어진 파일들
-          }
-        }
-      }
-    }
-  }
-
   /**
    *
    * History 관련 멤버 함수
@@ -429,35 +162,11 @@ export default class Client {
     return this._history;
   }
 
-  get gitFiles() {
-    return this._gitFiles;
-  }
-
-  set gitFiles(val) {
-    this._gitFiles = val;
-  }
-
   get files() {
     return this._files;
   }
 
-  get branch() {
-    return this._branch;
-  }
-
-  get repoSrc() {
-    return this._repoSrc;
-  }
-
-  set repoSrc(val) {
-    this._repoSrc = val;
-  }
-
-  get ignoreList() {
-    return this._ignoreList;
-  }
-
-  set ignoreList(val) {
-    this._ignoreList = val;
+  get gitManager() {
+    return this._gitManager;
   }
 }

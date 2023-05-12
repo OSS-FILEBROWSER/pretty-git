@@ -5,7 +5,9 @@ body {
 
 li {
   list-style: none;
-  border: 2px solid black;
+}
+p {
+  margin: 0;
 }
 
 button,
@@ -74,22 +76,29 @@ input[type="reset"] {
   margin: 0 auto;
 }
 
+.button-section {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin: 20px 0;
+}
+
 /* back button */
 .back-button {
-  align-self: flex-start;
   display: flex;
-  flex-direction: row;
-  flex: 1;
-  margin: 10px 10px;
-  width: 200px;
-  height: 10px;
-  background-color: black;
-  color: #fff;
-  border-radius: 25px;
+  font-weight: 700;
+  font-size: 20px;
+  border-radius: 15px;
+  border: 2px solid black;
+  width: 150px;
+  align-items: center;
+  padding: 5px 5px;
+  margin-left: 20px;
+  transition: all 0.3s;
 }
 
 .back-button:hover {
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(133, 120, 120, 0.2);
 }
 
 .back-font {
@@ -97,11 +106,9 @@ input[type="reset"] {
 }
 
 .back-img-container {
-  width: 35px;
-  height: 35px;
-  margin: auto 8px;
-  border-radius: 25px;
-  background-color: #fff;
+  width: 30px;
+  height: 30px;
+  margin: auto 0;
 }
 
 .back-img-container img {
@@ -183,7 +190,7 @@ input[type="reset"] {
 }
 
 .ignored {
-  color: orangered
+  color: orangered;
 }
 
 .disabled {
@@ -213,9 +220,33 @@ input[type="reset"] {
 }
 
 .open-modal {
-  position: absolute;
-  top: 100px;
-  left: 250px;
+  display: flex;
+  font-weight: 700;
+  font-size: 20px;
+  border-radius: 15px;
+  border: 2px solid black;
+  width: 150px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  margin-right: 20px;
+  transition: all 0.3s;
+}
+
+.open-modal:hover {
+  background-color: rgba(133, 120, 120, 0.2);
+}
+
+.status-img-container {
+  width: 30px;
+  height: 30px;
+  margin: auto 0;
+}
+
+.status-img-container img {
+  width: inherit;
+  height: inherit;
 }
 
 .close-modal {
@@ -330,13 +361,38 @@ input[type="reset"] {
   padding: 0;
 }
 
-.status-item-ul-li {
+.status-item ul li {
   font-size: 14px;
   line-height: 1.5;
   margin-top: 3px;
   overflow-wrap: break-word;
+  font-weight: 700;
+  pointer-events: auto;
+  border-bottom: 1px solid rgba(133, 120, 120, 0.2);
+}
+
+.status-item ul li:hover {
+  background-color: #f0f0f0;
+  border-radius: 10px;
 }
 
 .hidden {
   display: none;
+}
+
+.commit-button {
+  position: absolute;
+  top: 30px;
+  right: 20px;
+  font-weight: 700;
+  font-size: 20px;
+  border-radius: 15px;
+  border: 2px solid black;
+  width: 150px;
+  padding: 5px 5px;
+  transition: all 0.3s;
+}
+
+.commit-button:hover {
+  background-color: rgba(133, 120, 120, 0.2);
 }

@@ -1,6 +1,48 @@
 //드래그 앤 드롭 구현
 render();
 
+// function handleDragDrop() {
+
+//   untrackedList.querySelectorAll("li").forEach((li) => {
+//     li.addEventListener("dragstart", (e) => {
+//       e.dataTransfer.setData("text/plain", e.target.textContent);
+//       e.dataTransfer.effectAllowed = "move";
+//     });
+
+//     li.addEventListener("drag", (e) => {});
+//   });
+
+//   modifiedList.addEventListener("dragover", (e) => {
+//     e.preventDefault();
+//   });
+
+//   modifiedList.addEventListener("drop", (e) => {
+//     e.preventDefault();
+//     const fileName = e.dataTransfer.getData("text/plain");
+//     modified.push(fileName);
+
+//     const index = untracked.indexOf(fileName);
+//     untracked.splice(index, 1);
+
+//     //untrackedList에서 옮겨진 li 태그를 삭제
+//     const liToDelete = untrackedList.querySelector(`li:nth-child(${index + 1})`);
+//     untrackedList.removeChild(liToDelete);
+
+//     render();
+//   });
+// }
+
+// function addDragListeners(list, state) {
+//   list.querySelectorAll("li").forEach((li) => {
+//     li.addEventListener("dragstart", (e) => {
+//       e.dataTransfer.setData("text/plain", e.target.textContent);
+//       e.dataTransfer.effectAllowed = "move";
+//     });
+
+//     li.addEventListener("drag", (e) => {});
+//   });
+// }
+
 function render() {
   untrackedList.innerHTML = "";
   modifiedList.innerHTML = "";
@@ -13,8 +55,8 @@ function render() {
       const li = document.createElement("li");
       switch (file.status) {
         case "untracked":
-          if(file.type) {
-            li.textContent = file.name + '(' + file.type + ')';
+          if (file.type) {
+            li.textContent = file.name + "(" + file.type + ")";
             untrackedList.appendChild(li);
           } else {
             li.textContent = file.name;
@@ -22,8 +64,9 @@ function render() {
           }
           break;
         case "staged":
-          if(file.type) {
-            li.textContent = file.name + '(' + file.type + ')';
+          if (file.type) {
+            console.log(file.type);
+            li.textContent = file.name + "(" + file.type + ")";
             stagedList.appendChild(li);
           } else {
             li.textContent = file.name;
@@ -31,8 +74,8 @@ function render() {
           }
           break;
         case "modified":
-          if(file.type) {
-            li.textContent = file.name + '(' + file.type + ')';
+          if (file.type) {
+            li.textContent = file.name + "(" + file.type + ")";
             modifiedList.appendChild(li);
           } else {
             li.textContent = file.name;
@@ -180,7 +223,7 @@ function handleModal() {
           onClick: async () => {
             try {
               const response = await axios.post("/dirs/git/restore/1", {
-                fileName: directoryName,
+                fileName: directoryName
               });
               window.location.href = "/";
             } catch (error) {
