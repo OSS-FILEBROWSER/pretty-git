@@ -55,6 +55,8 @@ app.get("/", async (req, res) => {
   const files = await user.getFilesInCurrentDir();
   user.gitManager.checkIgnores(files, user.path);
 
+  console.log(user.history);
+
   res.render("index", {
     title: "Pretty git, Make Your git usage Fancy",
     files: files,
@@ -63,8 +65,24 @@ app.get("/", async (req, res) => {
 
 app.post("/dirs/forward", (req, res) => {
   const temp = user.path; // 경로 복원용 임시 저장 변수
-  user.path = user.path + `${req.body.dirName}/`; // 유저 경로 업데이트
-  const newHistory = new History(user.path, user.history.isRepo);
+  const directoryName = req.body.dirName;
+
+  let newDirectoryStat = null;
+  user.files.forEach((file) => {
+    if (
+      file.name == directoryName &&
+      (file.status == "untracked" || file.status == "ignored")
+    ) {
+      newDirectoryStat = file.status;
+    }
+  });
+
+  user.path = user.path + `${directoryName}/`; // 유저 경로 업데이트
+  const newHistory = new History(
+    user.path,
+    user.history.isRepo, // directory 상태 상속
+    newDirectoryStat ? newDirectoryStat : user.history.directoryStatus // directory 상태 상속
+  );
 
   user
     .getFilesInCurrentDir(newHistory)
@@ -84,7 +102,11 @@ app.get("/dirs/backward", (req, res) => {
   if (user.history.prev) {
     user.popHistory(); // 이전 히스토리로 이동
     user.path = user.history.path; //현재 유저 경로를 이전 디렉토리로 업데이트
-    user.ignoreList = [];
+    user.gitManager.ignoreList = [];
+    if (!user.history.isRepo) {
+      user.gitManager.isRepo = false;
+      user.gitManager.repoSrc = "none";
+    }
     res.status(200).redirect("/"); //재렌더링
   }
 });
@@ -101,6 +123,10 @@ app.post("/dirs/git/init", (req, res) => {
 
 app.get("/dirs/git/isRepo", (req, res) => {
   res.send(user.history.isRepo);
+});
+
+app.get("/dirs/git/isTracked", (req, res) => {
+  res.send(user.history.directoryStatus);
 });
 
 app.get("/dirs/git/status", (req, res) => {
