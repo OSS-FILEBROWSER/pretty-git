@@ -156,11 +156,10 @@ app.post("/dirs/git/add", async (req, res) => {
 });
 
 app.post("/dirs/git/commit", async (req, res) => {
-  const fileName = req.body.fileName;
   const commitMessage = req.body.commitMessage;
 
   try {
-    const result = await gitCommit(fileName, commitMessage, user.path);
+    const result = await gitCommit(commitMessage, user.path);
     try {
       const logData = await gitStatus(user.path);
       user.gitManager.updateStatus(logData);

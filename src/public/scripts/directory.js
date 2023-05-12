@@ -138,22 +138,6 @@ directories.forEach(async (dir) => {
                 }
               },
             },
-            {
-              label: "git commit",
-              onClick: async () => {
-                try {
-                  const commitText = prompt("commit message 입력");
-                  const response = await axios.post("/dirs/git/commit", {
-                    fileName: directoryName,
-                    commitMessage: commitText,
-                  });
-                  window.location.href = "/";
-                } catch (error) {
-                  console.log(error);
-                  alert("something gone wrong while processing git commit");
-                }
-              },
-            },
           ])
         );
       } else if (statusString === "committed") {
@@ -182,14 +166,13 @@ directories.forEach(async (dir) => {
                   const res = await axios.post("/dirs/git/rm/1", {
                     fileName: directoryName,
                   });
+                  window.location.href = "/";
                 } catch (error) {
                   console.log(error);
                   alert(
                     "something gone wrong while processing git rm --cached"
                   );
                 }
-
-                window.location.href = "/";
               },
             },
             {
@@ -263,6 +246,23 @@ backButton.addEventListener("click", () => {
   }
 });
 
+// commit event
+async function requestCommit() {
+  try {
+    const commitText = prompt("commit message 입력");
+    const response = await axios.post("/dirs/git/commit", {
+      commitMessage: commitText,
+    });
+    if (response.status == 200) {
+      alert("All Staged files successfully committed!!");
+    }
+    window.location.reload();
+  } catch (error) {
+    console.log(error);
+    alert("something gone wrong while processing git commit");
+  }
+}
+
 // context menu 없애기
 function handleClearContextMenu(event) {
   const ctxMenu = document.getElementById("context-menu");
@@ -308,6 +308,9 @@ openModalButton.addEventListener("click", () => {
     dir.classList.add("modal-open");
   });
 
+  const commitButton = document.querySelector(".commit-button");
+  commitButton.addEventListener("click", requestCommit);
+
   //git status 요청
   axios.get("/dirs/git/status").then((res) => {
     //api로부터 받아온 파일 정보
@@ -342,6 +345,9 @@ openModalButton.addEventListener("click", () => {
 
 closeModalButton.addEventListener("click", function () {
   gitStatusModal.style.display = "none";
+
+  const commitButton = document.querySelector(".commit-button");
+  commitButton.removeEventListener("click", requestCommit);
   enableBodyScroll();
 });
 
