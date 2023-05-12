@@ -99,11 +99,11 @@ When you right-click a file image, git commands that can be executed for each st
 
   3. If you want to untrack your file?,
   Click the 'git rm --cached' buttton, now the file will be untracked.<br/>
-  <div style="display:flex; justify-content: center;"><img width ="500px" height="500px" src="src/public/readmeimg/committed.png" alt="browsing action"/></div>
+  <div style="display:flex; justify-content: center;"><img width ="300px" height="300px" src="src/public/readmeimg/committed.png" alt="browsing action"/></div>
 
-## 3. Features
+# Features
 
-### 1. git repo
+## 1. git repository
 
 <div style="display:flex; justify-content: center;"><img width ="300px" height="300px" src="src/public/readmeimg/gitrepo.png" alt="browsing action"/></div><br/>
 As you browse through the files, you can easily tell if a directory is a git repository by looking at the 'git' icon.
@@ -112,7 +112,7 @@ As you browse through the files, you can easily tell if a directory is a git rep
 
 Of course, you can also make your working directory into a git repository by right-clicking on the directory and selecting the 'git init' option. Then 'git' icon will show you on that file.
 
-### 2. git status
+## 2. git status
 
 You can check the approximate file status through the icon above the file.
 
@@ -121,7 +121,7 @@ You can check the approximate file status through the icon above the file.
 - Staged File Icon <div style="display:flex; justify-content: center;"><img width ="50px" height="50px" src="src/public/icons/staged.png" alt="browsing action"/></div>
 - Committed and Modified Icon <div style="display:flex; justify-content: center;"><img width ="50px" height="50px" src="src/public/icons/committed.png" alt="browsing action"/></div>
 - Modified File <div style="display:flex; justify-content: center;"><img width ="50px" height="50px" src="src/public/icons/modified.png" alt="browsing action"/></div>
-- .gitignore Icon <div style="display:flex; justify-content: center;"><img width ="50px" height="50px" src="src/public/icons/ignored.png" alt="browsing action"/></div>
+- Ignored Icon <div style="display:flex; justify-content: center;"><img width ="50px" height="50px" src="src/public/icons/ignored.png" alt="browsing action"/></div>
 
 You can view more detailed file status(renamed, deleted, modified) of your git repostory in a modal view via the 'git status' button in the upper right corner of the screen.
 
