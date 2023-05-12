@@ -55,8 +55,6 @@ app.get("/", async (req, res) => {
   const files = await user.getFilesInCurrentDir();
   user.gitManager.checkIgnores(files, user.path);
 
-  console.log(user.history);
-
   res.render("index", {
     title: "Pretty git, Make Your git usage Fancy",
     files: files,
@@ -176,7 +174,7 @@ app.post("/dirs/git/commit", async (req, res) => {
 app.post("/dirs/git/restore/:staged", async (req, res) => {
   const fileName = req.body.fileName;
   const staged = req.params.staged === "1";
-  
+
   try {
     const message = await gitRestore(fileName, staged, user.path);
     try {

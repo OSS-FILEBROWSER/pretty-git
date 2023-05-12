@@ -248,18 +248,22 @@ backButton.addEventListener("click", () => {
 
 // commit event
 async function requestCommit() {
-  try {
-    const commitText = prompt("commit message 입력");
-    const response = await axios.post("/dirs/git/commit", {
-      commitMessage: commitText,
-    });
-    if (response.status == 200) {
-      alert("All Staged files successfully committed!!");
+  const commitText = prompt("commit message 입력");
+  if (commitText !== null) {
+    try {
+      const response = await axios.post("/dirs/git/commit", {
+        commitMessage: commitText,
+      });
+      if (response.status == 200) {
+        alert("All Staged files successfully committed!!");
+      }
+      window.location.reload();
+    } catch (error) {
+      console.log(error);
+      alert("Something gone wrong while processing git commit");
     }
-    window.location.reload();
-  } catch (error) {
-    console.log(error);
-    alert("something gone wrong while processing git commit");
+  } else {
+    alert("You should type message to commit");
   }
 }
 
