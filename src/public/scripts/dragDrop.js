@@ -5,15 +5,8 @@ function render() {
   untrackedList.innerHTML = "";
   modifiedList.innerHTML = "";
   stagedList.innerHTML = "";
-  // committedList.innerHTML = "";
 
-  //각각의 상태에 대한 임시 저장 배열들
-  const untrackedT = [];
-  const modifiedT = [];
-  const stagedT = [];
-  
   axios.get("/dirs/files").then((res) => {
-    //api로부터 받아온 파일 정보
     const files = res.data;
 
     for (let file of files) {
