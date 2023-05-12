@@ -223,7 +223,7 @@ function handleModal() {
           onClick: async () => {
             try {
               const response = await axios.post("/dirs/git/restore/1", {
-                fileName: directoryName
+                fileName: directoryName,
               });
               window.location.href = "/";
             } catch (error) {
@@ -237,16 +237,19 @@ function handleModal() {
         {
           label: "git commit",
           onClick: async () => {
-            try {
-              const commitText = prompt("commit message 입력");
-              const response = await axios.post("/dirs/git/commit", {
-                fileName: directoryName,
-                commitMessage: commitText
-              });
-              window.location.href = "/";
-            } catch (error) {
-              console.log(error);
-              alert("something gone wrong while processing git commit");
+            const commitText = prompt("commit message 입력");
+            
+            if (commitText !== null) {
+              try {
+                const response = await axios.post("/dirs/git/commit", {
+                  fileName: directoryName,
+                  commitMessage: commitText
+                });
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                alert("something gone wrong while processing git commit");
+              }
             }
           },
         },

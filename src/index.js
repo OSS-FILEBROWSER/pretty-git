@@ -176,7 +176,7 @@ app.post("/dirs/git/commit", async (req, res) => {
 app.post("/dirs/git/restore/:staged", async (req, res) => {
   const fileName = req.body.fileName;
   const staged = req.params.staged === "1";
-
+  
   try {
     const message = await gitRestore(fileName, staged, user.path);
     try {
