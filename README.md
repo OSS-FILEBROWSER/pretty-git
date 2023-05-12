@@ -46,11 +46,13 @@
 
 You can browse directories by double clicking each directory item. But it is not allowed for you to access in files, no directories or directories that requires system permission.
 
-<div style="display:flex; justify-content: center;"><img width ="500px" height="250px" src="src/public/gifs/browsing.gif" alt="browsing action"/></div>
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="500px" height="250px" src="src/public/gifs/browsing.gif" alt="browsing action"/></div></div>
 
 Also, it is possible to go back to previous browsing history by clicking 'Go to previous' button on the left-top corner.
 
-<div style="display:flex; justify-content: center;"><img width ="500px" height="250px" src="src/public/gifs/popback.gif" alt="browsing action"/></div>
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="500px" height="250px" src="src/public/gifs/popback.gif" alt="browsing action"/></div></div>
 
 ## 2. Git Commands
 
@@ -62,7 +64,8 @@ When you right-click a file image, git commands that can be executed for each st
 
   For the untracked file, you can add the file into staged area.
   Clickk 'git add' option.
-  <div style="display:flex; justify-content: center;"><img width ="250px" height="250px" src="src/public/readmeimg/gitadd.png" alt="browsing action"/></div>
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="250px" height="250px" src="src/public/readmeimg/gitadd.png" alt="browsing action"/></div></div>
 
 - for [modified file]
 
@@ -72,8 +75,12 @@ When you right-click a file image, git commands that can be executed for each st
      Click 'git restore' option.
   2. If you want to stage your modification?<br/>
      Click 'git add' option.
+ <div align="center">
+  <div style="display: flex; justify-content: center;">
+    <img width="250px" height="250px" src="src/public/readmeimg/modified.png" alt="browsing action" style="display: block; margin: 0 auto;">
+  </div>
+</div>
 
-  <div style="display:flex; justify-content: center;"><img width ="250px" height="250px" src="src/public/readmeimg/modified.png" alt="browsing action"/></div>
 
 - for [staged file]
 
@@ -83,8 +90,8 @@ When you right-click a file image, git commands that can be executed for each st
      Click 'git restore --staged' button.
   2. If you want to commit your staged file?<br/>
      Click 'git commit' button.
-
-  <div style="display:flex; justify-content: center;"><img width ="250px" height="250px" src="src/public/readmeimg/staged.png" alt="browsing action"/></div>
+  <div align="center">
+  <div style="display:flex; justify-content: center;"><img width ="250px" height="250px" src="src/public/readmeimg/staged.png" alt="browsing action"/></div></div>
 
 - for [committed and unmodified items]
 
@@ -95,20 +102,24 @@ When you right-click a file image, git commands that can be executed for each st
      
   2. If you want to rename your file?<br/>
   Click thd 'git mv' button, then you can face the pop up screen for typing new name you want.
-  <div style="display:flex; justify-content: center;"><img width ="300px" height="150px" src="src/public/readmeimg/rename.png" alt="browsing action"/></div>
+  <div align="center">
+  <div style="display:flex; justify-content: center;"><img width ="300px" height="150px" src="src/public/readmeimg/rename.png" alt="browsing action"/></div></div>
 
   3. If you want to untrack your file?,
-  Click the 'git rm --cached' buttton, now the file will be untracked.<br/>
-  <div style="display:flex; justify-content: center;"><img width ="300px" height="300px" src="src/public/readmeimg/committed.png" alt="browsing action"/></div>
+  Click the 'git rm --cached' buttton, now the file will be untracked.<br/> 
+  <div align="center">
+  <div style="display:flex; justify-content: center;"><img width ="300px" height="300px" src="src/public/readmeimg/committed.png" alt="browsing action"/></div></div>
 
 # Features
 
 ## 1. git repository
 
-<div style="display:flex; justify-content: center;"><img width ="300px" height="300px" src="src/public/readmeimg/gitrepo.png" alt="browsing action"/></div><br/>
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="300px" height="300px" src="src/public/readmeimg/gitrepo.png" alt="browsing action"/></div><br/></div>
 As you browse through the files, you can easily tell if a directory is a git repository by looking at the 'git' icon.
 
-<div style="display:flex; justify-content: center;"><img width ="300px" height="300px" src="src/public/readmeimg/gitinit.png" alt="browsing action"/></div><br/>
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="300px" height="300px" src="src/public/readmeimg/gitinit.png" alt="browsing action"/></div><br/></div>
 
 Of course, you can also make your working directory into a git repository by right-clicking on the directory and selecting the 'git init' option. Then 'git' icon will show you on that file.
 
@@ -125,7 +136,8 @@ You can check the approximate file status through the icon above the file.
 
 You can view more detailed file status(renamed, deleted, modified) of your git repostory in a modal view via the 'git status' button in the upper right corner of the screen.
 
-<div style="display:flex; justify-content: center;"><img width ="500px" height="250px" src="src/public/readmeimg/gitstatusmodal.png" alt="browsing action"/></div>
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="500px" height="250px" src="src/public/readmeimg/gitstatusmodal.png" alt="browsing action"/></div></div>
 
 Allows browsing of .gitignore directories, but limits functionality to files.
 
