@@ -1,6 +1,5 @@
 //pacakge import
 import express from "express";
-import dotenv from "dotenv";
 import path from "path";
 //class import
 //!! import시 주의 사항 : 프로젝트가 module type으로 설정되어있어서
