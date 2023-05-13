@@ -89,6 +89,8 @@
 
 # Usages
 
+<span style="color: orangered;">[Warning]</span> We assume that you're running our service on English language environment. Also, Keep in mind that it can't process some tasks if you include special cases and other languages like Korean in the name of your files.
+
 ## 1. Browse directories
 
 You can browse directories by double clicking each directory item. But it is not allowed for you to access in files, no directories or directories that requires system permission.
@@ -155,6 +157,10 @@ Click thd 'git mv' button, then you can face the pop up screen for typing new na
 Click the 'git rm --cached' buttton, now the file will be untracked.<br/>
 <div align="center">
 <div style="display:flex; justify-content: center;"><img width ="300px" height="300px" src="src/public/readmeimg/committed.png" alt="browsing action"/></div></div>
+
+4. You should notice that we don't support 'git rm' and 'git rm --cached' with '-r', which means you can't run these commands about directories
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="300px" height="300px" src="src/public/readmeimg/rm_dir.png" alt="browsing action"/></div></div>
 
 # Features
 
