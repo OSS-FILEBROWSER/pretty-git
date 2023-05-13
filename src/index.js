@@ -15,6 +15,7 @@ import {
   gitStatus,
   gitCommit,
 } from "./modules/gitCommand.js";
+import { log } from "console";
 
 //Constant
 const PORT = 3000;
@@ -42,11 +43,12 @@ app.get("/", async (req, res) => {
 
   //레포일 경우 status 업데이트
   if (user.history.isRepo === true) {
-    gitStatus(user.path)
-      .then((data) => {
-        user.gitManager.updateStatus(data);
-      })
-      .catch((err) => console.log(err));
+    try {
+      const logData = await gitStatus(user.path);
+      user.gitManager.updateStatus(logData);
+    } catch (error) {
+      console.log(err);
+    }
   }
 
   const files = await user.getFilesInCurrentDir();
@@ -106,16 +108,6 @@ app.get("/dirs/backward", (req, res) => {
   }
 });
 
-app.post("/dirs/git/init", (req, res) => {
-  gitInit(user.path + `${req.body.dirName}/`)
-    .then((result) => {
-      res.status(200).send(result);
-    })
-    .catch((error) => {
-      res.status(500).send(error);
-    });
-});
-
 app.get("/dirs/git/isRepo", (req, res) => {
   res.send(user.history.isRepo);
 });
@@ -130,6 +122,16 @@ app.get("/dirs/git/status", (req, res) => {
 
 app.get("/dirs/files", (req, res) => {
   res.send(user.gitManager.gitFiles);
+});
+
+app.post("/dirs/git/init", (req, res) => {
+  gitInit(user.path + `${req.body.dirName}/`)
+    .then((result) => {
+      res.status(200).send(result);
+    })
+    .catch((error) => {
+      res.status(500).send(error);
+    });
 });
 
 app.post("/dirs/git/add", async (req, res) => {
