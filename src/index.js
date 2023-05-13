@@ -53,8 +53,6 @@ app.get("/", async (req, res) => {
   const files = await user.getFilesInCurrentDir();
   user.gitManager.checkIgnores(files, user.path);
 
-  console.log(user.history);
-
   res.render("index", {
     title: "Pretty git, Make Your git usage Fancy",
     files: files,

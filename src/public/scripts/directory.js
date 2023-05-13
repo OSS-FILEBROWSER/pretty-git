@@ -248,18 +248,22 @@ backButton.addEventListener("click", () => {
 
 // commit event
 async function requestCommit() {
-  try {
-    const commitText = prompt("commit message 입력");
-    const response = await axios.post("/dirs/git/commit", {
-      commitMessage: commitText,
-    });
-    if (response.status == 200) {
-      alert("All Staged files successfully committed!!");
+  const commitText = prompt("commit message 입력");
+  if (commitText !== null) {
+    try {
+      const response = await axios.post("/dirs/git/commit", {
+        commitMessage: commitText,
+      });
+      if (response.status == 200) {
+        alert("All Staged files successfully committed!!");
+      }
+      window.location.reload();
+    } catch (error) {
+      console.log(error);
+      alert("Something gone wrong while processing git commit");
     }
-    window.location.reload();
-  } catch (error) {
-    console.log(error);
-    alert("something gone wrong while processing git commit");
+  } else {
+    alert("You should type message to commit");
   }
 }
 
@@ -359,9 +363,6 @@ function enableBodyScroll() {
   document.body.style.overflow = "visible";
 }
 
-//root element event 관련
-rootElement.addEventListener("click", handleClearContextMenu);
-
 //git status button update
 const res = axios
   .get("/dirs/git/isRepo")
@@ -371,3 +372,10 @@ const res = axios
     }
   })
   .catch((err) => console.log(err));
+
+window.addEventListener("click", (event) => {
+  const contextMenu = document.getElementById("context-menu");
+  if (contextMenu && !contextMenu.contains(event.target)) {
+    contextMenu.remove();
+  }
+});
