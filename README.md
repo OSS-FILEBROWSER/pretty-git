@@ -16,14 +16,33 @@
 
 # Prerequisites
 
+- If you don't have a git, Install git first and then config your git account
+
+  - [Git installation](https://git-scm.com/)
+
+  - ```
+      git config --global user.email "your email"
+      git config --global user.name "your name"
+    ```
+
 - Install node.js runtime corresponding your machine platform. We highly recommend you to install LTS version.
   - [official node.js site](https://nodejs.org/ko)
 - To run local server in your machine, you need to install 'nodemon' package globally. Follow below command.
   <br>
-  Before running this command, You should have node runtime!!
+  Before running this command, check node version and npm version by runngin below commands.
+  If you got some errors, re-run your shell or terminal
+
+  ```
+    node -v
+    npm -v
+  ```
+
+  If the node is successfully installed, run below command to install nodemon
+
   ```
    npm i -g nodemon
   ```
+
 - Our project doesn't guarantee that it will work on every browser. We recommend you to use chrome browser.
   - [chrome browser download](https://www.google.com/chrome/?brand=CHBD&brand=CHBD&gclid=Cj0KCQjwmN2iBhCrARIsAG_G2i6teiD4fIvR-a5CQEAxNGkxlercrsgwv6onbD1pMKGr1soGa1exmQEaAm6bEALw_wcB&gclsrc=aw.ds)
 
@@ -33,7 +52,7 @@
    ```
     git clone https://github.com/OSS-FILEBROWSER/pretty-git.git
    ```
-2. First open your terminal. Then, Go to root directory and install dependencies
+2. First open your terminal or WindowsShell. Then, Go to root directory of cloned repository and install dependencies
    ```
    npm install
    ```

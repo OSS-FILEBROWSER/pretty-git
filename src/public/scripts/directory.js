@@ -51,6 +51,7 @@ directories.forEach(async (dir) => {
     isTracked.data != "untracked"
   ) {
     dir.addEventListener("contextmenu", (event) => {
+      console.log(dir);
       // 기본 Context Menu가 나오지 않게 차단
       event.preventDefault();
 
@@ -142,60 +143,89 @@ directories.forEach(async (dir) => {
         );
       } else if (statusString === "committed") {
         //committed
-        ctxMenu.appendChild(
-          renderContextMenuList([
-            {
-              label: "git rm",
-              onClick: async () => {
-                try {
-                  const res = await axios.post("/dirs/git/rm/0", {
-                    fileName: directoryName,
-                  });
-                  console.log(res.data);
-                  window.location.href = "/";
-                } catch (error) {
-                  console.log(error);
-                  alert("something gone wrong while processing git rm");
-                }
-              },
-            },
-            {
-              label: "git rm --cached",
-              onClick: async () => {
-                try {
-                  const res = await axios.post("/dirs/git/rm/1", {
-                    fileName: directoryName,
-                  });
-                  window.location.href = "/";
-                } catch (error) {
-                  console.log(error);
-                  alert(
-                    "something gone wrong while processing git rm --cached"
-                  );
-                }
-              },
-            },
-            {
-              label: "git mv",
-              onClick: async () => {
-                try {
-                  const input = prompt("Type new file name");
-                  const currentName = dir.querySelector(".directory-name");
-                  const response = await axios.post("/dirs/git/mv", {
-                    oldFileName: directoryName,
-                    newFileName: input,
-                  });
+        const dirIconSrc = imageContainer.childNodes[1].src;
+        const dirType = dirIconSrc.split("/")[4].split(".")[0];
 
-                  window.location.href = "/";
-                  currentName.textContent = input;
-                } catch (error) {
-                  console.log(error);
-                  alert("something gone wrong while processing git mv");
-                }
+        if (dirType == "documents") {
+          ctxMenu.appendChild(
+            renderContextMenuList([
+              {
+                label: "git rm",
+                onClick: async () => {
+                  try {
+                    const res = await axios.post("/dirs/git/rm/0", {
+                      fileName: directoryName,
+                    });
+                    console.log(res.data);
+                    window.location.href = "/";
+                  } catch (error) {
+                    console.log(error);
+                    alert("something gone wrong while processing git rm");
+                  }
+                },
               },
-            },
-          ])
-        );
+              {
+                label: "git rm --cached",
+                onClick: async () => {
+                  try {
+                    const res = await axios.post("/dirs/git/rm/1", {
+                      fileName: directoryName,
+                    });
+                    window.location.href = "/";
+                  } catch (error) {
+                    console.log(error);
+                    alert(
+                      "something gone wrong while processing git rm --cached"
+                    );
+                  }
+                },
+              },
+              {
+                label: "git mv",
+                onClick: async () => {
+                  try {
+                    const input = prompt("Type new file name");
+                    const currentName = dir.querySelector(".directory-name");
+                    const response = await axios.post("/dirs/git/mv", {
+                      oldFileName: directoryName,
+                      newFileName: input,
+                    });
+
+                    window.location.href = "/";
+                    currentName.textContent = input;
+                  } catch (error) {
+                    console.log(error);
+                    alert("something gone wrong while processing git mv");
+                  }
+                },
+              },
+            ])
+          );
+        } else {
+          ctxMenu.appendChild(
+            renderContextMenuList([
+              {
+                label: "git mv",
+                onClick: async () => {
+                  try {
+                    const input = prompt("Type new file name");
+                    const currentName = dir.querySelector(".directory-name");
+                    const response = await axios.post("/dirs/git/mv", {
+                      oldFileName: directoryName,
+                      newFileName: input,
+                    });
+
+                    window.location.href = "/";
+                    currentName.textContent = input;
+                  } catch (error) {
+                    console.log(error);
+                    alert("something gone wrong while processing git mv");
+                  }
+                },
+              },
+            ])
+          );
+        }
       } else if (statusString == "folder") {
         ctxMenu.appendChild(
           renderContextMenuList([
