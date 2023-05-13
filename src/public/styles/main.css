@@ -202,6 +202,11 @@ input[type="reset"] {
   text-align: center;
   font-weight: 500;
   font-size: 20px;
+
+  /* 파일 이름이 너무 긴 애들을 위한 처리 */
+  white-space: no-wrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* modal */

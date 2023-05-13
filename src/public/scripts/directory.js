@@ -46,8 +46,8 @@ directories.forEach(async (dir) => {
   const isTracked = await axios.get("/dirs/git/isTracked");
   if (
     statusString != "ignored" &&
-    statusString != "folder" &&
     statusString != "documents" &&
+    statusString != "git" &&
     isTracked.data != "untracked"
   ) {
     dir.addEventListener("contextmenu", (event) => {
@@ -196,7 +196,7 @@ directories.forEach(async (dir) => {
             },
           ])
         );
-      } else if (statusString == "git") {
+      } else if (statusString == "folder") {
         ctxMenu.appendChild(
           renderContextMenuList([
             {
