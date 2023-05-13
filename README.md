@@ -89,7 +89,9 @@
 
 # Usages
 
-<span style="color: orangered;">[Warning]</span> We assume that you're running our service on English language environment. Also, Keep in mind that it can't process some tasks if you include special cases and other languages like Korean in the name of your files.
+<span style="color: orangered;">[Warning]</span> We assume that you're running our service on English language environment. You should set English to your terminal profile and git language as a default if you don't want to have any problems while using our service.(From v0.3.1, we started to support Korean git status parsing functionality. But it is still unstable)
+<br>
+Also, Keep in mind that it can't process some tasks if you include special cases and other languages like Korean in the name of your files.
 
 ## 1. Browse directories
 
@@ -133,14 +135,12 @@ Click 'git add' option.
 
 ### For Staged Files
 
-For the staged file, you can do a couple of git commands, 'git restore --staged' and 'git commit'.
+For the staged file, you can restore staged files to move it into modified stage or discard changes, 'git restore --staged'.
 
 1. If you want to change the git status from staged to untracked?<br/>
-   Click 'git restore --staged' button.
-2. If you want to commit your staged file?<br/>
-Click 'git commit' button.
+Click 'git restore --staged' button.
 <div align="center">
-<div style="display:flex; justify-content: center;"><img width ="300px" height="300px" src="src/public/readmeimg/staged.png" alt="browsing action"/></div></div>
+<div style="display:flex; justify-content: center;"><img width ="300px" height="300px" src="src/public/readmeimg/staged-item.png" alt="browsing action"/></div></div>
 
 ### For Committed and Unmodified items
 
@@ -193,11 +193,22 @@ You can check the approximate file status through the icon above the file.
   <br>
 - Ignored Icon <div style="display:flex; "><img width ="50px" height="50px" src="src/public/icons/ignored.png" alt="browsing action"/></div>
 
-If you request 'git rm', 'git restore', you can't see any of the modified or staged files in GUI.
+If you request 'git rm', 'git restore', you can't see any of the modified or staged files in GUI view.
 Instead, If you click 'git status' button, You can view more detailed file status(renamed, deleted, modified) of your git repostory in a modal view via the 'git status' button in the upper right corner of the screen.
 
 <div align="center">
 <div style="display:flex; justify-content: center;"><img width ="500px" height="250px" src="src/public/readmeimg/gitstatusmodal.png" alt="browsing action"/></div></div>
+
+We are providing Integrated commit interface in this modal screen. If you want to commit all the staged at once, you just need to click 'Let`s commit!' button on the right-top corner.
+
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="500px" height="250px" src="src/public/readmeimg/commit-modal.png" alt="browsing action"/></div></div>
+Then, Type any message that you want to include in your new commit.
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="500px" height="250px" src="src/public/readmeimg/commit-message.png" alt="browsing action"/></div></div>
+Finally, if you click '확인' or 'yes' buttom on prompt, you can get this alert after successful commit
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="500px" height="250px" src="src/public/readmeimg/success-commit.png" alt="browsing action"/></div></div>
 
 You are allowed to browse in ignored directories, but are restricted to do functionalities that we supports.
 
