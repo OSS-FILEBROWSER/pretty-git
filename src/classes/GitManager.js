@@ -113,6 +113,10 @@ export default class GitManager {
     return this._branch;
   }
 
+  set branch(val) {
+    this._branch = val;
+  }
+
   get isRepo() {
     return this._isRepo;
   }

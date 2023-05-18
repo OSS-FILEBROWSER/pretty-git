@@ -10,7 +10,8 @@ import {
   restoreFile,
   commitFiles,
   renameFile,
-  getBranchInfo,
+  handleBranchRequest,
+  showAllLocalBranches,
 } from "../controllers/apiController.js";
 
 const router = Router();
@@ -18,7 +19,8 @@ const router = Router();
 
 export function apiRouterWrapper(user) {
   //새로 추가된 api
-  router.get("/branch", (req, res) => getBranchInfo(req, res, user));
+  router.post("/branch", (req, res) => handleBranchRequest(req, res, user));
+  router.get("/branches", (req, res) => showAllLocalBranches(req, res, user));
 
   router.get("/isRepo", (req, res) => checkRepo(req, res, user));
 
