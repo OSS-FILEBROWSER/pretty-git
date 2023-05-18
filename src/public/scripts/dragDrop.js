@@ -6,7 +6,7 @@ function render() {
   modifiedList.innerHTML = "";
   stagedList.innerHTML = "";
 
-  axios.get("/dirs/files").then((res) => {
+  axios.get("/dirs/git/files").then((res) => {
     const files = res.data;
 
     for (let file of files) {
