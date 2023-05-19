@@ -17,6 +17,7 @@ block body
                 h3 Current Git Status
                 button.close-modal 
                     img(src='icons/return.png')
+                button.commit-button Let's Commit!
                 div.status-list
                     div.status-item.untracked
                         h4 Untracked
@@ -33,7 +34,7 @@ block body
                 
         div#directory-container
             each file in files
-                div(class=`${file.type == "directory" ? "directory-item" : file.status != "none" ? "directory-item status-directory-item" : "directory-item disabled"} ${file.status == "ignored" ? "disabled" : ""}`)
+                div(class=`${file.type == "directory" ? "directory-item" : file.status != "none" ? "directory-item status-directory-item" : "directory-item disabled"} ${(file.status == "ignored" && file.type == "file") ? "disabled" : ""}`)
                     //img 주소 및 크기 고정
                     div.file-image-container
                         //- div.git-status

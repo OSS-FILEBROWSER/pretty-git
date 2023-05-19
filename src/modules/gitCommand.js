@@ -114,18 +114,18 @@ const gitMove = (oldFileName, newFileName, curPath) => {
   });
 };
 
-const gitCommit = (fileName, commitMessage, userPath) => {
+const gitCommit = (commitMessage, userPath) => {
   return new Promise((resolve, reject) => {
-    const args = ["commit", "-m", commitMessage, fileName];
+    const args = ["commit", "-m", commitMessage];
 
     const child = spawn("git", args, { cwd: userPath });
 
     child.on("exit", (code, signal) => {
       if (code === 0) {
-        const message = `git commit ${fileName} 성공!`;
+        const message = `git commit  성공!`;
         resolve(message);
       } else {
-        const error = `git commit ${fileName} 실패. code: ${code}, signal: ${signal}`;
+        const error = `git commit 실패. code: ${code}, signal: ${signal}`;
         reject(error);
       }
     });
@@ -172,6 +172,38 @@ const gitStatus = (path) => {
   });
 };
 
+const gitBranch = (userPath, branchName) => {
+  return new Promise((resolve, reject) => {
+    const args = ["branch", branchName];
+    const child = spawn("git", args, { cwd: userPath });
+
+    let stdout = "";
+    let stderr = "";
+
+    // Log any output from the command to the console
+    child.stdout.on("data", (data) => {
+      stdout += data;
+    });
+
+    child.stderr.on("data", (data) => {
+      stderr += data;
+    });
+
+    child.on("exit", (code, signal) => {
+      if (code === 0) {
+        const message = `Successfully create branch : ${stdout}`;
+        resolve(message);
+      } else {
+        reject(stderr);
+      }
+    });
+
+    child.on("error", (error) => {
+      reject(`git branch ${branchName} 실행 중 오류 발생: ${error}`);
+    });
+  });
+};
+
 export {
   gitAdd,
   gitInit,
@@ -180,4 +212,5 @@ export {
   gitRestore,
   gitStatus,
   gitCommit,
+  gitBranch,
 };

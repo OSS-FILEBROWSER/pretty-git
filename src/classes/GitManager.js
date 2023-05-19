@@ -18,9 +18,12 @@ export default class GitManager {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
 
-      if (line.startsWith("On branch ")) {
+      if (line.startsWith("On branch ") || line.startsWith("현재 브랜치 ")) {
         this._branch = line.substring("On branch ".length).trim();
-      } else if (line.startsWith("Changes to be committed:")) {
+      } else if (
+        line.startsWith("Changes to be committed:") ||
+        line.startsWith("커밋할 변경 사항:")
+      ) {
         i += 2; // Skip the next line, which is a header
         while (i < lines.length && lines[i] != "") {
           const info = lines[i].split(":");
@@ -35,7 +38,10 @@ export default class GitManager {
           i++;
         }
         i--; // Go back one line so we don't skip any lines
-      } else if (line.startsWith("Changes not staged for commit:")) {
+      } else if (
+        line.startsWith("Changes not staged for commit:") ||
+        line.startsWith("커밋하도록 정하지 않은 변경 사항:")
+      ) {
         i += 3; // Skip the next line, which is a header
         while (i < lines.length && lines[i] != "") {
           const info = lines[i].split(":");
@@ -45,7 +51,10 @@ export default class GitManager {
           i++;
         }
         i--; // Go back one line so we don't skip any lines
-      } else if (line.startsWith("Untracked files:")) {
+      } else if (
+        line.startsWith("Untracked files:") ||
+        line.startsWith("추적하지 않는 파일:")
+      ) {
         i += 2; // Skip the next line, which is a header
         while (i < lines.length && lines[i] != "") {
           const file = lines[i].trim();
@@ -102,6 +111,10 @@ export default class GitManager {
 
   get branch() {
     return this._branch;
+  }
+
+  set branch(val) {
+    this._branch = val;
   }
 
   get isRepo() {
