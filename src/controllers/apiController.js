@@ -240,6 +240,36 @@ const showAllLocalBranches = async (req, res, user) => {
   }
 };
 
+const handleMergeRequest = async (req, res, user) => {
+  try {
+    gitHelper.cwd(user.path);
+    const { targetBranch } = req.body;
+    // const currentBranch = user.gitManager.branch;
+    await gitHelper.merge([targetBranch]);
+    res.status(200).json({
+      type: "success",
+      msg: `Successfully merged from '${targetBranch}' to  '${user.gitManager.branch}'`,
+    });
+  } catch (error) {
+    //merge conflict 발생 시
+    console.log(error);
+    try {
+      await gitHelper.reset(["--hard", "ORIG_HEAD"]);
+      res.status(400).json({
+        type: "error",
+        msg: "Failed to Merge, but we aborted it.",
+        errorData: error,
+      });
+    } catch (abortErr) {
+      res.status(400).json({
+        type: "error",
+        msg: "Failed to Merge, and also something gone wrong while aborting merge.",
+        errorData: abortErr,
+      });
+    }
+  }
+};
+
 export {
   checkRepo,
   checkStatus,
@@ -253,4 +283,5 @@ export {
   renameFile,
   handleBranchRequest,
   showAllLocalBranches,
+  handleMergeRequest,
 };
