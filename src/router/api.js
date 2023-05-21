@@ -12,6 +12,7 @@ import {
   renameFile,
   handleBranchRequest,
   showAllLocalBranches,
+  handleMergeRequest,
 } from "../controllers/apiController.js";
 
 const router = Router();
@@ -21,6 +22,8 @@ export function apiRouterWrapper(user) {
   //새로 추가된 api
   router.post("/branch", (req, res) => handleBranchRequest(req, res, user));
   router.get("/branches", (req, res) => showAllLocalBranches(req, res, user));
+
+  router.post("/merge", (req, res) => handleMergeRequest(req, res, user));
 
   router.get("/isRepo", (req, res) => checkRepo(req, res, user));
 
