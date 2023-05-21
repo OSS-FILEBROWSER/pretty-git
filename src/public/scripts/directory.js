@@ -3,6 +3,7 @@ const directories = document.querySelectorAll(".directory-item");
 const backButton = document.querySelector("#back");
 const gitStatusModal = document.querySelector(".git-status-modal");
 const openModalButton = document.querySelector(".open-modal");
+const branchButton = document.querySelector(".branch-button")
 const closeModalButton = document.querySelector(".close-modal");
 const untrackedList = document.querySelector(".status-item.untracked ul");
 const modifiedList = document.querySelector(".status-item.modified ul");
@@ -365,6 +366,7 @@ const res = axios
   .then((res) => {
     if (res.data) {
       openModalButton.classList.remove("hidden");
+      branchButton.classList.remove("hidden");
     }
   })
   .catch((err) => console.log(err));
