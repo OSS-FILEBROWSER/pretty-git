@@ -32,11 +32,13 @@ input[type="reset"] {
 #directory-container {
   width: 90%;
   height: 100%;
+  max-width: 100vw;
   display: grid;
   /* 최대 100개의 row에 대해서 적용 */
   grid-template-rows: repeat(2, 250px);
   grid-template-columns: repeat(4, 1fr);
   grid-auto-rows: 250px;
+  grid-auto-columns: 1fr;
   gap: 80px;
 }
 
@@ -118,6 +120,7 @@ input[type="reset"] {
 
 /* directory layout & item style */
 .directory-item {
+  position: relative;
   -webkit-user-drag: none;
   user-select: none;
   -moz-user-select: none;
@@ -199,9 +202,16 @@ input[type="reset"] {
 }
 
 .directory-name {
+  position: absolute;
   text-align: center;
   font-weight: 500;
   font-size: 20px;
+  width: calc(100vw / 7);
+  left: 12%;
+  /* 파일 이름이 너무 긴 애들을 위한 처리 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* modal */
