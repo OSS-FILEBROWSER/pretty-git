@@ -394,22 +394,6 @@ function enableBodyScroll() {
   document.body.style.overflow = "visible";
 }
 
-// window.onload = function() {
-//   const branchName = "";
-//   var pTag = branchButton.querySelector("p")
-
-//   axios.post("/dirs/git/branch", {mode : "get"})
-//   .then(res => {
-//     console.log(res)
-//     branchName = res.data;
-//   })
-//   .catch(error => {
-//     console.error('Error:', error);
-//   });
-
-//   pTag.textContent = branchName;
-// }
-
 //git status button update
 const res = axios
   .get("/dirs/git/isRepo")
