@@ -507,8 +507,18 @@ branchButton.addEventListener("click", (event) => {
                 }
               } 
             },
-            { label: "Checkout", onClick: () => {
-                
+            { label: "Checkout", onClick: async () => {
+                try {
+                  const response = await axios.post("/dirs/git/branch", {
+                    mode: "checkout",
+                    branchName: branch
+                  });
+                  window.location.href = "/";
+                } catch (error) {
+                  console.log(error);
+                  alert("something gone wrong while processing");
+                  console.log(branch);
+                }
               } 
             },
             ],
