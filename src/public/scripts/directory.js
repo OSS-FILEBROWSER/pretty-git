@@ -319,6 +319,24 @@ function renderContextMenuList(list) {
 
     ctxMenuItem.className = "custom-context-menu-li";
 
+    if (item.submenu) {
+      const arrowIcon = document.createElement("span");
+      arrowIcon.className = "submenu-arrow";
+      ctxMenuItemAnchor.appendChild(arrowIcon);
+
+      const submenu = renderContextMenuList(item.submenu);
+      submenu.className = "submenu-container";
+      ctxMenuItem.appendChild(submenu);
+
+      ctxMenuItem.addEventListener("mouseenter", () => {
+        submenu.style.display = "block";
+      });
+
+      ctxMenuItem.addEventListener("mouseleave", () => {
+        submenu.style.display = "none";
+      });
+    }
+
     // 클릭 이벤트 설정
     if (item.onClick) {
       ctxMenuItem.addEventListener("click", item.onClick, false);
@@ -442,6 +460,12 @@ branchButton.addEventListener("click", (event) => {
             onClick: async () => {
               // 클릭 이벤트
             },
+            submenu: [
+              { label: "Create", onClick: () => { /* Create의 클릭 이벤트 */ } },
+              { label: "Delete", onClick: () => { /* Delete의 클릭 이벤트 */ } },
+              { label: "Rename", onClick: () => { /* Rename의 클릭 이벤트 */ } },
+              { label: "Checkout", onClick: () => { /* Checkout의 클릭 이벤트 */ } },
+            ],
           }))
         )
       );
@@ -449,3 +473,4 @@ branchButton.addEventListener("click", (event) => {
     })
     .catch((err) => console.log(err));
 })
+
