@@ -394,11 +394,38 @@ function enableBodyScroll() {
   document.body.style.overflow = "visible";
 }
 
+// window.onload = function() {
+//   const branchName = "";
+//   var pTag = branchButton.querySelector("p")
+
+//   axios.post("/dirs/git/branch", {mode : "get"})
+//   .then(res => {
+//     console.log(res)
+//     branchName = res.data;
+//   })
+//   .catch(error => {
+//     console.error('Error:', error);
+//   });
+
+//   pTag.textContent = branchName;
+// }
+
 //git status button update
 const res = axios
   .get("/dirs/git/isRepo")
   .then((res) => {
     if (res.data) {
+      var pTag = branchButton.querySelector("p");
+
+      axios.post("/dirs/git/branch", {mode : "get"})
+      .then((res) => {
+        console.log(res.data);
+        pTag.textContent = res.data;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+
       openModalButton.classList.remove("hidden");
       branchButton.classList.remove("hidden");
     }
@@ -411,3 +438,30 @@ window.addEventListener("click", (event) => {
     contextMenu.remove();
   }
 });
+
+branchButton.addEventListener("click", (event) => {
+  axios
+    .get("/dirs/git/branches")
+    .then((res) => {
+      const branchList = Object.keys(res.data.data.branches);
+
+      const ctxMenu = document.createElement("div");
+      ctxMenu.id = "context-menu";
+      ctxMenu.className = "custom-context-menu";
+      ctxMenu.style.top = event.pageY + "px";
+      ctxMenu.style.left = event.pageX + "px";
+
+      ctxMenu.appendChild(
+        renderContextMenuList(
+          branchList.map((branch) => ({
+            label: branch,
+            onClick: async () => {
+              // 클릭 이벤트
+            },
+          }))
+        )
+      );
+      document.body.appendChild(ctxMenu);
+    })
+    .catch((err) => console.log(err));
+})
