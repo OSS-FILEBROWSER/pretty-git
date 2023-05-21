@@ -490,8 +490,21 @@ branchButton.addEventListener("click", (event) => {
                 }
               } 
             },
-            { label: "Rename", onClick: () => {
-                
+            { label: "Rename", onClick: async () => {
+                try {
+                  const input = prompt("Enter branch name");
+                  if (input !== null) {
+                    const response = await axios.post("/dirs/git/branch", {
+                      mode: "rename",
+                      branchName: branch,
+                      newName: input
+                    });
+                  }
+                  window.location.href = "/";
+                } catch (error) {
+                  console.log(error);
+                  alert("something gone wrong while processing");
+                }
               } 
             },
             { label: "Checkout", onClick: () => {
