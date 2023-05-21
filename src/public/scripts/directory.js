@@ -477,8 +477,17 @@ branchButton.addEventListener("click", (event) => {
                 }
               } 
             },
-            { label: "Delete", onClick: () => { 
-                
+            { label: "Delete", onClick: async () => { 
+                try {
+                  const response = await axios.post("/dirs/git/branch", {
+                    mode: "delete",
+                    branchName: branch,
+                  });
+                  window.location.href = "/";
+                } catch (error) {
+                  console.log(error);
+                  alert("Something went wrong while processing");
+                }
               } 
             },
             { label: "Rename", onClick: () => {
