@@ -461,10 +461,34 @@ branchButton.addEventListener("click", (event) => {
               // 클릭 이벤트
             },
             submenu: [
-              { label: "Create", onClick: () => { /* Create의 클릭 이벤트 */ } },
-              { label: "Delete", onClick: () => { /* Delete의 클릭 이벤트 */ } },
-              { label: "Rename", onClick: () => { /* Rename의 클릭 이벤트 */ } },
-              { label: "Checkout", onClick: () => { /* Checkout의 클릭 이벤트 */ } },
+            { label: "Create", onClick: async () => { 
+                try {
+                  const input = prompt("Enter branch name");
+                  if (input !== null) {
+                    const response = await axios.post("/dirs/git/branch", {
+                      mode: "create",
+                      branchName: input
+                    });
+                  }
+                  window.location.href = "/";
+                } catch (error) {
+                  console.log(error);
+                  alert("something gone wrong while processing");
+                }
+              } 
+            },
+            { label: "Delete", onClick: () => { 
+                
+              } 
+            },
+            { label: "Rename", onClick: () => {
+                
+              } 
+            },
+            { label: "Checkout", onClick: () => {
+                
+              } 
+            },
             ],
           }))
         )
