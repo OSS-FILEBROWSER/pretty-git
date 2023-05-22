@@ -535,10 +535,11 @@ branchButton.addEventListener("click", (event) => {
                             targetBranch: branch,
                           });
                           window.location.href = "/";
-                          successMsg = `Successfully merged from '${targetBranch}' to  '${user.gitManager.branch}'`;
+                          // successMsg = `Successfully merged from '${targetBranch}' to  '${user.gitManager.branch}'`;
                           alert(successMsg);
                         } catch (error) {
-                          alert("Failed to Merge, but we aborted it.");
+                          const errorMsg = error.response.data; // 에러 응답의 데이터를 가져옴
+                          console.log(errorMsg); // 에러 메시지를 콘솔에 출력하거나 다른 작업에 활용할 수 있음
                         }
                       },
                     },
