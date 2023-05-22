@@ -270,11 +270,19 @@ const handleMergeRequest = async (req, res, user) => {
   }
 };
 
-const sendCommitHistory = async (_req, res) => {
+const sendCommitHistory = async (req, res) => {
   //command  : git log --graph --pretty=format:$%h - %an : %s
-  const log = await git.log(["--graph", "--pretty=format:$%h - %an : %s"]);
+  const { branchName } = req.body;
+  const log = await git.log([
+    branchName,
+    "--graph",
+    "--pretty=format:$%h - %an : %s",
+  ]);
 
-  res.render("graph", { log: log });
+  res.render("graph", {
+    log: log,
+    title: "Pretty git, Make Your git usage Fancy",
+  });
 };
 
 export {
