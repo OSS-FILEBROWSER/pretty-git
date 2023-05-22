@@ -270,6 +270,13 @@ const handleMergeRequest = async (req, res, user) => {
   }
 };
 
+const sendCommitHistory = async (_req, res) => {
+  //command  : git log --graph --pretty=format:$%h - %an : %s
+  const log = await git.log(["--graph", "--pretty=format:$%h - %an : %s"]);
+
+  res.render("graph", { log: log });
+};
+
 export {
   checkRepo,
   checkStatus,
@@ -284,4 +291,5 @@ export {
   handleBranchRequest,
   showAllLocalBranches,
   handleMergeRequest,
+  sendCommitHistory,
 };
