@@ -274,7 +274,10 @@ const sendCommitHistory = async (_req, res) => {
   //command  : git log --graph --pretty=format:$%h - %an : %s
   const log = await git.log(["--graph", "--pretty=format:$%h - %an : %s"]);
 
-  res.render("graph", { log: log });
+  res.render("graph", {
+    log: log,
+    title: "Pretty git, Make Your git usage Fancy",
+  });
 };
 
 export {
