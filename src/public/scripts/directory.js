@@ -454,91 +454,185 @@ branchButton.addEventListener("click", (event) => {
       ctxMenu.style.top = event.pageY + "px";
       ctxMenu.style.left = event.pageX + "px";
 
+      // ctxMenu.appendChild(
+      //   renderContextMenuList(
+      //     branchList.map((branch) => ({
+      //       label: branch,
+      //       onClick: async () => {
+      //         // 클릭 이벤트
+      //       },
+      //       submenu: [
+      //       { label: "Create", onClick: async () => { 
+      //           try {
+      //             const input = prompt("Enter branch name");
+      //             if (input !== null) {
+      //               const response = await axios.post("/dirs/git/branch", {
+      //                 mode: "create",
+      //                 branchName: input
+      //               });
+      //             }
+      //             window.location.href = "/";
+      //           } catch (error) {
+      //             console.log(error);
+      //             const errorList = error.response.data.msg.split("Error: error:")
+      //             alert("!![ERROR] : "+ errorList[1]);
+      //           }
+      //         } 
+      //       },
+      //       ...(branch !== currentBranch
+      //         ? [
+      //             {
+      //               label: "Delete",
+      //               onClick: async () => {
+      //                 try {
+      //                   const response = await axios.post("/dirs/git/branch", {
+      //                     mode: "delete",
+      //                     branchName: branch,
+      //                   });
+      //                   window.location.href = "/";
+      //                 } catch (error) {
+      //                   console.log(error);
+      //                   const errorList = error.response.data.msg.split("Error: error:")
+      //                   alert("!![ERROR] : "+ errorList[1]);
+      //                 }
+      //               },
+      //             },
+      //             {
+      //               label: "Checkout",
+      //               onClick: async () => {
+      //                 try {
+      //                   const response = await axios.post("/dirs/git/branch", {
+      //                     mode: "checkout",
+      //                     branchName: branch
+      //                   });
+      //                   window.location.href = "/";
+      //                 } catch (error) {
+      //                   console.log(error);
+      //                   const errorList = error.response.data.msg.split("Error: error:")
+      //                   alert("!![ERROR] : "+ errorList[1]);
+      //                   console.log(branch);
+      //                 }
+      //               },
+      //             },
+      //           ]
+      //         : []),
+      //       { label: "Rename", 
+      //         onClick: async () => {
+      //           try {
+      //             const input = prompt("Enter branch name");
+      //             if (input !== null) {
+      //               const response = await axios.post("/dirs/git/branch", {
+      //                 mode: "rename",
+      //                 branchName: branch,
+      //                 newName: input
+      //               });
+      //             }
+      //             window.location.href = "/";
+      //           } catch (error) {
+      //             console.log(error);
+      //             const errorList = error.response.data.msg.split("Error: error:")
+      //             alert("!![ERROR] : "+ errorList[1]);
+      //           }
+      //         } 
+      //       },
+      //       ],
+      //     }))
+      //   )
+      // );
+
+      
       ctxMenu.appendChild(
-        renderContextMenuList(
-          branchList.map((branch) => ({
+        renderContextMenuList([
+          {
+            label: "Create new branch", 
+            onClick: async () => { 
+              try {
+                const input = prompt("Enter branch name");
+                if (input !== null) {
+                  const response = await axios.post("/dirs/git/branch", {
+                    mode: "create",
+                    branchName: input
+                  });
+                }
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                const errorList = error.response.data.msg.split("Error: error:")
+                alert("!![ERROR] : "+ errorList[1]);
+              }
+            } 
+          },
+          ...branchList.map((branch) => ({
             label: branch,
             onClick: async () => {
               // 클릭 이벤트
             },
             submenu: [
-            { label: "Create", onClick: async () => { 
-                try {
-                  const input = prompt("Enter branch name");
-                  if (input !== null) {
-                    const response = await axios.post("/dirs/git/branch", {
-                      mode: "create",
-                      branchName: input
-                    });
-                  }
-                  window.location.href = "/";
-                } catch (error) {
-                  console.log(error);
-                  const errorList = error.response.data.msg.split("Error: error:")
-                  alert("!![ERROR] : "+ errorList[1]);
-                }
-              } 
-            },
-            ...(branch !== currentBranch
-              ? [
-                  {
-                    label: "Delete",
-                    onClick: async () => {
-                      try {
-                        const response = await axios.post("/dirs/git/branch", {
-                          mode: "delete",
-                          branchName: branch,
-                        });
-                        window.location.href = "/";
-                      } catch (error) {
-                        console.log(error);
-                        const errorList = error.response.data.msg.split("Error: error:")
-                        alert("!![ERROR] : "+ errorList[1]);
-                      }
+              
+              ...(branch !== currentBranch
+                ? [
+                    {
+                      label: "Checkout",
+                      onClick: async () => {
+                        try {
+                          const response = await axios.post("/dirs/git/branch", {
+                            mode: "checkout",
+                            branchName: branch
+                          });
+                          window.location.href = "/";
+                        } catch (error) {
+                          console.log(error);
+                          const errorList = error.response.data.msg.split("Error: error:")
+                          alert("!![ERROR] : "+ errorList[1]);
+                          console.log(branch);
+                        }
+                      },
                     },
-                  },
-                  {
-                    label: "Checkout",
-                    onClick: async () => {
-                      try {
-                        const response = await axios.post("/dirs/git/branch", {
-                          mode: "checkout",
-                          branchName: branch
-                        });
-                        window.location.href = "/";
-                      } catch (error) {
-                        console.log(error);
-                        const errorList = error.response.data.msg.split("Error: error:")
-                        alert("!![ERROR] : "+ errorList[1]);
-                        console.log(branch);
-                      }
+                    {
+                      label: "Delete",
+                      onClick: async () => {
+                        try {
+                          const response = await axios.post("/dirs/git/branch", {
+                            mode: "delete",
+                            branchName: branch,
+                          });
+                          window.location.href = "/";
+                        } catch (error) {
+                          console.log(error);
+                          const errorList = error.response.data.msg.split("Error: error:")
+                          alert("!![ERROR] : "+ errorList[1]);
+                        }
+                      },
                     },
-                  },
-                ]
-              : []),
-            { label: "Rename", 
-              onClick: async () => {
-                try {
-                  const input = prompt("Enter branch name");
-                  if (input !== null) {
-                    const response = await axios.post("/dirs/git/branch", {
-                      mode: "rename",
-                      branchName: branch,
-                      newName: input
-                    });
+                  ]
+                : []),
+              {
+                label: "Rename", 
+                onClick: async () => {
+                  try {
+                    const input = prompt("Enter branch name");
+                    if (input !== null) {
+                      const response = await axios.post("/dirs/git/branch", {
+                        mode: "rename",
+                        branchName: branch,
+                        newName: input
+                      });
+                    }
+                    window.location.href = "/";
+                  } catch (error) {
+                    console.log(error);
+                    const errorList = error.response.data.msg.split("Error: error:")
+                    alert("!![ERROR] : "+ errorList[1]);
                   }
-                  window.location.href = "/";
-                } catch (error) {
-                  console.log(error);
-                  const errorList = error.response.data.msg.split("Error: error:")
-                  alert("!![ERROR] : "+ errorList[1]);
-                }
-              } 
-            },
+                } 
+              },
             ],
-          }))
-        )
+          })),
+        ])
       );
+      
+
+
       document.body.appendChild(ctxMenu);
     })
     .catch((err) => console.log(err));
