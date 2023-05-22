@@ -140,7 +140,18 @@ body {
 }
 
 .spotted-line {
-  width: 100%;
+  position: absolute;
+  top: 3px;
+  left: 0;
   height: 2px;
-  border-bottom: 1px dotted lightgray;
+  border-bottom: 3px dotted grey;
+  z-index: -1;
+}
+
+.commit-body {
+  position: relative;
+  margin: auto 0;
+  font-size: 13px;
+  max-width: 1200px;
+  padding-left: 8px;
 }

@@ -3,11 +3,12 @@ const directories = document.querySelectorAll(".directory-item");
 const backButton = document.querySelector("#back");
 const gitStatusModal = document.querySelector(".git-status-modal");
 const openModalButton = document.querySelector(".open-modal");
-const branchButton = document.querySelector(".branch-button")
+const branchButton = document.querySelector(".branch-button");
 const closeModalButton = document.querySelector(".close-modal");
 const untrackedList = document.querySelector(".status-item.untracked ul");
 const modifiedList = document.querySelector(".status-item.modified ul");
 const stagedList = document.querySelector(".status-item.staged ul");
+const logButton = document.querySelector(".log-button");
 // const committedList = document.querySelector(".status-item.committed ul");
 let untracked = [];
 let modified = [];
@@ -419,17 +420,19 @@ const res = axios
     if (res.data) {
       var pTag = branchButton.querySelector("p");
 
-      axios.post("/dirs/git/branch", {mode : "get"})
-      .then((res) => {
-        console.log(res.data);
-        pTag.textContent = res.data;
-      })
-      .catch(error => {
-        console.error('Error:', error);
-      });
+      axios
+        .post("/dirs/git/branch", { mode: "get" })
+        .then((res) => {
+          console.log(res.data);
+          pTag.textContent = res.data;
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
 
       openModalButton.classList.remove("hidden");
       branchButton.classList.remove("hidden");
+      logButton.classList.remove("hidden");
     }
   })
   .catch((err) => console.log(err));
@@ -461,66 +464,74 @@ branchButton.addEventListener("click", (event) => {
               // 클릭 이벤트
             },
             submenu: [
-            { label: "Create", onClick: async () => { 
-                try {
-                  const input = prompt("Enter branch name");
-                  if (input !== null) {
-                    const response = await axios.post("/dirs/git/branch", {
-                      mode: "create",
-                      branchName: input
-                    });
+              {
+                label: "Create",
+                onClick: async () => {
+                  try {
+                    const input = prompt("Enter branch name");
+                    if (input !== null) {
+                      const response = await axios.post("/dirs/git/branch", {
+                        mode: "create",
+                        branchName: input,
+                      });
+                    }
+                    window.location.href = "/";
+                  } catch (error) {
+                    console.log(error);
+                    alert("something gone wrong while processing");
                   }
-                  window.location.href = "/";
-                } catch (error) {
-                  console.log(error);
-                  alert("something gone wrong while processing");
-                }
-              } 
-            },
-            { label: "Delete", onClick: async () => { 
-                try {
-                  const response = await axios.post("/dirs/git/branch", {
-                    mode: "delete",
-                    branchName: branch,
-                  });
-                  window.location.href = "/";
-                } catch (error) {
-                  console.log(error);
-                  alert("Something went wrong while processing");
-                }
-              } 
-            },
-            { label: "Rename", onClick: async () => {
-                try {
-                  const input = prompt("Enter branch name");
-                  if (input !== null) {
+                },
+              },
+              {
+                label: "Delete",
+                onClick: async () => {
+                  try {
                     const response = await axios.post("/dirs/git/branch", {
-                      mode: "rename",
+                      mode: "delete",
                       branchName: branch,
-                      newName: input
                     });
+                    window.location.href = "/";
+                  } catch (error) {
+                    console.log(error);
+                    alert("Something went wrong while processing");
                   }
-                  window.location.href = "/";
-                } catch (error) {
-                  console.log(error);
-                  alert("something gone wrong while processing");
-                }
-              } 
-            },
-            { label: "Checkout", onClick: async () => {
-                try {
-                  const response = await axios.post("/dirs/git/branch", {
-                    mode: "checkout",
-                    branchName: branch
-                  });
-                  window.location.href = "/";
-                } catch (error) {
-                  console.log(error);
-                  alert("something gone wrong while processing");
-                  console.log(branch);
-                }
-              } 
-            },
+                },
+              },
+              {
+                label: "Rename",
+                onClick: async () => {
+                  try {
+                    const input = prompt("Enter branch name");
+                    if (input !== null) {
+                      const response = await axios.post("/dirs/git/branch", {
+                        mode: "rename",
+                        branchName: branch,
+                        newName: input,
+                      });
+                    }
+                    window.location.href = "/";
+                  } catch (error) {
+                    console.log(error);
+                    alert("something gone wrong while processing");
+                  }
+                },
+              },
+              {
+                label: "Checkout",
+                onClick: async () => {
+                  try {
+                    const response = await axios.post("/dirs/git/branch", {
+                      mode: "checkout",
+                      branchName: branch,
+                    });
+                    window.location.href = "/";
+                  } catch (error) {
+                    console.log(error);
+                    alert("something gone wrong while processing");
+                    console.log(branch);
+                  }
+                },
+              },
             ],
           }))
         )
@@ -528,5 +539,17 @@ branchButton.addEventListener("click", (event) => {
       document.body.appendChild(ctxMenu);
     })
     .catch((err) => console.log(err));
-})
+});
 
+/**
+ * Click Log button event
+ */
+logButton.addEventListener("click", async () => {
+  try {
+    await axios.get(`dirs/git/log`);
+    window.location.href = "dirs/git/log";
+  } catch (error) {
+    window.location.href = "/";
+    console.log(error);
+  }
+});
