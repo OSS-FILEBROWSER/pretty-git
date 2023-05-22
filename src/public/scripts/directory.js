@@ -535,10 +535,10 @@ branchButton.addEventListener("click", (event) => {
                             targetBranch: branch,
                           });
                           window.location.href = "/";
-                          alert("merge success!");
+                          successMsg = `Successfully merged from '${targetBranch}' to  '${user.gitManager.branch}'`;
+                          alert(successMsg);
                         } catch (error) {
-                          console.log(error);
-                          alert("merge error");
+                          alert("Failed to Merge, but we aborted it.");
                         }
                       },
                     },
