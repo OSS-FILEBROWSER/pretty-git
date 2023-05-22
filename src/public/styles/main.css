@@ -405,6 +405,10 @@ input[type="reset"] {
   background-color: rgba(133, 120, 120, 0.2);
 }
 
+.merge-button {
+  display: flex;
+}
+
 .hidden {
   display: none;
 }
