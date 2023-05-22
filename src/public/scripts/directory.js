@@ -517,6 +517,21 @@ branchButton.addEventListener("click", (event) => {
                         }
                       },
                     },
+                    {
+                      label: "Merge",
+                      onClick: async () => {
+                        try {
+                          const response = await axios.post("/dirs/git/merge", {
+                            mode: "merge",
+                            targetBranch: branch,
+                          });
+                          window.location.href = "/";
+                        } catch (error) {
+                          console.log(error);
+                          alert("merge error");
+                        }
+                      },        
+                    },
                   ]
                 : []),
               {
