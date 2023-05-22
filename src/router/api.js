@@ -25,7 +25,7 @@ export function apiRouterWrapper(user) {
 
   router.post("/merge", (req, res) => handleMergeRequest(req, res, user));
 
-  router.get("/log", (req, res) => sendCommitHistory(req, res));
+  router.post("/log", (req, res) => sendCommitHistory(req, res));
 
   router.get("/isRepo", (req, res) => checkRepo(req, res, user));
 
