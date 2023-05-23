@@ -544,13 +544,8 @@ branchButton.addEventListener("click", (event) => {
                           }
                           window.location.href = "/"; // 성공 시 페이지 리로드
                         } catch (error) {
-                            if (response.data.errorData === "error") alert(error.data.msg);
-                            alert(error.data.msg);                      
-                          }
-                        
-                        //   const errorMsg = error.response.data; // 에러 응답의 데이터를 가져옴
-                        //   alert(errorMsg); // 에러 메시지를 콘솔에 출력하거나 다른 작업에 활용할 수 있음
-                        
+                          alert(error.response.data.msg);
+                        }
                       },
                     },
                   ]
