@@ -431,3 +431,11 @@ input[type="reset"] {
 .commit-button:hover {
   background-color: rgba(133, 120, 120, 0.2);
 }
+
+.log-button {
+  justify-content: center;
+}
+
+.log-button:hover {
+  background-color: rgba(133, 120, 120, 0.2);
+}
