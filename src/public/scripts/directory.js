@@ -534,12 +534,18 @@ branchButton.addEventListener("click", (event) => {
                             mode: "merge",
                             targetBranch: branch,
                           });
-                          window.location.href = "/";
-                          // successMsg = `Successfully merged from '${targetBranch}' to  '${user.gitManager.branch}'`;
-                          alert(successMsg);
+                          if (response.data.type === "success") {
+                            alert(response.data.msg);
+                            window.location.href = "/";
+                          } else {
+                            console.log(response.data.errorData);
+                            // alert("Error: api response failed");
+                            alert(response.data.errorData);
+                          }
+                          window.location.href = "/"; // 성공 시 페이지 리로드
                         } catch (error) {
                           const errorMsg = error.response.data; // 에러 응답의 데이터를 가져옴
-                          console.log(errorMsg); // 에러 메시지를 콘솔에 출력하거나 다른 작업에 활용할 수 있음
+                          alert(errorMsg); // 에러 메시지를 콘솔에 출력하거나 다른 작업에 활용할 수 있음
                         }
                       },
                     },
