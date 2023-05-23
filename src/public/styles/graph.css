@@ -1,0 +1,157 @@
+body {
+  width: 100vw;
+}
+
+#graph-container {
+  width: 100%;
+  height: 100%;
+}
+
+.graph-container {
+  width: 100%;
+  height: 100%;
+}
+
+.graph-flex {
+  display: flex;
+  width: 100vw;
+  height: 100%;
+  flex: 1;
+}
+
+.graph-box {
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+
+.straight-line {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 2px;
+  height: 100%;
+  background-color: #000;
+}
+
+.right-diagonal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom left,
+    transparent calc(50% - 1px),
+    #000 calc(50% - 0.5px),
+    #000 calc(50% + 0.5px),
+    transparent calc(50% + 1px)
+  );
+}
+
+.left-diagoanl {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom right,
+    transparent calc(50% - 1px),
+    #000 calc(50% - 0.5px),
+    #000 calc(50% + 0.5px),
+    transparent calc(50% + 1px)
+  );
+}
+
+.bottom-line {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #000;
+}
+
+.commit-object {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid black;
+  background-color: orange;
+  transition: all 0.3s;
+}
+
+.commit-object:hover {
+  background-color: bisque;
+}
+
+.bottom-half-left-line {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  width: 50%;
+  height: 2px;
+  background-color: #000;
+}
+
+.bottom-half-right-line {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transform: translateX(100%);
+  width: 50%;
+  height: 2px;
+  background-color: #000;
+}
+
+.top-half-left-line {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateX(-100%);
+  width: 50%;
+  height: 2px;
+  background-color: #000;
+}
+
+.top-half-right-line {
+  content: "";
+  position: absolute;
+  top: -2px;
+  right: 0;
+  transform: translateX(100%);
+  width: 50%;
+  height: 2px;
+  background-color: #000;
+}
+
+.spotted-line {
+  position: absolute;
+  top: 3px;
+  left: 0;
+  height: 2px;
+  border-bottom: 3px dotted grey;
+  z-index: -1;
+}
+
+.commit-body {
+  position: relative;
+  margin: auto 0;
+  font-size: 13px;
+  max-width: 1200px;
+  padding-left: 8px;
+}
