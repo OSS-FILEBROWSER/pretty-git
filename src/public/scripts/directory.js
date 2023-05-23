@@ -534,11 +534,17 @@ branchButton.addEventListener("click", (event) => {
                             mode: "merge",
                             targetBranch: branch,
                           });
-                          window.location.href = "/";
-                          alert("merge success!");
+                          if (response.data.type === "success") {
+                            alert(response.data.msg);
+                            window.location.href = "/";
+                          } else {
+                            console.log(response.data.errorData);
+                            // alert("Error: api response failed");
+                            alert(response.data.errorData);
+                          }
+                          window.location.href = "/"; // 성공 시 페이지 리로드
                         } catch (error) {
-                          console.log(error);
-                          alert("merge error");
+                          alert(error.response.data.msg);
                         }
                       },
                     },
