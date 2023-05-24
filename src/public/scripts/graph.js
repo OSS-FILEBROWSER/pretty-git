@@ -105,15 +105,10 @@ function draw(graph2D) {
       const commitBody = document.createElement("div");
       commitBody.classList.add("commit-body");
       graphFlex.appendChild(commitBody);
-      commitBody.classList.add(commitHash);
       commitBody.innerText = commitMessage;
 
       const commitObj = graphFlex.querySelector(".commit-object");
-      if (commitObj) {
-        commitObj.addEventListener("click", () => {
-          alert(`Clicked commit hash is ${commitHash}`);
-        });
-      }
+      commitObj.classList.add(commitHash);
       const distanceTo =
         calculateDistance(commitObj, commitBody) - commitObj.offsetWidth;
       //   const distanceTo =
@@ -166,7 +161,66 @@ axios
         });
 
         draw(graph2D);
+
+        const commitObjects = document.querySelectorAll(".commit-object");
+        const popup = document.getElementById("commit-popup");
+
+        const closeButton = popup.querySelector(".popup-close");
+        closeButton.addEventListener("click", function () {
+          popup.style.display = "none";
+        });
+
+        for (let co of commitObjects) {
+          co.addEventListener("click", () => {
+            const previousPopupContent =
+              popup.querySelectorAll(".popup-content");
+            for (let content of previousPopupContent) {
+              popup.removeChild(content);
+            }
+
+            popup.style.display = "block";
+
+            const buttonRect = co.getBoundingClientRect();
+            const buttonRight = buttonRect.right;
+            const buttonTop = buttonRect.top;
+            popup.style.left = buttonRight + "px";
+            popup.style.top = buttonTop + "px";
+
+            axios
+              .post("/dirs/git/commitDetail", { checkSum: co.classList[1] })
+              .then((res) => {
+                const lines = res.data.split("\n");
+                for (let line of lines) {
+                  const paragraph = document.createElement("p");
+                  paragraph.classList.add("popup-content");
+                  const lineData = line.split(/(?<=^\S+)\s/);
+                  const head = lineData[0];
+                  const body = lineData[1];
+
+                  if (
+                    line != "" &&
+                    (head == "tree" ||
+                      head == "parent" ||
+                      head == "author" ||
+                      head == "committer")
+                  ) {
+                    paragraph.innerHTML = `<span class="commit-content-head">${head}</span> : <span class="commit-content-body">${body}</span>`;
+                  } else {
+                    paragraph.innerText = line;
+                  }
+
+                  popup.appendChild(paragraph);
+                }
+              });
+          });
+        }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        window.location.href = "/";
+        console.log(err);
+      });
   })
-  .catch((err) => console.log(err));
+  .catch((err) => {
+    window.location.href = "/";
+    console.log(err);
+  });
