@@ -270,6 +270,8 @@ const handleMergeRequest = async (req, res, user) => {
   }
 };
 
+const handleCloneRequest = async (req, res, user) => {};
+
 export {
   checkRepo,
   checkStatus,
@@ -284,4 +286,5 @@ export {
   handleBranchRequest,
   showAllLocalBranches,
   handleMergeRequest,
+  handleCloneRequest,
 };
