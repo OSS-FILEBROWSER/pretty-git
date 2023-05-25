@@ -279,7 +279,9 @@ const handleCloneRequest = async (req, res, user) => {
       type: "success",
       msg: `Successfully clone from '${remoteAddress}'`,
     });
-  } catch (error) {}
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export {
