@@ -270,7 +270,17 @@ const handleMergeRequest = async (req, res, user) => {
   }
 };
 
-const handleCloneRequest = async (req, res, user) => {};
+const handleCloneRequest = async (req, res, user) => {
+  try {
+    gitHelper.cwd(user.path);
+    const { remoteAddress } = req.body;
+    await gitHelper.clone([remoteAddress]);
+    res.status(200).json({
+      type: "success",
+      msg: `Successfully clone from '${remoteAddress}'`,
+    });
+  } catch (error) {}
+};
 
 export {
   checkRepo,
