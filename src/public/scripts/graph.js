@@ -183,8 +183,9 @@ axios
             const buttonRect = co.getBoundingClientRect();
             const buttonRight = buttonRect.right;
             const buttonTop = buttonRect.top;
-            popup.style.left = buttonRight + "px";
-            popup.style.top = buttonTop + "px";
+            const winScrollY = window.scrollY;
+            popup.style.left = buttonRight + 20 + "px";
+            popup.style.top = buttonTop + winScrollY + "px";
 
             axios
               .post("/dirs/git/commitDetail", { checkSum: co.classList[1] })

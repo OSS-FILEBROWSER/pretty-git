@@ -17,6 +17,11 @@ body {
   max-width: 600px;
   max-height: 500px;
   z-index: 100;
+  /* animation */
+  animation-name: fadeIn;
+  animation-duration: 0.3s;
+  animation-timing-function: ease-out;
+  animation-fill-mode: forwards;
 }
 
 .popup-close {
@@ -188,4 +193,14 @@ body {
 
 .commit-content-body {
   width: inherit;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
 }
