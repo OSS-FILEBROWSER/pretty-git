@@ -295,6 +295,21 @@ const sendCommitHistory = async (req, res, user) => {
   }
 };
 
+const sendCommitDetail = async (req, res, user) => {
+  const { checkSum } = req.body;
+  try {
+    gitHelper.cwd(user.path);
+    const detail = await gitHelper.catFile(["-p", checkSum]);
+    res.status(200).send(detail);
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      type: "error",
+      msg: error,
+    });
+  }
+};
+
 export {
   checkRepo,
   checkStatus,
@@ -311,4 +326,5 @@ export {
   handleMergeRequest,
   renderGraphPage,
   sendCommitHistory,
+  sendCommitDetail,
 };
