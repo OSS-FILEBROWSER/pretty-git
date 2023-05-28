@@ -280,11 +280,11 @@ const handleCloneRequest = async (req, res, user) => {
     gitHelper.cwd(user.path);
 
     const isGitRepo = await gitHelper.checkIsRepo();
-    
+
     if (isGitRepo) {
       res.status(400).json({
         type: "error",
-        msg: "This directory is already a Git repository. You should clone it other directory."
+        msg: "This directory is already a Git repository. You should clone i other directory."
       })
     }
 
