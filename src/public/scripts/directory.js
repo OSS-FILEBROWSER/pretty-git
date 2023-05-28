@@ -8,6 +8,7 @@ const closeModalButton = document.querySelector(".close-modal");
 const untrackedList = document.querySelector(".status-item.untracked ul");
 const modifiedList = document.querySelector(".status-item.modified ul");
 const stagedList = document.querySelector(".status-item.staged ul");
+const logButton = document.querySelector(".log-button");
 // const committedList = document.querySelector(".status-item.committed ul");
 let untracked = [];
 let modified = [];
@@ -431,6 +432,7 @@ const res = axios
 
       openModalButton.classList.remove("hidden");
       branchButton.classList.remove("hidden");
+      logButton.classList.remove("hidden");
     }
   })
   .catch((err) => console.log(err));
@@ -579,4 +581,17 @@ branchButton.addEventListener("click", (event) => {
       document.body.appendChild(ctxMenu);
     })
     .catch((err) => console.log(err));
+});
+
+/**
+ * Click Log button event
+ */
+logButton.addEventListener("click", async () => {
+  try {
+    await axios.get(`dirs/git/log`);
+    window.location.href = "dirs/git/log";
+  } catch (error) {
+    window.location.href = "/";
+    console.log(error);
+  }
 });

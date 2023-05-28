@@ -270,6 +270,31 @@ const handleMergeRequest = async (req, res, user) => {
   }
 };
 
+const renderGraphPage = async (req, res) => {
+  res.render("graph", {
+    title: "Pretty git, Make Your git usage Fancy",
+  });
+};
+
+const sendCommitHistory = async (req, res, user) => {
+  const { branchName } = req.body;
+  try {
+    gitHelper.cwd(user.path);
+    const log = await gitHelper.log([
+      "--graph",
+      "--pretty=format:$%h - %an : %s",
+      branchName,
+    ]);
+
+    res.status(200).send(log.all);
+  } catch (error) {
+    res.status(400).json({
+      type: "error",
+      msg: error,
+    });
+  }
+};
+
 export {
   checkRepo,
   checkStatus,
@@ -284,4 +309,6 @@ export {
   handleBranchRequest,
   showAllLocalBranches,
   handleMergeRequest,
+  renderGraphPage,
+  sendCommitHistory,
 };
