@@ -268,7 +268,7 @@ const handleMergeRequest = async (req, res, user) => {
       });
     }
   }
-};
+};  
 
 const handleCloneRequest = async (req, res, user) => {
   try {

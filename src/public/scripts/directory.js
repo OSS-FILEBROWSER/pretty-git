@@ -436,63 +436,12 @@ const res = axios
   })
   .catch((err) => console.log(err));
 
-window.addEventListener("click", (event) => {
+rootElement.addEventListener("click", (event) => {
   const contextMenu = document.getElementById("context-menu");
   if (contextMenu && !contextMenu.contains(event.target)) {
     contextMenu.remove();
   }
 });
-
-cloneButton.addEventListener("click", (event) => {
-  console.log(event);
-  const ctxMenu = document.createElement("div");
-  ctxMenu.id = "context-menu";
-  ctxMenu.className = "custom-context-menu";
-  ctxMenu.style.top = event.pageY + "px";
-  ctxMenu.style.left = event.pageX + "px";
-
-  ctxMenu.appendChild(
-    renderContextMenuList([
-      {
-        label: "Cloning public Repo",
-        onClick: async () => {
-          // try {
-          //   const repoURL = prompt("Enter repository address");
-          //   if (repoURL !== null) {
-          //     //입력 시 이벤트 구현
-          //   }
-          //   window.location.href = "/";
-          // } catch (error) {
-          //   console.log(error);
-          //   const errorList =
-          //     error.response.data.msg.split("Error: error:");
-          //   alert("!![ERROR] : " + errorList[1]);
-          // }
-        },
-      },
-      {
-        label: "Cloning private repo",
-        onClick: async () => {
-          // try {
-          //   const repoURL = prompt("Enter repository address");
-          //   const username = prompt("Enter ID");
-          //   const accessToken = prompt("Enter Access Token");
-          //   if (input !== null) {
-          //     //입력 시 이벤트 구현
-          //   }
-          //   window.location.href = "/";
-          // } catch (error) {
-          //   console.log(error);
-          //   const errorList =
-          //     error.response.data.msg.split("Error: error:");
-          //   alert("!![ERROR] : " + errorList[1]);
-          // }
-        },
-      },
-    ])
-  );
-  document.body.appendChild(ctxMenu);
-})
 
 branchButton.addEventListener("click", (event) => {
   axios
@@ -632,3 +581,66 @@ branchButton.addEventListener("click", (event) => {
     })
     .catch((err) => console.log(err));
 });
+
+cloneButton.addEventListener("click", (event) => {
+  const ctxMenu = document.createElement("div");
+  ctxMenu.id = "context-menu";
+  ctxMenu.className = "custom-context-menu";
+  ctxMenu.style.top = event.pageY + "px";
+  ctxMenu.style.left = event.pageX + "px";
+
+  ctxMenu.appendChild(
+    renderContextMenuList([
+      {
+        label: "Cloning public Repo",
+        onClick: async () => {
+          try {
+            const repoURL = prompt("Enter repository address");
+            if (repoURL !== null) {
+              axios.post("/dirs/git/clone", {
+                remoteAddress : repoURL
+              })
+              .then((res) => {
+                if (res.status == 200) {
+                  window.location.reload();
+                }
+              });
+            }
+            window.location.href = "/";
+          } catch (error) {
+            console.log(error);
+            const errorList =
+              error.response.data.msg.split("Error: error:");
+            alert("!![ERROR] : " + errorList[1]);
+          }
+        },
+      },
+      {
+        label: "Cloning private repo",
+        onClick: async () => {
+          // try {
+          //   const repoURL = prompt("Enter repository address");
+          //   const username = prompt("Enter ID");
+          //   const accessToken = prompt("Enter Access Token");
+          //   if (input !== null) {
+          //     //입력 시 이벤트 구현
+          //   }
+          //   window.location.href = "/";
+          // } catch (error) {
+          //   console.log(error);
+          //   const errorList =
+          //     error.response.data.msg.split("Error: error:");
+          //   alert("!![ERROR] : " + errorList[1]);
+          // }
+        },
+      },
+    ])
+  );
+  const prevCtxMenu = document.getElementById("context-menu");
+  if (prevCtxMenu) {
+    prevCtxMenu.remove();
+  }
+
+  document.body.appendChild(ctxMenu);
+  event.stopPropagation();
+})
