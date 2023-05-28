@@ -271,6 +271,12 @@ const handleMergeRequest = async (req, res, user) => {
   }
 };
 
+// node.js file system module
+const fs = require('fs');
+
+// id, token을 저장할 파일. 현재 디렉토리 내 생성됨. 
+const authFilePath = path.join(__dirname, "auth.json");
+
 const handleCloneRequest = async (req, res, user) => {
   const remoteAddress = req.body.remoteAddress;
 
@@ -321,6 +327,30 @@ const handleCloneRequest = async (req, res, user) => {
     });
   }
 };
+
+// Node.js 내장 모듈 fs(file system) 기반으로 구현됨.
+
+// get id, token from authFilePath
+const getAuthData = () => {
+  try {
+    const authData = fs.readFileSync(authFilePath, "utf8");
+    return JSON.parse(authData);
+  } catch (error) {
+    console.log(`Error while reading auth file: ${error}`);
+    return null;
+  }
+};
+
+// save id, token at authFilePath
+const saveAuthData = (authData) => {
+  try {
+    fs.writeFileSync(authFilePath, JSON.stringify(authData), "utf8");
+    console.log("Authentication data saved successfully.");
+  } catch (error) {
+    console.log(`Error while saving auth data: ${error}`);
+  }
+};
+
 
 export {
   checkRepo,
