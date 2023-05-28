@@ -205,13 +205,6 @@ const gitBranch = (userPath, branchName) => {
   });
 };
 
-const gitClone = (repoPath) => {
-  return new Promise((resolve, reject) => {
-    const args = ["clone", repoPath];
-    const child = spawn("git", args, { cwd})
-  })
-}
-
 export {
   gitAdd,
   gitInit,
