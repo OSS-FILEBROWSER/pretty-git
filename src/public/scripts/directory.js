@@ -4,6 +4,7 @@ const backButton = document.querySelector("#back");
 const gitStatusModal = document.querySelector(".git-status-modal");
 const openModalButton = document.querySelector(".open-modal");
 const branchButton = document.querySelector(".branch-button");
+const cloneButton = document.querySelector(".clone-button");
 const closeModalButton = document.querySelector(".close-modal");
 const untrackedList = document.querySelector(".status-item.untracked ul");
 const modifiedList = document.querySelector(".status-item.modified ul");
@@ -441,6 +442,57 @@ window.addEventListener("click", (event) => {
     contextMenu.remove();
   }
 });
+
+cloneButton.addEventListener("click", (event) => {
+  console.log(event);
+  const ctxMenu = document.createElement("div");
+  ctxMenu.id = "context-menu";
+  ctxMenu.className = "custom-context-menu";
+  ctxMenu.style.top = event.pageY + "px";
+  ctxMenu.style.left = event.pageX + "px";
+
+  ctxMenu.appendChild(
+    renderContextMenuList([
+      {
+        label: "Cloning public Repo",
+        onClick: async () => {
+          // try {
+          //   const repoURL = prompt("Enter repository address");
+          //   if (repoURL !== null) {
+          //     //입력 시 이벤트 구현
+          //   }
+          //   window.location.href = "/";
+          // } catch (error) {
+          //   console.log(error);
+          //   const errorList =
+          //     error.response.data.msg.split("Error: error:");
+          //   alert("!![ERROR] : " + errorList[1]);
+          // }
+        },
+      },
+      {
+        label: "Cloning private repo",
+        onClick: async () => {
+          // try {
+          //   const repoURL = prompt("Enter repository address");
+          //   const username = prompt("Enter ID");
+          //   const accessToken = prompt("Enter Access Token");
+          //   if (input !== null) {
+          //     //입력 시 이벤트 구현
+          //   }
+          //   window.location.href = "/";
+          // } catch (error) {
+          //   console.log(error);
+          //   const errorList =
+          //     error.response.data.msg.split("Error: error:");
+          //   alert("!![ERROR] : " + errorList[1]);
+          // }
+        },
+      },
+    ])
+  );
+  document.body.appendChild(ctxMenu);
+})
 
 branchButton.addEventListener("click", (event) => {
   axios
