@@ -15,6 +15,7 @@ import {
   handleMergeRequest,
   renderGraphPage,
   sendCommitHistory,
+  sendCommitDetail,
 } from "../controllers/apiController.js";
 
 const router = Router();
@@ -29,6 +30,7 @@ export function apiRouterWrapper(user) {
 
   router.get("/log", (req, res) => renderGraphPage(req, res, user));
   router.post("/logData", (req, res) => sendCommitHistory(req, res, user));
+  router.post("/commitDetail", (req, res) => sendCommitDetail(req, res, user));
 
   router.get("/isRepo", (req, res) => checkRepo(req, res, user));
 
