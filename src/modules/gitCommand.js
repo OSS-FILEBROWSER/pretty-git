@@ -1,5 +1,6 @@
 import fs from "fs";
 import { spawn } from "child_process";
+import { resolve } from "path";
 
 const gitInit = (curPath) => {
   return new Promise((resolve, reject) => {
@@ -203,6 +204,13 @@ const gitBranch = (userPath, branchName) => {
     });
   });
 };
+
+const gitClone = (repoPath) => {
+  return new Promise((resolve, reject) => {
+    const args = ["clone", repoPath];
+    const child = spawn("git", args, { cwd})
+  })
+}
 
 export {
   gitAdd,

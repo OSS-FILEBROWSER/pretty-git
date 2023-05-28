@@ -271,16 +271,24 @@ const handleMergeRequest = async (req, res, user) => {
 };
 
 const handleCloneRequest = async (req, res, user) => {
+  const remoteAddress = req.body.remoteAddress;
+  const localAddress = req.body.localAddress;
+
   try {
     gitHelper.cwd(user.path);
-    const { remoteAddress } = req.body;
-    await gitHelper.clone([remoteAddress]);
+    // clone(repoPath: string, localPath: string, options?: TaskOptions | undefined, callback?: SimpleGitTaskCallback<string> | undefined): Response<string>
+    gitHelper.clone(remoteAddress, localAddress);
     res.status(200).json({
       type: "success",
       msg: `Successfully clone from '${remoteAddress}'`,
     });
   } catch (error) {
-    console.log(error);
+      console.log(`Error[git clone] :  ${error}`);
+      res.status(500).json({
+          type: "error",
+          msg: `Failed to clone from '${remoteAddress}'`,
+          error: error,
+      });
   }
 };
 
