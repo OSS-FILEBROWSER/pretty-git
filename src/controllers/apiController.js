@@ -272,13 +272,12 @@ const handleMergeRequest = async (req, res, user) => {
 
 const handleCloneRequest = async (req, res, user) => {
   const remoteAddress = req.body.remoteAddress;
-  const localAddress = req.body.localAddress;
 
   try {
     gitHelper.cwd(user.path);
-    
+
     // clone(repoPath: string, localPath: string, options?: TaskOptions | undefined, callback?: SimpleGitTaskCallback<string> | undefined): Response<string>
-    gitHelper.clone(remoteAddress, localAddress);
+    gitHelper.clone(remoteAddress, user.path);
     res.status(200).json({
       type: "success",
       msg: `Successfully clone from '${remoteAddress}'`,
