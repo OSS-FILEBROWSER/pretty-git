@@ -10,6 +10,7 @@ import {
 } from "../modules/gitCommand.js";
 //git 명령어를 실행하기 위한 helper library
 import { simpleGit } from "simple-git";
+import axios from "axios";
 const options = {
   baseDir: process.cwd(),
   binary: "git",
@@ -278,12 +279,13 @@ const handleCloneRequest = async (req, res, user) => {
   try {
     gitHelper.cwd(user.path);
 
-    const repoType = await axios.get(`https://api.github.com/repos/${remoteAddress}`);
+    // const repoType = await axios.get(`https://api.github.com/repos/${remoteAddress}`);
+    const repoType = await axios.get(remoteAddress);
     const isPrivate = repoType.data.private;
 
-    if(isPrivate) {
+    if (isPrivate) {
       const { id, token } = req.body;
-      // GithubAPI 인증에 필요한 헤더. 
+      // GithubAPI 인증에 필요한 헤더.
       const authHeader = {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -291,8 +293,8 @@ const handleCloneRequest = async (req, res, user) => {
       };
       await gitHelper.clone(remoteAddress, user.path, authHeader);
     } else {
-        // clone(repoPath: string, localPath: string, options?: TaskOptions | undefined, callback?: SimpleGitTaskCallback<string> | undefined): Response<string>
-        gitHelper.clone(remoteAddress, user.path);
+      // clone(repoPath: string, localPath: string, options?: TaskOptions | undefined, callback?: SimpleGitTaskCallback<string> | undefined): Response<string>
+      gitHelper.clone(remoteAddress, user.path);
     }
 
     res.status(200).json({
