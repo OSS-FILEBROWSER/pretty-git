@@ -10,6 +10,7 @@ import {
 } from "../modules/gitCommand.js";
 //git 명령어를 실행하기 위한 helper library
 import { simpleGit } from "simple-git";
+import axios from "axios";
 const options = {
   baseDir: process.cwd(),
   binary: "git",
@@ -271,16 +272,51 @@ const handleMergeRequest = async (req, res, user) => {
 };
 
 const handleCloneRequest = async (req, res, user) => {
+  const remoteAddress = req.body.remoteAddress;
+
+  // private 함수인지 사용자가 직접 입력하면 정확도는 더 높다고 함.
+  // const isPrivate = req.body.isPrivate;
   try {
     gitHelper.cwd(user.path);
-    const { remoteAddress } = req.body;
-    await gitHelper.clone([remoteAddress]);
+
+    const isGitRepo = await gitHelper.checkIsRepo();
+
+    if (isGitRepo) {
+      res.status(400).json({
+        type: "error",
+        msg: "This directory is already a Git repository. You should clone i other directory."
+      })
+    }
+
+    // const repoType = await axios.get(`https://api.github.com/repos/${remoteAddress}`);
+    const repoType = await axios.get(remoteAddress);
+    const isPrivate = repoType.data.private;
+
+    if (isPrivate) {
+      const { id, token } = req.body;
+      // GithubAPI 인증에 필요한 헤더.
+      const authHeader = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      await gitHelper.clone(remoteAddress, user.path, authHeader);
+    } else {
+      // clone(repoPath: string, localPath: string, options?: TaskOptions | undefined, callback?: SimpleGitTaskCallback<string> | undefined): Response<string>
+      gitHelper.clone(remoteAddress, user.path);
+    }
+
     res.status(200).json({
       type: "success",
       msg: `Successfully clone from '${remoteAddress}'`,
     });
   } catch (error) {
-    console.log(error);
+    console.log(`Error[git clone] :  ${error}`);
+    res.status(500).json({
+      type: "error",
+      msg: `Failed to clone from '${remoteAddress}'`,
+      error: error,
+    });
   }
 };
 

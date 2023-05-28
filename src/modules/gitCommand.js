@@ -1,5 +1,6 @@
 import fs from "fs";
 import { spawn } from "child_process";
+import { resolve } from "path";
 
 const gitInit = (curPath) => {
   return new Promise((resolve, reject) => {
