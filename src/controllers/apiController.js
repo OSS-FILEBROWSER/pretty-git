@@ -300,8 +300,21 @@ const handleCloneRequest = async (req, res, user) => {
     // const repoType = await axios.get(remoteAddress);
     const isPrivate = repoType.data.private;
 
+    let id, token;
+
     if (isPrivate) {
-      const { id, token } = req.body;
+      const authData = getAuthData();
+      // id, token이 저장되어 있다면,
+      if (authData) {
+        id = authData.id;
+        token = authData.token;
+      } else {
+          res.status(401).json({
+            type: "error",
+            msg: "Authentication is required. Please provide id and token.",
+          });
+          return;
+      }
       // GithubAPI 인증에 필요한 헤더.
       const authHeader = {
         headers: {
