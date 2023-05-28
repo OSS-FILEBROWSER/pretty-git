@@ -276,6 +276,7 @@ const handleCloneRequest = async (req, res, user) => {
 
   try {
     gitHelper.cwd(user.path);
+    
     // clone(repoPath: string, localPath: string, options?: TaskOptions | undefined, callback?: SimpleGitTaskCallback<string> | undefined): Response<string>
     gitHelper.clone(remoteAddress, localAddress);
     res.status(200).json({
