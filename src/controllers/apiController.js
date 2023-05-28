@@ -272,7 +272,7 @@ const handleMergeRequest = async (req, res, user) => {
 };
 
 // node.js file system module
-const fs = require('fs');
+// const fs = require('fs');
 
 // id, token을 저장할 파일. 현재 디렉토리 내 생성됨. 
 const authFilePath = path.join(__dirname, "auth.json");
@@ -315,18 +315,19 @@ const handleCloneRequest = async (req, res, user) => {
           });
           return;
       }
-      // GithubAPI 인증에 필요한 헤더.
-      const authHeader = {
+
+      if(id != 0 && toek != 0) {
+        const authHeader = {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       };
       await gitHelper.clone(remoteAddress, user.path, authHeader);
-    } else {
+      } else {
       // clone(repoPath: string, localPath: string, options?: TaskOptions | undefined, callback?: SimpleGitTaskCallback<string> | undefined): Response<string>
       gitHelper.clone(remoteAddress, user.path);
     }
-
+  }
     res.status(200).json({
       type: "success",
       msg: `Successfully clone from '${remoteAddress}'`,
@@ -342,6 +343,20 @@ const handleCloneRequest = async (req, res, user) => {
 };
 
 // Node.js 내장 모듈 fs(file system) 기반으로 구현됨.
+
+const handleAuthRequest = async (req, res) => {
+  const { id, token } = req.body;
+  const authData = { id, token };
+
+  // id와 token을 파일에 저장
+  saveAuthData(authData);
+
+  res.status(200).json({
+    type: "success",
+    msg: "Authentication succeeded.",
+  });
+};
+
 
 // get id, token from authFilePath
 const getAuthData = () => {
