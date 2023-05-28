@@ -290,12 +290,11 @@ const handleCloneRequest = async (req, res, user) => {
         },
       };
       await gitHelper.clone(remoteAddress, user.path, authHeader);
-
-
+    } else {
+        // clone(repoPath: string, localPath: string, options?: TaskOptions | undefined, callback?: SimpleGitTaskCallback<string> | undefined): Response<string>
+        gitHelper.clone(remoteAddress, user.path);
     }
 
-    // clone(repoPath: string, localPath: string, options?: TaskOptions | undefined, callback?: SimpleGitTaskCallback<string> | undefined): Response<string>
-    gitHelper.clone(remoteAddress, user.path);
     res.status(200).json({
       type: "success",
       msg: `Successfully clone from '${remoteAddress}'`,
