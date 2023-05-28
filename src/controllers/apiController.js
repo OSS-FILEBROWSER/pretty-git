@@ -273,8 +273,26 @@ const handleMergeRequest = async (req, res, user) => {
 const handleCloneRequest = async (req, res, user) => {
   const remoteAddress = req.body.remoteAddress;
 
+  // private 함수인지 사용자가 직접 입력하면 정확도는 더 높다고 함.
+  // const isPrivate = req.body.isPrivate;
   try {
     gitHelper.cwd(user.path);
+
+    const repoType = await axios.get(`https://api.github.com/repos/${remoteAddress}`);
+    const isPrivate = repoType.data.private;
+
+    if(isPrivate) {
+      const { id, token } = req.body;
+      // GithubAPI 인증에 필요한 헤더. 
+      const authHeader = {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      };
+      await gitHelper.clone(remoteAddress, user.path, authHeader);
+
+
+    }
 
     // clone(repoPath: string, localPath: string, options?: TaskOptions | undefined, callback?: SimpleGitTaskCallback<string> | undefined): Response<string>
     gitHelper.clone(remoteAddress, user.path);
@@ -283,12 +301,12 @@ const handleCloneRequest = async (req, res, user) => {
       msg: `Successfully clone from '${remoteAddress}'`,
     });
   } catch (error) {
-      console.log(`Error[git clone] :  ${error}`);
-      res.status(500).json({
-          type: "error",
-          msg: `Failed to clone from '${remoteAddress}'`,
-          error: error,
-      });
+    console.log(`Error[git clone] :  ${error}`);
+    res.status(500).json({
+      type: "error",
+      msg: `Failed to clone from '${remoteAddress}'`,
+      error: error,
+    });
   }
 };
 
