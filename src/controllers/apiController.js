@@ -276,6 +276,7 @@ const handleCloneRequest = async (req, res, user) => {
 
   // private 함수인지 사용자가 직접 입력하면 정확도는 더 높다고 함.
   // const isPrivate = req.body.isPrivate;
+
   try {
     gitHelper.cwd(user.path);
 
@@ -285,11 +286,12 @@ const handleCloneRequest = async (req, res, user) => {
       res.status(400).json({
         type: "error",
         msg: "This directory is already a Git repository. You should clone i other directory."
-      })
+      });
+      return;
     }
 
-    // const repoType = await axios.get(`https://api.github.com/repos/${remoteAddress}`);
-    const repoType = await axios.get(remoteAddress);
+    const repoType = await axios.get(`https://api.github.com/repos/${remoteAddress}`);
+    // const repoType = await axios.get(remoteAddress);
     const isPrivate = repoType.data.private;
 
     if (isPrivate) {
