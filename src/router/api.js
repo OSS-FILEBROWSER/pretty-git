@@ -14,6 +14,9 @@ import {
   showAllLocalBranches,
   handleMergeRequest,
   handleCloneRequest,
+  renderGraphPage,
+  sendCommitHistory,
+  sendCommitDetail,
 } from "../controllers/apiController.js";
 
 const router = Router();
@@ -27,6 +30,9 @@ export function apiRouterWrapper(user) {
   router.post("/merge", (req, res) => handleMergeRequest(req, res, user));
 
   router.post("/clone", (req, res) => handleCloneRequest(req, res, user));
+  router.get("/log", (req, res) => renderGraphPage(req, res, user));
+  router.post("/logData", (req, res) => sendCommitHistory(req, res, user));
+  router.post("/commitDetail", (req, res) => sendCommitDetail(req, res, user));
 
   router.get("/isRepo", (req, res) => checkRepo(req, res, user));
 

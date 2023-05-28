@@ -9,6 +9,7 @@ const closeModalButton = document.querySelector(".close-modal");
 const untrackedList = document.querySelector(".status-item.untracked ul");
 const modifiedList = document.querySelector(".status-item.modified ul");
 const stagedList = document.querySelector(".status-item.staged ul");
+const logButton = document.querySelector(".log-button");
 // const committedList = document.querySelector(".status-item.committed ul");
 let untracked = [];
 let modified = [];
@@ -432,6 +433,7 @@ const res = axios
 
       openModalButton.classList.remove("hidden");
       branchButton.classList.remove("hidden");
+      logButton.classList.remove("hidden");
     }
   })
   .catch((err) => console.log(err));
@@ -618,20 +620,26 @@ cloneButton.addEventListener("click", (event) => {
       {
         label: "Cloning private repo",
         onClick: async () => {
-          // try {
-          //   const repoURL = prompt("Enter repository address");
-          //   const username = prompt("Enter ID");
-          //   const accessToken = prompt("Enter Access Token");
-          //   if (input !== null) {
-          //     //입력 시 이벤트 구현
-          //   }
-          //   window.location.href = "/";
-          // } catch (error) {
-          //   console.log(error);
-          //   const errorList =
-          //     error.response.data.msg.split("Error: error:");
-          //   alert("!![ERROR] : " + errorList[1]);
-          // }
+          try {
+            const repoURL = prompt("Enter repository address");
+            if (repoURL !== null) {
+              // 해당 레포에 대해 토큰을 사용한 내역이 있는지 확인 후 다음의 질문을 날린다.
+              if (confirm("토큰 내역이 있습니다. 재사용하시겠습니까?")) {
+                //저장되어있는 토큰 가져와서 재활용
+              } else {
+                const username = prompt("Enter ID");
+                if (username !== null) {
+                  const accessToken = prompt("Enter Access Token");
+                }
+              }
+            }
+            window.location.href = "/";
+          } catch (error) {
+            console.log(error);
+            const errorList =
+              error.response.data.msg.split("Error: error:");
+            alert("!![ERROR] : " + errorList[1]);
+          }
         },
       },
     ])
@@ -644,3 +652,15 @@ cloneButton.addEventListener("click", (event) => {
   document.body.appendChild(ctxMenu);
   event.stopPropagation();
 })
+/**
+ * Click Log button event
+ */
+logButton.addEventListener("click", async () => {
+  try {
+    await axios.get(`dirs/git/log`);
+    window.location.href = "dirs/git/log";
+  } catch (error) {
+    window.location.href = "/";
+    console.log(error);
+  }
+});
