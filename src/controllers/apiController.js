@@ -279,6 +279,15 @@ const handleCloneRequest = async (req, res, user) => {
   try {
     gitHelper.cwd(user.path);
 
+    const isGitRepo = await gitHelper.checkIsRepo();
+    
+    if (isGitRepo) {
+      res.status(400).json({
+        type: "error",
+        msg: "This directory is already a Git repository. You should clone it other directory."
+      })
+    }
+
     // const repoType = await axios.get(`https://api.github.com/repos/${remoteAddress}`);
     const repoType = await axios.get(remoteAddress);
     const isPrivate = repoType.data.private;
