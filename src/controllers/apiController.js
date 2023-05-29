@@ -10,6 +10,10 @@ import {
 } from "../modules/gitCommand.js";
 //git 명령어를 실행하기 위한 helper library
 import { simpleGit } from "simple-git";
+import fs from "fs";
+import os from "os";
+import { match } from "assert";
+
 const options = {
   baseDir: process.cwd(),
   binary: "git",
@@ -270,17 +274,104 @@ const handleMergeRequest = async (req, res, user) => {
   }
 };  
 
+// global config에 id, token을 저장하는 함수
+const saveUserIdAndTokenToConfig = (userId, token) => {
+  const configPath = `${os.homedir()}/.gitconfig`;
+
+  const configData = fs.readFileSync(configPath, "utf8");
+
+  const updatedConfigData =
+    configData + `\n\n[github]\n  user = ${userId}\n  token = ${token}\n`;
+
+  fs.writeFileSync(configPath, updatedConfigData, "utf8");
+};
+
+const checkIsGitRepo = async (path) => {
+  gitHelper.cwd(path);
+  return await gitHelper.checkIsRepo();
+};
+// const checkIsGitRepo = async (req, res, user) => {
+//   try {
+//     gitHelper.cwd(path);
+//     const isGitRepo = await gitHelper.checkIsRepo();
+//     res.status(200).json({ isGitRepo });
+//   } catch (error) {
+//     console.log(`Error[checkIsGitRepoAPI]: ${error}`);
+//     res.status(500).json({
+//       type: "error",
+//       msg: "Failed to check whether this is a git repo.",
+//       error: error.message,
+//     });
+//   }
+// };
+
+const clonePublicRepo = async (remoteAddress, path) => {
+  gitHelper.clone(remoteAddress, path);
+};
+
+const clonePrivateRepo = async (remoteAddress, userId, repoName, path) => {
+  const configPath = `${os.homedir()}/.gitconfig`;
+  const configData = fs.readFileSync(configPath, "utf8");
+  const isIdInConfigFile = configData.match(userId);
+
+  if (isIdInConfigFile) {
+    const tokenRegex = /token\s*=\s*(.+)/;
+    const tokenMatch = configData.match(tokenRegex);
+    const token = tokenMatch && tokenMatch.length >= 2 ? tokenMatch[1] : null;
+    const privateRemoteAddress = `https://${token}:x-oauth-basic@/github.com/${userId}/${repoName}`;
+    gitHelper.clone(privateRemoteAddress, path);
+  } else {
+    const newPrivateId = req.body.newPrivateId;
+    const newPrivateToken = req.body.newPrivateToken;
+    const newPrivateRemoteAddress = `https://${newPrivateToken}:x-oauth-basic@/github.com/${newPrivateId}/${repoName}`;
+    gitHelper.clone(newPrivateRemoteAddress, path);
+
+    // config에 새 id, token을 저장.
+    saveUserIdAndTokenToConfig(newPrivateId, newPrivateToken);
+  }
+};
+
 const handleCloneRequest = async (req, res, user) => {
+  const remoteAddress = req.body.remoteAddress;
+  const isPrivateRepo = req.body.isPrivateRepo;
+
   try {
     gitHelper.cwd(user.path);
-    const { remoteAddress } = req.body;
-    await gitHelper.clone([remoteAddress]);
+
+    // 이미 git repo일 때 예외처리
+    const isGitRepo = await checkIsGitRepo(user.path);
+
+    if (isGitRepo) {
+      res.status(400).json({
+        type: "error",
+        msg: "This directory is already a Git repository. You should clone i other directory.",
+      });
+      return;
+    }
+
+    if (isPrivateRepo === "private") {
+      const urlData = req.body.remoteAddress.split("/");
+      const userId = urlData[3];
+      const repoName = urlData[4];
+      console.log(userId);
+      console.log(repoName);
+
+      await clonePrivateRepo(remoteAddress, userId, repoName, user.path);
+    } else {
+      await clonePublicRepo(remoteAddress, user.path);
+    }
+
     res.status(200).json({
       type: "success",
       msg: `Successfully clone from '${remoteAddress}'`,
     });
   } catch (error) {
-    console.log(error);
+    console.log(`Error[git clone] :  ${error}`);
+    res.status(500).json({
+      type: "error",
+      msg: `Failed to clone from '${remoteAddress}'`,
+      error: error,
+    });
   }
 };
 
