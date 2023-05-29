@@ -609,7 +609,7 @@ cloneButton.addEventListener("click", (event) => {
         label: "Cloning public Repo",
         onClick: async () => {
           try {
-            const repoURL = prompt("Enter repository address");
+            const repoURL = prompt("Enter public repository address");
             if (repoURL !== null) {
               const response = await axios.post("/dirs/git/clone/public", {
                 remoteAddress : repoURL
@@ -628,7 +628,7 @@ cloneButton.addEventListener("click", (event) => {
         label: "Cloning private repo",
         onClick: async () => {
           try {
-            const repoURL = prompt("Enter repository address");
+            const repoURL = prompt("Enter private repository address");
             const response = await axios.post("/dirs/git/clone/private/id", {
               remoteAddress : repoURL
             })
