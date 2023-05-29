@@ -611,7 +611,7 @@ cloneButton.addEventListener("click", (event) => {
           try {
             const repoURL = prompt("Enter repository address");
             if (repoURL !== null) {
-              const response = await axios.post("/dirs/git/clone", {
+              const response = await axios.post("/dirs/git/clone/public", {
                 remoteAddress : repoURL
               })
             } 
@@ -629,14 +629,24 @@ cloneButton.addEventListener("click", (event) => {
         onClick: async () => {
           try {
             const repoURL = prompt("Enter repository address");
-            if (repoURL !== null) {
-              // 해당 레포에 대해 토큰을 사용한 내역이 있는지 확인 후 다음의 질문을 날린다.
-              if (confirm("토큰 내역이 있습니다. 재사용하시겠습니까?")) {
-                //저장되어있는 토큰 가져와서 재활용
-              } else {
-                const username = prompt("Enter ID");
-                if (username !== null) {
-                  const accessToken = prompt("Enter Access Token");
+            const response = await axios.post("/dirs/git/clone/private/id", {
+              remoteAddress : repoURL
+            })
+            console.log(response.data.type)
+            if (response.data.type === "success") {
+              const response = await axios.post("/dirs/git/clone/private/config", {
+                remoteAddress : repoURL
+              })
+            } else {
+              const userId = prompt("Enter ID");
+              if (userId !== null) {
+                const token = prompt("Enter Access Token");
+                if (token !== null) {
+                  const response = await axios.post("/dirs/git/clone/private/new", {
+                    remoteAddress : repoURL,
+                    newPrivateId : userId,
+                    newPrivateToken : token
+                  })
                 }
               }
             }

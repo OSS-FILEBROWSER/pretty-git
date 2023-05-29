@@ -13,7 +13,6 @@ import {
   handleBranchRequest,
   showAllLocalBranches,
   handleMergeRequest,
-  handleCloneRequest,
   renderGraphPage,
   sendCommitHistory,
   sendCommitDetail,
