@@ -274,6 +274,20 @@ const handleMergeRequest = async (req, res, user) => {
   }
 };
 
+const saveUserIdAndTokenToConfig = (userId, token) => {
+  const configPath = `${os.homedir()}/.gitconfig`;
+
+  // Read existing config file
+  const configData = fs.readFileSync(configPath, "utf8");
+
+  // Create updated config data with userId and token
+  const updatedConfigData =
+    configData + `\n\n[github]\n  user = ${userId}\n  token = ${token}\n`;
+
+  // Write updated config data back to .gitconfig file
+  fs.writeFileSync(configPath, updatedConfigData, "utf8");
+};
+
 const handleCloneRequest = async (req, res, user) => {
   const remoteAddress = req.body.remoteAddress;
   const isPrivateRepo = req.body.isPrivateRepo;
@@ -295,8 +309,8 @@ const handleCloneRequest = async (req, res, user) => {
     if (isPrivateRepo === "private") {
       // config인지 확인?
       // 이름을 codernineteen
-      
-      // remoteAddress에서 userId를 추출하기 위해 파싱함. 
+
+      // remoteAddress에서 userId를 추출하기 위해 파싱함.
       const remoteAddressRegex = /https?:\/\/github.com\/([^/]+)\//;
       const matches = remoteAddress.match(remoteAddressRegex);
 
@@ -307,13 +321,22 @@ const handleCloneRequest = async (req, res, user) => {
 
       const isIdInConfigFile = configData.match(userIdInAddress);
 
-      if(isIdInConfigFile) {
-        
+      if (isIdInConfigFile) {
+        const tokenRegex = /token\s*=\s*(.+)/;
+        const tokenMatch = configData.match(tokenRegex);
+        const token = tokenMatch && tokenMatch.length >= 2 ? tokenMatch[1] : null;
+        const privateRemoteAddress = `https://${userId}:${token}@${remoteAddress}`;
+        gitHelper.clone(privateRemoteAddress, user.path);
+      } else {
+        newPrivateId = req.body.newPrivateId;
+        newPrivateToken = req.body.newPrivateToken;
+        const newPrivateRemoteAddress = `https://${newPrivateId}:${newPrivateToken}@${remoteAddress}`;
+        gitHelper.clone(newPrivateRemoteAddress, user.path);
+        // config에 새 id, token을 저장. 
+        saveUserIdAndTokenToConfig(newPrivateId, newPrivateToken);
       }
-
-
     } else {
-        gitHelper.clone(remoteAddress, user.path);
+      gitHelper.clone(remoteAddress, user.path);
     }
 
     res.status(200).json({
@@ -329,21 +352,6 @@ const handleCloneRequest = async (req, res, user) => {
     });
   }
 };
-
-const findIdTokenInConfig = async () => {
-  const configPath = `${os.homedir()}/.gitconfig`;
-  const configData = fs.readFileSync(configPath, "utf8");
-
-  const userIdRegex = /user\s*=\s*(.+)/;
-  const userIdMatch = configData.match(userIdRegex);
-  const userId = userIdMatch && userIdMatch.length >= 2 ? userIdMatch[1] : null;
-
-  const tokenRegex = /token\s*=\s*(.+)/;
-  const tokenMatch = configData.match(tokenRegex);
-  const token = tokenMatch && tokenMatch.length >= 2 ? tokenMatch[1] : null;
-
-  return { userId, token };
-}
 
 export {
   checkRepo,
