@@ -10,6 +10,8 @@ import {
 } from "../modules/gitCommand.js";
 //git 명령어를 실행하기 위한 helper library
 import { simpleGit } from "simple-git";
+import { promises as fs } from "fs";
+
 import axios from "axios";
 const options = {
   baseDir: process.cwd(),
@@ -271,17 +273,8 @@ const handleMergeRequest = async (req, res, user) => {
   }
 };
 
-// node.js file system module
-// const fs = require('fs');
-
-// id, token을 저장할 파일. 현재 디렉토리 내 생성됨. 
-const authFilePath = path.join(__dirname, "auth.json");
-
 const handleCloneRequest = async (req, res, user) => {
   const remoteAddress = req.body.remoteAddress;
-
-  // private 함수인지 사용자가 직접 입력하면 정확도는 더 높다고 함.
-  // const isPrivate = req.body.isPrivate;
 
   try {
     gitHelper.cwd(user.path);
@@ -296,38 +289,17 @@ const handleCloneRequest = async (req, res, user) => {
       return;
     }
 
-    const repoType = await axios.get(`https://api.github.com/repos/${remoteAddress}`);
+    const repoType = await axios.get(remoteAddress);
     // const repoType = await axios.get(remoteAddress);
     const isPrivate = repoType.data.private;
 
-    let id, token;
-
     if (isPrivate) {
-      const authData = getAuthData();
-      // id, token이 저장되어 있다면,
-      if (authData) {
-        id = authData.id;
-        token = authData.token;
-      } else {
-          res.status(401).json({
-            type: "error",
-            msg: "Authentication is required. Please provide id and token.",
-          });
-          return;
-      }
-
-      if(id != 0 && toek != 0) {
-        const authHeader = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      };
-      await gitHelper.clone(remoteAddress, user.path, authHeader);
+      console.log(repoType);
       } else {
       // clone(repoPath: string, localPath: string, options?: TaskOptions | undefined, callback?: SimpleGitTaskCallback<string> | undefined): Response<string>
       gitHelper.clone(remoteAddress, user.path);
     }
-  }
+  
     res.status(200).json({
       type: "success",
       msg: `Successfully clone from '${remoteAddress}'`,
@@ -344,41 +316,40 @@ const handleCloneRequest = async (req, res, user) => {
 
 // Node.js 내장 모듈 fs(file system) 기반으로 구현됨.
 
-const handleAuthRequest = async (req, res) => {
-  const { id, token } = req.body;
-  const authData = { id, token };
+// const handleAuthRequest = async (req, res) => {
+//   const { id, token } = req.body;
+//   const authData = { id, token };
 
-  // id와 token을 파일에 저장
-  saveAuthData(authData);
+//   // id와 token을 파일에 저장
+//   saveAuthData(authData);
 
-  res.status(200).json({
-    type: "success",
-    msg: "Authentication succeeded.",
-  });
-};
+//   res.status(200).json({
+//     type: "success",
+//     msg: "Authentication succeeded.",
+//   });
+// };
 
 
-// get id, token from authFilePath
-const getAuthData = () => {
-  try {
-    const authData = fs.readFileSync(authFilePath, "utf8");
-    return JSON.parse(authData);
-  } catch (error) {
-    console.log(`Error while reading auth file: ${error}`);
-    return null;
-  }
-};
+// // get id, token from authFilePath
+// const getAuthData = () => {
+//   try {
+//     const authData = fs.readFileSync(authFilePath, "utf8");
+//     return JSON.parse(authData);
+//   } catch (error) {
+//     console.log(`Error while reading auth file: ${error}`);
+//     return null;
+//   }
+// };
 
-// save id, token at authFilePath
-const saveAuthData = (authData) => {
-  try {
-    fs.writeFileSync(authFilePath, JSON.stringify(authData), "utf8");
-    console.log("Authentication data saved successfully.");
-  } catch (error) {
-    console.log(`Error while saving auth data: ${error}`);
-  }
-};
-
+// // save id, token at authFilePath
+// const saveAuthData = (authData) => {
+//   try {
+//     fs.writeFileSync(authFilePath, JSON.stringify(authData), "utf8");
+//     console.log("Authenticatio1n data saved successfully.");
+//   } catch (error) {
+//     console.log(`Error while saving auth data: ${error}`);
+//   }
+// };
 
 export {
   checkRepo,
