@@ -12,6 +12,7 @@ import {
 import { simpleGit } from "simple-git";
 import fs from "fs";
 import os from "os";
+import { match } from "assert";
 
 const options = {
   baseDir: process.cwd(),
@@ -299,34 +300,20 @@ const handleCloneRequest = async (req, res, user) => {
       const remoteAddressRegex = /https?:\/\/github.com\/([^/]+)\//;
       const matches = remoteAddress.match(remoteAddressRegex);
 
-      let userIdInAddress;
-
-      if (matches && matches.length >= 2) {
-        userIdInAddress = matches[1];
-      } else {
-        // remoteAddress에서 사용자 ID를 추출할 수 없는 경우, 예외 처리
-        res.status(400).json({
-          type: "error",
-          msg: "Invalid remote address. Unable to extract user ID."
-        });
-        return;
-      }
-
-      
-
-
+      const userIdInAddress = matches[1];
 
       const configPath = `${os.homedir()}/.gitconfig`;
+      const configData = fs.readFileSync(configPath, "utf8");
 
-    } else if (isPrivateRepo === "public") {
-      // else: public 레포일 때 처리
-      // clone(repoPath: string, localPath: string, options?: TaskOptions | undefined, callback?: SimpleGitTaskCallback<string> | undefined): Response<string>
-      gitHelper.clone(remoteAddress, user.path);
+      const isIdInConfigFile = configData.match(userIdInAddress);
+
+      if(isIdInConfigFile) {
+        
+      }
+
+
     } else {
-      res.status(400).json({
-        type: "error",
-        msg: "Wrong repository type.",
-      });
+        gitHelper.clone(remoteAddress, user.path);
     }
 
     res.status(200).json({
@@ -343,18 +330,20 @@ const handleCloneRequest = async (req, res, user) => {
   }
 };
 
-const cloneWithCredentials = async (
-  remoteAddress,
-  localPath,
-  userId,
-  token
-) => {
-  const options = {
-    // 사용자 ID와 토큰을 인증 정보로 사용
-    auth: `${userId}:${token}`,
-  };
-  gitHelper.clone(remoteAddress, localPath, options);
-};
+const findIdTokenInConfig = async () => {
+  const configPath = `${os.homedir()}/.gitconfig`;
+  const configData = fs.readFileSync(configPath, "utf8");
+
+  const userIdRegex = /user\s*=\s*(.+)/;
+  const userIdMatch = configData.match(userIdRegex);
+  const userId = userIdMatch && userIdMatch.length >= 2 ? userIdMatch[1] : null;
+
+  const tokenRegex = /token\s*=\s*(.+)/;
+  const tokenMatch = configData.match(tokenRegex);
+  const token = tokenMatch && tokenMatch.length >= 2 ? tokenMatch[1] : null;
+
+  return { userId, token };
+}
 
 export {
   checkRepo,
