@@ -10,9 +10,9 @@ import {
 } from "../modules/gitCommand.js";
 //git 명령어를 실행하기 위한 helper library
 import { simpleGit } from "simple-git";
-import { promises as fs } from "fs";
-
 import axios from "axios";
+import config from "simple-git/dist/src/lib/tasks/config.js";
+
 const options = {
   baseDir: process.cwd(),
   binary: "git",
@@ -273,33 +273,59 @@ const handleMergeRequest = async (req, res, user) => {
   }
 };
 
+const fs = require("fs");
+const { exec } = require("child_process");
+
 const handleCloneRequest = async (req, res, user) => {
   const remoteAddress = req.body.remoteAddress;
+  const isPrivateRepo = req.body.isPrivateRepo;
 
   try {
     gitHelper.cwd(user.path);
 
+    // 이미 git repo일 때 예외처리
     const isGitRepo = await gitHelper.checkIsRepo();
 
     if (isGitRepo) {
       res.status(400).json({
         type: "error",
-        msg: "This directory is already a Git repository. You should clone i other directory."
+        msg: "This directory is already a Git repository. You should clone i other directory.",
       });
       return;
     }
 
-    const repoType = await axios.get(remoteAddress);
-    // const repoType = await axios.get(remoteAddress);
-    const isPrivate = repoType.data.private;
+    if (isPrivateRepo === "private") {
+      const configPath = '/path/to/global/config/file';
+      const configData = fs.readFileSync(configPath, 'utf8');
 
-    if (isPrivate) {
-      console.log(repoType);
+      const userIdRegex = /user\s*=\s*(.+)/;
+      const tokenRegex = /token\s*=\s*(.+)/;
+
+      const userIdMatch = configData.match(userIdRegex);
+      const tokenMatch = configData.match(tokenRegex);
+
+      let userId, token;
+
+      if(userIdMatch && tokenMatch) {
+        userId = userIdRegex[1];
+        token = tokenMatch[1];
       } else {
+          const configContent = `user = ${userId}\ntoken = ${token}\n`;
+          // config 파일에 저장함.
+          fs.appendFileSync(configPath, configContent);
+
+          // config 파일 동기화
+          exec(`git config --global --replace-all user.name "${userId}"`);
+          exec(`git config --global --replace-all user.token "${token}"`);
+      }
+
+      cloneWithCredentials(remoteAddress, user.path, userId, token);
+    } else {
+      // else: public 레포일 때 처리
       // clone(repoPath: string, localPath: string, options?: TaskOptions | undefined, callback?: SimpleGitTaskCallback<string> | undefined): Response<string>
       gitHelper.clone(remoteAddress, user.path);
     }
-  
+
     res.status(200).json({
       type: "success",
       msg: `Successfully clone from '${remoteAddress}'`,
@@ -314,42 +340,15 @@ const handleCloneRequest = async (req, res, user) => {
   }
 };
 
-// Node.js 내장 모듈 fs(file system) 기반으로 구현됨.
+const cloneWithCredentials = async (remoteAddress, userPath, userId, token) => {
+  const options = {
+    // 사용자 ID와 토큰을 인증 정보로 사용
+    auth: `${userId}:${token}`,
+  };
 
-// const handleAuthRequest = async (req, res) => {
-//   const { id, token } = req.body;
-//   const authData = { id, token };
+  gitHelper.clone(remoteAddress, user.path, options);
 
-//   // id와 token을 파일에 저장
-//   saveAuthData(authData);
-
-//   res.status(200).json({
-//     type: "success",
-//     msg: "Authentication succeeded.",
-//   });
-// };
-
-
-// // get id, token from authFilePath
-// const getAuthData = () => {
-//   try {
-//     const authData = fs.readFileSync(authFilePath, "utf8");
-//     return JSON.parse(authData);
-//   } catch (error) {
-//     console.log(`Error while reading auth file: ${error}`);
-//     return null;
-//   }
-// };
-
-// // save id, token at authFilePath
-// const saveAuthData = (authData) => {
-//   try {
-//     fs.writeFileSync(authFilePath, JSON.stringify(authData), "utf8");
-//     console.log("Authenticatio1n data saved successfully.");
-//   } catch (error) {
-//     console.log(`Error while saving auth data: ${error}`);
-//   }
-// };
+}
 
 export {
   checkRepo,
