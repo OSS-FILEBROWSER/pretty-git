@@ -17,6 +17,7 @@ import {
   clonePrivateRepo,
   clonePrivateUsingConfig,
   clonePrivateWithoutConfig,
+  checkIdPrivateRepo,
 } from "../controllers/apiController.js";
 
 const router = Router();
@@ -31,8 +32,12 @@ export function apiRouterWrapper(user) {
 
   // public repo 클론
   router.post("/clone/public", (req, res) => clonePublicRepo(req, res, user));
-  // private repo 클론
-  router.post("/clone/private", (req, res) => clonePrivateRepo(req, res, user));
+
+  // config에 정보 있을 때 클론
+  router.post("/clone/private/config", (req, res) => clonePrivateUsingConfig(req, res, user));
+
+  // config에 정보 없을 때 클론
+  router.post("/clone/private/new", (req, res) => clonePrivateWithoutConfig(req, res, user));
 
   router.get("/isRepo", (req, res) => checkRepo(req, res, user));
 
