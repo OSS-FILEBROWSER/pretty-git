@@ -455,8 +455,15 @@ branchButton.addEventListener("click", (event) => {
       const ctxMenu = document.createElement("div");
       ctxMenu.id = "context-menu";
       ctxMenu.className = "custom-context-menu";
-      ctxMenu.style.top = event.pageY + "px";
-      ctxMenu.style.left = event.pageX + "px";
+      // ctxMenu.style.top = event.pageY + "px";
+      // ctxMenu.style.left = event.pageX + "px";
+
+      const targetElement = event.target.tagName.toLowerCase() === "p" ? event.target.parentNode : event.target;
+      const buttonRect = targetElement.getBoundingClientRect();
+      const buttonBottom = buttonRect.top + buttonRect.height;
+
+      ctxMenu.style.top = buttonBottom + "px";
+      ctxMenu.style.left = buttonRect.left + "px";
 
       ctxMenu.appendChild(
         renderContextMenuList([
@@ -588,8 +595,13 @@ cloneButton.addEventListener("click", (event) => {
   const ctxMenu = document.createElement("div");
   ctxMenu.id = "context-menu";
   ctxMenu.className = "custom-context-menu";
-  ctxMenu.style.top = event.pageY + "px";
-  ctxMenu.style.left = event.pageX + "px";
+
+  const targetElement = event.target.tagName.toLowerCase() === "p" ? event.target.parentNode : event.target;
+  const buttonRect = targetElement.getBoundingClientRect();
+  const buttonBottom = buttonRect.top + buttonRect.height;
+
+  ctxMenu.style.top = buttonBottom + "px";
+  ctxMenu.style.left = buttonRect.left + "px";
 
   ctxMenu.appendChild(
     renderContextMenuList([
