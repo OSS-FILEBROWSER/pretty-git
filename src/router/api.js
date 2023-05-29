@@ -13,7 +13,6 @@ import {
   handleBranchRequest,
   showAllLocalBranches,
   handleMergeRequest,
-  // handleCloneRequest,
   clonePublicRepo,
   clonePrivateRepo,
 } from "../controllers/apiController.js";
@@ -28,11 +27,8 @@ export function apiRouterWrapper(user) {
 
   router.post("/merge", (req, res) => handleMergeRequest(req, res, user));
 
-  // router.post("/clone", (req, res) => handleCloneRequest(req, res, user));
-
   // public repo 클론
   router.post("/clone/public", (req, res) => clonePublicRepo(req, res, user));
-
   // private repo 클론
   router.post("/clone/private", (req, res) => clonePrivateRepo(req, res, user));
 
