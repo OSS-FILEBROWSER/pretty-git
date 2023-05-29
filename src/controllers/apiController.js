@@ -295,11 +295,11 @@ const handleCloneRequest = async (req, res, user) => {
       // config인지 확인?
       // 이름을 codernineteen
       
-      let userIdInAddress;
-
       // remoteAddress에서 userId를 추출하기 위해 파싱함. 
       const remoteAddressRegex = /https?:\/\/github.com\/([^/]+)\//;
       const matches = remoteAddress.match(remoteAddressRegex);
+
+      let userIdInAddress;
 
       if (matches && matches.length >= 2) {
         userIdInAddress = matches[1];
@@ -310,7 +310,10 @@ const handleCloneRequest = async (req, res, user) => {
           msg: "Invalid remote address. Unable to extract user ID."
         });
         return;
-        }
+      }
+
+      
+
 
 
       const configPath = `${os.homedir()}/.gitconfig`;
