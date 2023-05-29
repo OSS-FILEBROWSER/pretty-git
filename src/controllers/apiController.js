@@ -274,6 +274,7 @@ const handleMergeRequest = async (req, res, user) => {
 };
 
 const fs = require("fs");
+const os = require("os");
 const { exec } = require("child_process");
 
 const handleCloneRequest = async (req, res, user) => {
@@ -295,8 +296,8 @@ const handleCloneRequest = async (req, res, user) => {
     }
 
     if (isPrivateRepo === "private") {
-      const configPath = '/path/to/global/config/file';
-      const configData = fs.readFileSync(configPath, 'utf8');
+      const configPath = `${os.homedir()}/.gitconfig`;
+      const configData = fs.readFileSync(configPath, "utf8");
 
       const userIdRegex = /user\s*=\s*(.+)/;
       const tokenRegex = /token\s*=\s*(.+)/;
@@ -306,24 +307,28 @@ const handleCloneRequest = async (req, res, user) => {
 
       let userId, token;
 
-      if(userIdMatch && tokenMatch) {
+      if (userIdMatch && tokenMatch) {
         userId = userIdRegex[1];
         token = tokenMatch[1];
       } else {
-          const configContent = `user = ${userId}\ntoken = ${token}\n`;
-          // config 파일에 저장함.
-          fs.appendFileSync(configPath, configContent);
+        const configContent = `user = ${userId}\ntoken = ${token}\n`;
+        // config 파일에 저장함.
+        fs.appendFileSync(configPath, configContent);
 
-          // config 파일 동기화
-          exec(`git config --global --replace-all user.name "${userId}"`);
-          exec(`git config --global --replace-all user.token "${token}"`);
+        // config 파일 동기화
+        exec(`git config --global --replace-all user.name "${userId}"`);
+        exec(`git config --global --replace-all user.token "${token}"`);
       }
-
       cloneWithCredentials(remoteAddress, user.path, userId, token);
-    } else {
+    } else if (isPrivateRepo === "public") {
       // else: public 레포일 때 처리
       // clone(repoPath: string, localPath: string, options?: TaskOptions | undefined, callback?: SimpleGitTaskCallback<string> | undefined): Response<string>
       gitHelper.clone(remoteAddress, user.path);
+    } else {
+      res.status(404).json({
+        type: "error",
+        msg: "Wrong repository type."
+      })
     }
 
     res.status(200).json({
@@ -340,15 +345,13 @@ const handleCloneRequest = async (req, res, user) => {
   }
 };
 
-const cloneWithCredentials = async (remoteAddress, userPath, userId, token) => {
+const cloneWithCredentials = async (remoteAddress, localPath, userId, token) => {
   const options = {
     // 사용자 ID와 토큰을 인증 정보로 사용
     auth: `${userId}:${token}`,
   };
-
-  gitHelper.clone(remoteAddress, user.path, options);
-
-}
+  gitHelper.clone(remoteAddress, localPath, options);
+};
 
 export {
   checkRepo,
