@@ -274,6 +274,7 @@ const handleMergeRequest = async (req, res, user) => {
   }
 };
 
+// global config에 id, token을 저장하는 함수
 const saveUserIdAndTokenToConfig = (userId, token) => {
   const configPath = `${os.homedir()}/.gitconfig`;
 
@@ -332,6 +333,7 @@ const handleCloneRequest = async (req, res, user) => {
         newPrivateToken = req.body.newPrivateToken;
         const newPrivateRemoteAddress = `https://${newPrivateId}:${newPrivateToken}@${remoteAddress}`;
         gitHelper.clone(newPrivateRemoteAddress, user.path);
+
         // config에 새 id, token을 저장. 
         saveUserIdAndTokenToConfig(newPrivateId, newPrivateToken);
       }
