@@ -14,6 +14,7 @@ import {
   showAllLocalBranches,
   handleMergeRequest,
   handleCloneRequest,
+  clonePublicRepo,
 } from "../controllers/apiController.js";
 
 const router = Router();
@@ -27,6 +28,9 @@ export function apiRouterWrapper(user) {
   router.post("/merge", (req, res) => handleMergeRequest(req, res, user));
 
   router.post("/clone", (req, res) => handleCloneRequest(req, res, user));
+
+  // public repo를 체크할 때
+  router.post("/clone/public", (req, res) => clonePublicRepo(req, res, user));
 
   router.get("/isRepo", (req, res) => checkRepo(req, res, user));
 
