@@ -364,6 +364,7 @@ const clonePrivateRepo = async (req, res, user) => {
     const isIdInConfigFile = configData.match(userId);
 
     if (isIdInConfigFile) {
+      console.log(`There is id in config file! ${isIdInConfigFile}`);
       const tokenRegex = /token\s*=\s*(.+)/;
       const tokenMatch = configData.match(tokenRegex);
       const token = tokenMatch && tokenMatch.length >= 2 ? tokenMatch[1] : null;
