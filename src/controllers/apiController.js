@@ -354,26 +354,36 @@ const clonePublicRepo = async (req, res, user) => {
 
 const clonePrivateRepo = async (req, res, user) => {
   const remoteAddress = req.body.remoteAddress;
-  const userId = req.body.userId;
-  const repoName = req.body.repoName;
+  // const userId = req.body.userId;
+  // const repoName = req.body.repoName;
+
+  const urlData = remoteAddress.split("/");
+  const IdInUrl = urlData[3];
+  const repoNameInUrl = urlData[4];
+
 
   try {
     gitHelper.cwd(user.path);
     const configPath = `${os.homedir()}/.gitconfig`;
     const configData = fs.readFileSync(configPath, "utf8");
-    const isIdInConfigFile = configData.match(userId);
+    const isIdInConfigFile = configData.match(IdInUrl);
 
     if (isIdInConfigFile) {
+      // 분기점으로 잘 들어오는 것을 확인함
       console.log(`There is id in config file! ${isIdInConfigFile}`);
       const tokenRegex = /token\s*=\s*(.+)/;
       const tokenMatch = configData.match(tokenRegex);
       const token = tokenMatch && tokenMatch.length >= 2 ? tokenMatch[1] : null;
-      const privateRemoteAddress = `https://${token}:x-oauth-basic@/github.com/${userId}/${repoName}`;
+      console.log(`token: ${token}`);
+
+      const privateRemoteAddress = `https://${token}:x-oauth-basic@github.com/${IdInUrl}/${repoNameInUrl}`;
       await gitHelper.clone(privateRemoteAddress, user.path);
     } else {
+      console.log("2nd part");
       const newPrivateId = req.body.newPrivateId;
       const newPrivateToken = req.body.newPrivateToken;
-      const newPrivateRemoteAddress = `https://${newPrivateToken}:x-oauth-basic@/github.com/${newPrivateId}/${repoName}`;
+      const newPrivateRemoteAddress = `https://${newPrivateToken}:x-oauth-basic@github.com/${newPrivateId}/${repoNameInUrl}`;
+      console.log(`${newPrivateRemoteAddress}`);
       await gitHelper.clone(newPrivateRemoteAddress, user.path);
 
       // config에 새 id, token을 저장.
@@ -438,43 +448,42 @@ const clonePrivateRepo = async (req, res, user) => {
 //   }
 // };
 
-const handleCloneRequest = async (req, res, user) => {
-  const remoteAddress = req.body.remoteAddress;
-  const isPrivateRepo = req.body.isPrivateRepo;
+// const handleCloneRequest = async (req, res, user) => {
+//   const remoteAddress = req.body.remoteAddress;
+//   const isPrivateRepo = req.body.isPrivateRepo;
 
-  try {
-    gitHelper.cwd(user.path);
+//   try {
+//     gitHelper.cwd(user.path);
 
-    const isGitRepo = await checkIsGitRepo(user.path);
-    if (isGitRepo) {
-      res.status(400).json({
-        type: "error",
-        msg: "This directory is already a Git repository. You should clone it in another directory.",
-      });
-      return;
-    }
+//     const isGitRepo = await checkIsGitRepo(user.path);
+//     if (isGitRepo) {
+//       res.status(400).json({
+//         type: "error",
+//         msg: "This directory is already a Git repository. You should clone it in another directory.",
+//       });
+//       return;
+//     }
 
-    if (isPrivateRepo === "private") {
-      const urlData = req.body.remoteAddress.split("/");
-      const userId = urlData[3];
-      const repoName = urlData[4];
-      console.log(userId);
-      console.log(repoName);
+//     if (isPrivateRepo === "private") {
+//       const urlData = req.body.remoteAddress.split("/");
+//       const userId = urlData[3];
+//       const repoName = urlData[4];
+//       console.log(userId);
+//       console.log(repoName);
 
-      await clonePrivateRepo(req, res, user);
-    } else {
-      await clonePublicRepo(req, res, user);
-    }
-  } catch (error) {
-    console.log(`Error[handleCloneRequest]: ${error}`);
-    res.status(500).json({
-      type: "error",
-      msg: "Failed to handle clone request",
-      error: error.message,
-    });
-  }
-};
-
+//       await clonePrivateRepo(req, res, user);
+//     } else {
+//       await clonePublicRepo(req, res, user);
+//     }
+//   } catch (error) {
+//     console.log(`Error[handleCloneRequest]: ${error}`);
+//     res.status(500).json({
+//       type: "error",
+//       msg: "Failed to handle clone request",
+//       error: error.message,
+//     });
+//   }
+// };
 
 export {
   checkRepo,
@@ -490,7 +499,7 @@ export {
   handleBranchRequest,
   showAllLocalBranches,
   handleMergeRequest,
-  handleCloneRequest,
+  // handleCloneRequest,
   clonePublicRepo,
   clonePrivateRepo,
 };
