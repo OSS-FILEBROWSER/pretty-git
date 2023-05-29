@@ -599,15 +599,10 @@ cloneButton.addEventListener("click", (event) => {
           try {
             const repoURL = prompt("Enter repository address");
             if (repoURL !== null) {
-              axios.post("/dirs/git/clone", {
+              const response = await axios.post("/dirs/git/clone", {
                 remoteAddress : repoURL
               })
-              .then((res) => {
-                if (res.status == 200) {
-                  window.location.reload();
-                }
-              });
-            }
+            } 
             window.location.href = "/";
           } catch (error) {
             console.log(error);
