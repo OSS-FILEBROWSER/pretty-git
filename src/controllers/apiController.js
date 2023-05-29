@@ -491,4 +491,5 @@ export {
   handleMergeRequest,
   handleCloneRequest,
   clonePublicRepo,
+  clonePrivateRepo,
 };

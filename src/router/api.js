@@ -15,6 +15,7 @@ import {
   handleMergeRequest,
   handleCloneRequest,
   clonePublicRepo,
+  clonePrivateRepo,
 } from "../controllers/apiController.js";
 
 const router = Router();
@@ -29,8 +30,11 @@ export function apiRouterWrapper(user) {
 
   router.post("/clone", (req, res) => handleCloneRequest(req, res, user));
 
-  // public repo를 체크할 때
+  // public repo 클론
   router.post("/clone/public", (req, res) => clonePublicRepo(req, res, user));
+
+  // private repo 클론
+  router.post("/clone/private", (req, res) => clonePrivateRepo(req, res, user));
 
   router.get("/isRepo", (req, res) => checkRepo(req, res, user));
 
