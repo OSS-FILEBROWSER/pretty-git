@@ -14,7 +14,6 @@ import {
   showAllLocalBranches,
   handleMergeRequest,
   clonePublicRepo,
-  clonePrivateRepo,
   clonePrivateUsingConfig,
   clonePrivateWithoutConfig,
   checkIdPrivateRepo,
@@ -35,7 +34,7 @@ export function apiRouterWrapper(user) {
 
   // private config에서 정보 탐색
   router.post("/clone/private/id", (req, res) => checkIdPrivateRepo(req, res, user));
-  
+
   // config에 정보 있을 때 클론
   router.post("/clone/private/config", (req, res) => clonePrivateUsingConfig(req, res, user));
 

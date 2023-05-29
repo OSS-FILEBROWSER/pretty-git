@@ -12,7 +12,6 @@ import {
 import { simpleGit } from "simple-git";
 import fs from "fs";
 import os from "os";
-import { match } from "assert";
 
 const options = {
   baseDir: process.cwd(),
@@ -376,7 +375,7 @@ const clonePrivateUsingConfig = async (req, res, user) => {
     });
   } 
   catch (error) {
-      console.log(`Error[clonePrivateRepoAPI]: ${error}`);
+      console.log(`Error[clonePrivateUsingConfig]: ${error}`);
       res.status(500).json({
         type: "error",
         msg: `Failed to clone using config file, '${remoteAddress}'`,
@@ -476,7 +475,7 @@ export {
   showAllLocalBranches,
   handleMergeRequest,
   clonePublicRepo,
-  clonePrivateRepo,
+  // clonePrivateRepo,
   checkIdPrivateRepo,
   clonePrivateUsingConfig,
   clonePrivateWithoutConfig,
