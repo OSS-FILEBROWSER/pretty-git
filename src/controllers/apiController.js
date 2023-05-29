@@ -10,8 +10,8 @@ import {
 } from "../modules/gitCommand.js";
 //git 명령어를 실행하기 위한 helper library
 import { simpleGit } from "simple-git";
-import axios from "axios";
-import config from "simple-git/dist/src/lib/tasks/config.js";
+import fs from "fs";
+import os from "os";
 
 const options = {
   baseDir: process.cwd(),
@@ -273,10 +273,6 @@ const handleMergeRequest = async (req, res, user) => {
   }
 };
 
-const fs = require("fs");
-const os = require("os");
-const { exec } = require("child_process");
-
 const handleCloneRequest = async (req, res, user) => {
   const remoteAddress = req.body.remoteAddress;
   const isPrivateRepo = req.body.isPrivateRepo;
@@ -296,39 +292,38 @@ const handleCloneRequest = async (req, res, user) => {
     }
 
     if (isPrivateRepo === "private") {
-      const configPath = `${os.homedir()}/.gitconfig`;
-      const configData = fs.readFileSync(configPath, "utf8");
+      // config인지 확인?
+      // 이름을 codernineteen
+      
+      let userIdInAddress;
 
-      const userIdRegex = /user\s*=\s*(.+)/;
-      const tokenRegex = /token\s*=\s*(.+)/;
+      // remoteAddress에서 userId를 추출하기 위해 파싱함. 
+      const remoteAddressRegex = /https?:\/\/github.com\/([^/]+)\//;
+      const matches = remoteAddress.match(remoteAddressRegex);
 
-      const userIdMatch = configData.match(userIdRegex);
-      const tokenMatch = configData.match(tokenRegex);
-
-      let userId, token;
-
-      if (userIdMatch && tokenMatch) {
-        userId = userIdRegex[1];
-        token = tokenMatch[1];
+      if (matches && matches.length >= 2) {
+        userIdInAddress = matches[1];
       } else {
-        const configContent = `user = ${userId}\ntoken = ${token}\n`;
-        // config 파일에 저장함.
-        fs.appendFileSync(configPath, configContent);
+        // remoteAddress에서 사용자 ID를 추출할 수 없는 경우, 예외 처리
+        res.status(400).json({
+          type: "error",
+          msg: "Invalid remote address. Unable to extract user ID."
+        });
+        return;
+        }
 
-        // config 파일 동기화
-        exec(`git config --global --replace-all user.name "${userId}"`);
-        exec(`git config --global --replace-all user.token "${token}"`);
-      }
-      cloneWithCredentials(remoteAddress, user.path, userId, token);
+
+      const configPath = `${os.homedir()}/.gitconfig`;
+
     } else if (isPrivateRepo === "public") {
       // else: public 레포일 때 처리
       // clone(repoPath: string, localPath: string, options?: TaskOptions | undefined, callback?: SimpleGitTaskCallback<string> | undefined): Response<string>
       gitHelper.clone(remoteAddress, user.path);
     } else {
-      res.status(404).json({
+      res.status(400).json({
         type: "error",
-        msg: "Wrong repository type."
-      })
+        msg: "Wrong repository type.",
+      });
     }
 
     res.status(200).json({
@@ -345,7 +340,12 @@ const handleCloneRequest = async (req, res, user) => {
   }
 };
 
-const cloneWithCredentials = async (remoteAddress, localPath, userId, token) => {
+const cloneWithCredentials = async (
+  remoteAddress,
+  localPath,
+  userId,
+  token
+) => {
   const options = {
     // 사용자 ID와 토큰을 인증 정보로 사용
     auth: `${userId}:${token}`,
