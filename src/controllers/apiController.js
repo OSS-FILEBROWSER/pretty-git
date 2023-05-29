@@ -339,7 +339,7 @@ const checkIdPrivateRepo = async (req, res, user) => {
       });
     } else {
       res.status(203).json({
-        type: "success",
+        type: "fail",
         msg: "No user Id in config file.",
         idInConfigFile: false,
       });
@@ -353,82 +353,113 @@ const checkIdPrivateRepo = async (req, res, user) => {
   }
 };
 
-const clonePrivateRepo = async (req, res, user) => {
+const clonePrivateUsingConfig = async (req, res, user) => {
   const remoteAddress = req.body.remoteAddress;
 
   const urlData = remoteAddress.split("/");
   const IdInUrl = urlData[3];
   const repoNameInUrl = urlData[4];
 
+  const configPath = `${os.homedir()}/.gitconfig`;
+  const configData = fs.readFileSync(configPath, "utf8");
+  
   try {
-    gitHelper.cwd(user.path);
-    const configPath = `${os.homedir()}/.gitconfig`;
-    const configData = fs.readFileSync(configPath, "utf8");
-    const isIdInConfigFile = configData.match(IdInUrl);
-
-    if (isIdInConfigFile) {
-      // 분기점으로 잘 들어오는 것을 확인함
-      console.log(`There is id in config file! ${isIdInConfigFile}`);
-      const tokenRegex = /token\s*=\s*(.+)/;
-      const tokenMatch = configData.match(tokenRegex);
-      const token = tokenMatch && tokenMatch.length >= 2 ? tokenMatch[1] : null;
-      console.log(`token: ${token}`);
-
-      const privateRemoteAddress = `https://${token}:x-oauth-basic@github.com/${IdInUrl}/${repoNameInUrl}`;
-      await gitHelper.clone(privateRemoteAddress, user.path);
-    } else {
-      const newPrivateId = req.body.newPrivateId;
-      const newPrivateToken = req.body.newPrivateToken;
-      const newPrivateRemoteAddress = `https://${newPrivateToken}:x-oauth-basic@github.com/${newPrivateId}/${repoNameInUrl}`;
-      console.log(`${newPrivateRemoteAddress}`);
-      await gitHelper.clone(newPrivateRemoteAddress, user.path);
-
-      // config에 새 id, token을 저장.
-      saveUserIdAndTokenToConfig(newPrivateId, newPrivateToken);
-    }
-
+    const tokenRegex = /token\s*=\s*(.+)/;
+    const tokenMatch = configData.match(tokenRegex);
+    const token = tokenMatch && tokenMatch.length >= 2 ? tokenMatch[1] : null;
+    const privateRemoteAddress = `https://${token}:x-oauth-basic@github.com/${IdInUrl}/${repoNameInUrl}`;
+    await gitHelper.clone(privateRemoteAddress, user.path);
+    console.log("private clone success");
     res.status(200).json({
       type: "success",
-      msg: `Successfully cloned from '${remoteAddress}'`,
+      msg: "Cloning private repo using config flie succeed.",
+    });
+  } 
+  catch (error) {
+      console.log(`Error[clonePrivateRepoAPI]: ${error}`);
+      res.status(500).json({
+        type: "error",
+        msg: `Failed to clone using config file, '${remoteAddress}'`,
+        error: error.message,
+      });
+  }
+}
+
+const clonePrivateWithoutConfig = async (req, res, user) => {
+  const remoteAddress = req.body.remoteAddress;
+
+  const urlData = remoteAddress.split("/");
+  const repoNameInUrl = urlData[4];
+
+  try {
+    const newPrivateId = req.body.newPrivateId;
+    const newPrivateToken = req.body.newPrivateToken;
+    const newPrivateRemoteAddress = `https://${newPrivateToken}:x-oauth-basic@github.com/${newPrivateId}/${repoNameInUrl}`;
+    await gitHelper.clone(newPrivateRemoteAddress, user.path);
+    // config에 새 id, token을 저장.
+    saveUserIdAndTokenToConfig(newPrivateId, newPrivateToken);
+    console.log("private clone success");
+    res.status(200).json({
+      type: "success",
+      msg: "Cloning private repo with new id and token succeeded.",
     });
   } catch (error) {
     console.log(`Error[clonePrivateRepoAPI]: ${error}`);
     res.status(500).json({
       type: "error",
-      msg: `Failed to clone from '${remoteAddress}'`,
+      msg: `Failed to clone with new id and token. private repo, '${remoteAddress}'`,
       error: error.message,
     });
   }
 };
 
-const checkToken = async (req, res, user) => {
-  const remoteAddress = req.body.remoteAddress;
-  const urlData = remoteAddress.split("/");
-  const IdInUrl = urlData[3];
+// const clonePrivateRepo = async (req, res, user) => {
+//   const remoteAddress = req.body.remoteAddress;
 
-  try {
-    gitHelper.cwd(user.path);
-    const configPath = `${os.homedir()}/.gitconfig`;
-    const configData = fs.readFileSync(configPath, "utf8");
-    const isIdInConfigFile = configData.match(IdInUrl);
+//   const urlData = remoteAddress.split("/");
+//   const IdInUrl = urlData[3];
+//   const repoNameInUrl = urlData[4];
 
-    //token이 있을 떄 - if status: 200
-    if (isIdInConfigFile) {
-      res.status(200).json({
-        type: "success",
-        result: "token exist",
-      });
-    } else {
-      res.status(400).json({
-        type: "fail",
-        result: "token doesn't exist",
-      });
-    }
-    //token이 없을 떄 - else status: 400
-  } catch (error) {
-    //처리중 에러가 났을 떄 status: 500
-  }
-};
+//   try {
+//     gitHelper.cwd(user.path);
+//     const configPath = `${os.homedir()}/.gitconfig`;
+//     const configData = fs.readFileSync(configPath, "utf8");
+//     const isIdInConfigFile = configData.match(IdInUrl);
+
+//     if (isIdInConfigFile) {
+//       // 분기점으로 잘 들어오는 것을 확인함
+//       console.log(`There is id in config file! ${isIdInConfigFile}`);
+//       const tokenRegex = /token\s*=\s*(.+)/;
+//       const tokenMatch = configData.match(tokenRegex);
+//       const token = tokenMatch && tokenMatch.length >= 2 ? tokenMatch[1] : null;
+//       console.log(`token: ${token}`);
+
+//       const privateRemoteAddress = `https://${token}:x-oauth-basic@github.com/${IdInUrl}/${repoNameInUrl}`;
+//       await gitHelper.clone(privateRemoteAddress, user.path);
+//     } else {
+//       const newPrivateId = req.body.newPrivateId;
+//       const newPrivateToken = req.body.newPrivateToken;
+//       const newPrivateRemoteAddress = `https://${newPrivateToken}:x-oauth-basic@github.com/${newPrivateId}/${repoNameInUrl}`;
+//       console.log(`${newPrivateRemoteAddress}`);
+//       await gitHelper.clone(newPrivateRemoteAddress, user.path);
+
+//       // config에 새 id, token을 저장.
+//       saveUserIdAndTokenToConfig(newPrivateId, newPrivateToken);
+//     }
+
+//     res.status(200).json({
+//       type: "success",
+//       msg: `Successfully cloned from '${remoteAddress}'`,
+//     });
+//   } catch (error) {
+//     console.log(`Error[clonePrivateRepoAPI]: ${error}`);
+//     res.status(500).json({
+//       type: "error",
+//       msg: `Failed to clone from '${remoteAddress}'`,
+//       error: error.message,
+//     });
+//   }
+// };
 
 export {
   checkRepo,
@@ -447,4 +478,6 @@ export {
   clonePublicRepo,
   clonePrivateRepo,
   checkIdPrivateRepo,
+  clonePrivateUsingConfig,
+  clonePrivateWithoutConfig,
 };

@@ -15,6 +15,8 @@ import {
   handleMergeRequest,
   clonePublicRepo,
   clonePrivateRepo,
+  clonePrivateUsingConfig,
+  clonePrivateWithoutConfig,
 } from "../controllers/apiController.js";
 
 const router = Router();
