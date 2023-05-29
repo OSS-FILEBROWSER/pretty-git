@@ -312,29 +312,36 @@ const handleCloneRequest = async (req, res, user) => {
       // 이름을 codernineteen
 
       // remoteAddress에서 userId를 추출하기 위해 파싱함.
-      const remoteAddressRegex = /https?:\/\/github.com\/([^/]+)\//;
-      const matches = remoteAddress.match(remoteAddressRegex);
+      // const remoteAddressRegex = /https?:\/\/github.com\/([^/]+)\//;
+      // const matches = remoteAddress.match(remoteAddressRegex);
 
-      const userIdInAddress = matches[1];
+      // const userIdInAddress = matches[1];
+
+      const urlData = req.body.remoteAddress.split("/");
+      const userId = urlData[3];
+      const repoName = urlData[4];
+      console.log(userId);
+      console.log(repoName);
 
       const configPath = `${os.homedir()}/.gitconfig`;
       const configData = fs.readFileSync(configPath, "utf8");
 
-      const isIdInConfigFile = configData.match(userIdInAddress);
+      const isIdInConfigFile = configData.match(userId);
 
       if (isIdInConfigFile) {
         const tokenRegex = /token\s*=\s*(.+)/;
         const tokenMatch = configData.match(tokenRegex);
-        const token = tokenMatch && tokenMatch.length >= 2 ? tokenMatch[1] : null;
-        const privateRemoteAddress = `https://${userId}:${token}@${remoteAddress}`;
+        const token =
+          tokenMatch && tokenMatch.length >= 2 ? tokenMatch[1] : null;
+        const privateRemoteAddress = `https://${token}:x-oauth-basic@/github.com/${userId}/${repoName}`;
         gitHelper.clone(privateRemoteAddress, user.path);
       } else {
-        newPrivateId = req.body.newPrivateId;
-        newPrivateToken = req.body.newPrivateToken;
-        const newPrivateRemoteAddress = `https://${newPrivateId}:${newPrivateToken}@${remoteAddress}`;
+        const newPrivateId = req.body.newPrivateId;
+        const newPrivateToken = req.body.newPrivateToken;
+        const newPrivateRemoteAddress = `https://${newPrivateToken}:x-oauth-basic@/github.com/${newPrivateId}/${repoName}`;
         gitHelper.clone(newPrivateRemoteAddress, user.path);
 
-        // config에 새 id, token을 저장. 
+        // config에 새 id, token을 저장.
         saveUserIdAndTokenToConfig(newPrivateId, newPrivateToken);
       }
     } else {
