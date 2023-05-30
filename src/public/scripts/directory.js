@@ -434,6 +434,7 @@ const res = axios
       openModalButton.classList.remove("hidden");
       branchButton.classList.remove("hidden");
       logButton.classList.remove("hidden");
+      cloneButton.classList.add("hidden");
     }
   })
   .catch((err) => console.log(err));
@@ -629,9 +630,11 @@ cloneButton.addEventListener("click", (event) => {
         onClick: async () => {
           try {
             const repoURL = prompt("Enter private repository address");
-            const response = await axios.post("/dirs/git/clone/private/id", {
-              remoteAddress : repoURL
-            })
+            if (repoURL !== null) {
+              const response = await axios.post("/dirs/git/clone/private/id", {
+                remoteAddress : repoURL
+              })
+            }
             console.log(response.data.type)
             if (response.data.type === "success") {
               const response = await axios.post("/dirs/git/clone/private/config", {
