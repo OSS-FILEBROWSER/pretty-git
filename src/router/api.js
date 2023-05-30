@@ -13,10 +13,13 @@ import {
   handleBranchRequest,
   showAllLocalBranches,
   handleMergeRequest,
-  handleCloneRequest,
   renderGraphPage,
   sendCommitHistory,
   sendCommitDetail,
+  clonePublicRepo,
+  clonePrivateUsingConfig,
+  clonePrivateWithoutConfig,
+  checkIdPrivateRepo,
 } from "../controllers/apiController.js";
 
 const router = Router();
@@ -29,10 +32,20 @@ export function apiRouterWrapper(user) {
 
   router.post("/merge", (req, res) => handleMergeRequest(req, res, user));
 
-  router.post("/clone", (req, res) => handleCloneRequest(req, res, user));
   router.get("/log", (req, res) => renderGraphPage(req, res, user));
   router.post("/logData", (req, res) => sendCommitHistory(req, res, user));
   router.post("/commitDetail", (req, res) => sendCommitDetail(req, res, user));
+  // public repo 클론
+  router.post("/clone/public", (req, res) => clonePublicRepo(req, res, user));
+
+  // private config에서 정보 탐색
+  router.post("/clone/private/id", (req, res) => checkIdPrivateRepo(req, res, user));
+
+  // config에 정보 있을 때 클론
+  router.post("/clone/private/config", (req, res) => clonePrivateUsingConfig(req, res, user));
+
+  // config에 정보 없을 때 클론
+  router.post("/clone/private/new", (req, res) => clonePrivateWithoutConfig(req, res, user));
 
   router.get("/isRepo", (req, res) => checkRepo(req, res, user));
 

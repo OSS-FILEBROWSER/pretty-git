@@ -434,6 +434,7 @@ const res = axios
       openModalButton.classList.remove("hidden");
       branchButton.classList.remove("hidden");
       logButton.classList.remove("hidden");
+      cloneButton.classList.add("hidden");
     }
   })
   .catch((err) => console.log(err));
@@ -455,8 +456,15 @@ branchButton.addEventListener("click", (event) => {
       const ctxMenu = document.createElement("div");
       ctxMenu.id = "context-menu";
       ctxMenu.className = "custom-context-menu";
-      ctxMenu.style.top = event.pageY + "px";
-      ctxMenu.style.left = event.pageX + "px";
+      // ctxMenu.style.top = event.pageY + "px";
+      // ctxMenu.style.left = event.pageX + "px";
+
+      const targetElement = event.target.tagName.toLowerCase() === "p" ? event.target.parentNode : event.target;
+      const buttonRect = targetElement.getBoundingClientRect();
+      const buttonBottom = buttonRect.top + buttonRect.height;
+
+      ctxMenu.style.top = buttonBottom + "px";
+      ctxMenu.style.left = buttonRect.left + "px";
 
       ctxMenu.appendChild(
         renderContextMenuList([
@@ -588,8 +596,13 @@ cloneButton.addEventListener("click", (event) => {
   const ctxMenu = document.createElement("div");
   ctxMenu.id = "context-menu";
   ctxMenu.className = "custom-context-menu";
-  ctxMenu.style.top = event.pageY + "px";
-  ctxMenu.style.left = event.pageX + "px";
+
+  const targetElement = event.target.tagName.toLowerCase() === "p" ? event.target.parentNode : event.target;
+  const buttonRect = targetElement.getBoundingClientRect();
+  const buttonBottom = buttonRect.top + buttonRect.height;
+
+  ctxMenu.style.top = buttonBottom + "px";
+  ctxMenu.style.left = buttonRect.left + "px";
 
   ctxMenu.appendChild(
     renderContextMenuList([
@@ -597,23 +610,16 @@ cloneButton.addEventListener("click", (event) => {
         label: "Cloning public Repo",
         onClick: async () => {
           try {
-            const repoURL = prompt("Enter repository address");
+            const repoURL = prompt("Enter public repository address");
             if (repoURL !== null) {
-              axios.post("/dirs/git/clone", {
+              const response = await axios.post("/dirs/git/clone/public", {
                 remoteAddress : repoURL
               })
-              .then((res) => {
-                if (res.status == 200) {
-                  window.location.reload();
-                }
-              });
-            }
+            } 
             window.location.href = "/";
           } catch (error) {
             console.log(error);
-            const errorList =
-              error.response.data.msg.split("Error: error:");
-            alert("!![ERROR] : " + errorList[1]);
+            alert(error.response.data.msg);
           }
         },
       },
@@ -621,24 +627,34 @@ cloneButton.addEventListener("click", (event) => {
         label: "Cloning private repo",
         onClick: async () => {
           try {
-            const repoURL = prompt("Enter repository address");
+            const repoURL = prompt("Enter private repository address");
             if (repoURL !== null) {
-              // 해당 레포에 대해 토큰을 사용한 내역이 있는지 확인 후 다음의 질문을 날린다.
-              if (confirm("토큰 내역이 있습니다. 재사용하시겠습니까?")) {
-                //저장되어있는 토큰 가져와서 재활용
+              const response = await axios.post("/dirs/git/clone/private/id", {
+                remoteAddress : repoURL
+              })
+
+              if (response.data.type === "success") {
+                const response = await axios.post("/dirs/git/clone/private/config", {
+                  remoteAddress : repoURL
+                })
               } else {
-                const username = prompt("Enter ID");
-                if (username !== null) {
-                  const accessToken = prompt("Enter Access Token");
+                const userId = prompt("Enter ID");
+                if (userId !== null) {
+                  const token = prompt("Enter Access Token");
+                  if (token !== null) {
+                    const response = await axios.post("/dirs/git/clone/private/new", {
+                      remoteAddress : repoURL,
+                      newPrivateId : userId,
+                      newPrivateToken : token
+                    })
+                  }
                 }
               }
             }
             window.location.href = "/";
           } catch (error) {
             console.log(error);
-            const errorList =
-              error.response.data.msg.split("Error: error:");
-            alert("!![ERROR] : " + errorList[1]);
+            alert(error.response.data.msg);
           }
         },
       },
