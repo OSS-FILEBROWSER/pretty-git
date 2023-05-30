@@ -289,7 +289,7 @@ const clonePublicRepo = async (req, res, user) => {
   const remoteAddress = req.body.remoteAddress;
   try {
     gitHelper.cwd(user.path);
-    await gitHelper.clone(remoteAddress, user.path);
+    await gitHelper.clone(remoteAddress);
 
     res.status(200).json({
       type: "success",
@@ -352,7 +352,7 @@ const clonePrivateUsingConfig = async (req, res, user) => {
     const tokenMatch = configData.match(tokenRegex);
     const token = tokenMatch && tokenMatch.length >= 2 ? tokenMatch[1] : null;
     const privateRemoteAddress = `https://${token}:x-oauth-basic@github.com/${IdInUrl}/${repoNameInUrl}`;
-    await gitHelper.clone(privateRemoteAddress, user.path);
+    await gitHelper.clone(privateRemoteAddress);
     console.log("private clone success");
     res.status(200).json({
       type: "success",
