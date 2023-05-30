@@ -348,6 +348,8 @@ const clonePrivateUsingConfig = async (req, res, user) => {
   const configData = fs.readFileSync(configPath, "utf8");
   
   try {
+    gitHelper.cwd(user.path);
+
     const tokenRegex = /token\s*=\s*(.+)/;
     const tokenMatch = configData.match(tokenRegex);
     const token = tokenMatch && tokenMatch.length >= 2 ? tokenMatch[1] : null;
@@ -376,10 +378,12 @@ const clonePrivateWithoutConfig = async (req, res, user) => {
   const repoNameInUrl = urlData[4];
 
   try {
+    gitHelper.cwd(user.path);
+
     const newPrivateId = req.body.newPrivateId;
     const newPrivateToken = req.body.newPrivateToken;
     const newPrivateRemoteAddress = `https://${newPrivateToken}:x-oauth-basic@github.com/${newPrivateId}/${repoNameInUrl}`;
-    await gitHelper.clone(newPrivateRemoteAddress, user.path);
+    await gitHelper.clone(newPrivateRemoteAddress);
     // config에 새 id, token을 저장.
     saveUserIdAndTokenToConfig(newPrivateId, newPrivateToken);
     console.log("private clone success");
