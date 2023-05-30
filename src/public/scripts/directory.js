@@ -619,9 +619,7 @@ cloneButton.addEventListener("click", (event) => {
             window.location.href = "/";
           } catch (error) {
             console.log(error);
-            const errorList =
-              error.response.data.msg.split("Error: error:");
-            alert("!![ERROR] : " + errorList[1]);
+            alert(error.response.data.msg);
           }
         },
       },
@@ -634,31 +632,29 @@ cloneButton.addEventListener("click", (event) => {
               const response = await axios.post("/dirs/git/clone/private/id", {
                 remoteAddress : repoURL
               })
-            }
-            console.log(response.data.type)
-            if (response.data.type === "success") {
-              const response = await axios.post("/dirs/git/clone/private/config", {
-                remoteAddress : repoURL
-              })
-            } else {
-              const userId = prompt("Enter ID");
-              if (userId !== null) {
-                const token = prompt("Enter Access Token");
-                if (token !== null) {
-                  const response = await axios.post("/dirs/git/clone/private/new", {
-                    remoteAddress : repoURL,
-                    newPrivateId : userId,
-                    newPrivateToken : token
-                  })
+
+              if (response.data.type === "success") {
+                const response = await axios.post("/dirs/git/clone/private/config", {
+                  remoteAddress : repoURL
+                })
+              } else {
+                const userId = prompt("Enter ID");
+                if (userId !== null) {
+                  const token = prompt("Enter Access Token");
+                  if (token !== null) {
+                    const response = await axios.post("/dirs/git/clone/private/new", {
+                      remoteAddress : repoURL,
+                      newPrivateId : userId,
+                      newPrivateToken : token
+                    })
+                  }
                 }
               }
             }
             window.location.href = "/";
           } catch (error) {
             console.log(error);
-            const errorList =
-              error.response.data.msg.split("Error: error:");
-            alert("!![ERROR] : " + errorList[1]);
+            alert(error.response.data.msg);
           }
         },
       },
