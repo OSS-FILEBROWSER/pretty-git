@@ -482,9 +482,7 @@ branchButton.addEventListener("click", (event) => {
                 window.location.href = "/";
               } catch (error) {
                 console.log(error);
-                const errorList =
-                  error.response.data.msg.split("Error: error:");
-                alert("!![ERROR] : " + errorList[1]);
+                alert(error.response.data.msg);
               }
             },
           },
