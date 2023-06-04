@@ -40,7 +40,6 @@ app.get("/", async (req, res) => {
   if (user.history.isRepo === true) {
     try {
       const logData = await gitStatus(user.path);
-      ㅇ;
       user.gitManager.updateStatus(logData);
     } catch (error) {
       console.log(error);
