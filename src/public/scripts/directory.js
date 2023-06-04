@@ -482,9 +482,7 @@ branchButton.addEventListener("click", (event) => {
                 window.location.href = "/";
               } catch (error) {
                 console.log(error);
-                const errorList =
-                  error.response.data.msg.split("Error: error:");
-                alert("!![ERROR] : " + errorList[1]);
+                alert(error.response.data.msg);
               }
             },
           },
@@ -548,14 +546,15 @@ branchButton.addEventListener("click", (event) => {
                           if (response.data.type === "success") {
                             alert(response.data.msg);
                             window.location.href = "/";
-                          } else {
-                            console.log(response.data.errorData);
-                            // alert("Error: api response failed");
-                            alert(response.data.errorData);
-                          }
+                          } 
                           window.location.href = "/"; // 성공 시 페이지 리로드
                         } catch (error) {
-                          alert(error.response.data.msg);
+                          console.log(error);
+                          alert(error.response.data.errorData.git.result 
+                            + "\n" 
+                            + error.response.data.msg
+                            + "\n"
+                            + "reason: " + error.response.data.errorData.git.conflicts[0].reason + ", file:" + error.response.data.errorData.git.conflicts[0].file);
                         }
                       },
                     },
