@@ -618,7 +618,7 @@ cloneButton.addEventListener("click", (event) => {
             window.location.href = "/";
           } catch (error) {
             console.log(error);
-            alert(error.response.data.msg);
+            alert(error.response.data.msg + "\n" + error.response.data.error);
           }
         },
       },
@@ -653,7 +653,7 @@ cloneButton.addEventListener("click", (event) => {
             window.location.href = "/";
           } catch (error) {
             console.log(error);
-            alert(error.response.data.msg);
+            alert(error.response.data.msg + "\n" + error.response.data.error);
           }
         },
       },
