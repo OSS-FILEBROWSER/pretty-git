@@ -4,19 +4,39 @@
    <p style="font-weight: 700; font-size: 30px;">Make Your Git Easier</p>
 </div></div>
 
+Pretty Git is browser-based git GUI program which supports basic browsing functionalities and several git-related commands.
+Git is a powerful version control system and it is easy to use once you get used to various git commands and its workflow. But For Beginners, it is true that git can be complex to use and it really takes time to apply git workflow to your project at the first time.
+Our team also stucked at this stage when we were beginner git and then started this project to make git usage more easier.
+It's always good starting point to understand git workflow with comprehensive GUI supports.
+we are sure that you will be familiar with git workflow while you using our project.
+
+We are always open to get any feedbacks and anyone who wants to contribute this project.
+
 # Tested environment
 
-- machine: MacOS Ventura 13.3.1, Windows OS 11
-- runtime : node v19.8.1
-- libraries
-  - axios : v1.4.0
-  - express : v4.18.2
-  - pug : v3.0.2
-  - nodemon : v2.0.20
-  - simple-git: v3.18.0
-  - minimatch: v9.0.0
+| machine    | version        |
+| ---------- | -------------- |
+| MacOS      | Ventura 13.3.1 |
+| Windows OS | 11             |
 
-# Prerequisites
+| Runtime | version |
+| ------- | ------- |
+| node.js | v19.8.1 |
+
+| libraries  | version  |
+| ---------- | -------- |
+| axios      | v1.4.0   |
+| express    | v4.18.2  |
+| pug        | v3.0.2   |
+| nodemon    | v2.0.20  |
+| simple-git | v.3.18.0 |
+| minimatch  | v9.0.0   |
+
+# Installation
+
+## 1. prerequisites
+
+### Git config
 
 - If you don't have a git, Install git first and then config your git account
 
@@ -26,6 +46,8 @@
       git config --global user.email "your email"
       git config --global user.name "your name"
     ```
+
+### Node.js
 
 - Install node.js runtime corresponding your machine platform. We highly recommend you to install LTS version.
   - [official node.js site](https://nodejs.org/ko)
@@ -45,16 +67,12 @@
    npm i -g nodemon
   ```
 
-- Install 'simple-git' npm module.
-
-  ```
-   npm i simple-git
-  ```
+### Chrome browser
 
 - Our project doesn't guarantee that it will work on every browser. We recommend you to use chrome browser.
   - [chrome browser download](https://www.google.com/chrome/?brand=CHBD&brand=CHBD&gclid=Cj0KCQjwmN2iBhCrARIsAG_G2i6teiD4fIvR-a5CQEAxNGkxlercrsgwv6onbD1pMKGr1soGa1exmQEaAm6bEALw_wcB&gclsrc=aw.ds)
 
-# How to run
+## 2. Download source codes and Install Dependencies
 
 1. Clone our repo or Download source files.
    ```
@@ -64,23 +82,39 @@
    ```
    npm install
    ```
-3. Run the file server by typing below command and Enjoy it!
 
-   ```
+# How to run
+
+1. First, To run the pretty-git local server, move to the directory path where you clone our project source code.
+   <br>
+   Then, you can run the server by running below command
+
+   ```bash
    npm run dev
    ```
 
-   <span style="color: orangered;">[Warning]</span> If you already running something on same port, you will see below error.
+   If the sever successfully running, you can see this lines in your terminal screen
+
+   ```bash
+   [nodemon] 2.0.20
+   [nodemon] to restart at any time, enter rs
+   [nodemon] watching path(s): *.*
+   [nodemon] watching extensions: js,mjs,json
+   [nodemon] starting node src/index.js
+   Server running on port 3000
+   ```
+
+2. <span style="color: orangered;">[Warning]</span> If you already running something on same port, you will see below error.
 
    ```
    Emitted 'error' event on Server instance at:
-       at emitErrorNT (node:net:1801:8)
-       at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
-     code: 'EADDRINUSE',
-     errno: -48,
-     syscall: 'listen',
-     address: '::',
-     port: 3000
+   at emitErrorNT (node:net:1801:8)
+   at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+   code: 'EADDRINUSE',
+   errno: -48,
+   syscall: 'listen',
+   address: '::',
+   port: 3000
    }
 
    Node.js v19.8.1
@@ -91,8 +125,8 @@
    a. Kill the port you use and re-run the sever.
    b. Go to src directory('~/pretty-git/src') and modify the `PORT` value inside index.js
 
-   ```
-     const PORT = 3000; //<-- modify the number here.
+   ```javascript
+   const PORT = 3000; //<-- modify the port number here.
    ```
 
 # New Features in v2.0.0
@@ -143,19 +177,19 @@ Now, you can mangage your branches on the browser.
 
 - When you click the 'Git Log' button to the left of the 'Git Status' button, Pretty-git will show you the commit history of your project in the form of a graph.
 
-  - Click 'Git Log' button.
-  <div align="center">
-  <div style="display:flex; justify-content: center;"><img width ="300px" height="px" src="src/public/readmeimg/log-btn.png" alt="current branch menu"/></div></div><br>
+- Click 'Git Log' button.
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="300px" height="px" src="src/public/readmeimg/log-btn.png" alt="current branch menu"/></div></div><br>
 
-  - Pretty-git will show you the graph. The graph includes the workflow of the current branch.
-  <div align="center">
-  <div style="display:flex; justify-content: center;"><img width ="500px" src="src/public/readmeimg/commit-history.png" alt="current branch menu"/></div></div><br>
+- Pretty-git will show you the graph. The graph includes the workflow of the current branch.
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="500px" src="src/public/readmeimg/commit-history.png" alt="current branch menu"/></div></div><br>
 
-  - Furthermore, If you choose a commit object shaped yellow circle, Pretty-git will provide the detailed information about the commit.
-  <div align="center">
-  <div style="display:flex; justify-content: center;"><img width ="500px" src="src/public/readmeimg/detail-commit.png" alt="current branch menu"/></div></div><br>
+- Furthermore, If you choose a commit object shaped yellow circle, Pretty-git will provide the detailed information about the commit.
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="500px" src="src/public/readmeimg/detail-commit.png" alt="current branch menu"/></div></div><br>
 
-  - If you want to close the detailed commit tab, just click the 'close' button.
+- If you want to close the detailed commit tab, just click the 'close' button.
 
 ## 4. Git clone from GitHub
 
@@ -172,12 +206,12 @@ You can easily clone both private and public repository using HTTPS of it.
 <div style="display:flex; justify-content: center;"><img width ="400px" src="src/public/readmeimg/public-repo.png" alt="current branch menu"/></div></div><br>
 
 - If you click the 'private repo', It will ask you the address of the repository.
-  <div align="center">
-  <div style="display:flex; justify-content: center;"><img width ="400px" src="src/public/readmeimg/private-url.png" alt="current branch menu"/></div></div><br>
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="400px" src="src/public/readmeimg/private-url.png" alt="current branch menu"/></div></div><br>
 
-  - If you already have the id and token that needed for cloning, Pretty-git directly clone the private repository.
+- If you already have the id and token that needed for cloning, Pretty-git directly clone the private repository.
 
-  - Otherwise, if you have no information that needed for cloning, Pretty-git ask you the id, token about the repository.
+- Otherwise, if you have no information that needed for cloning, Pretty-git ask you the id, token about the repository.
 
 <div align="center">
 <div style="display:flex; justify-content: center;"><img width ="400px" src="src/public/readmeimg/enter-id.png" alt="current branch menu"/></div></div><br>
@@ -194,9 +228,10 @@ You can easily clone both private and public repository using HTTPS of it.
 - If you think an information of the access token is wrong or want to renew the token information by yourselves, you can update it in .gitconfig, which is global config file of git VCS.
 
 - To enter and edit .gitconfig file, run the below command (The command might not work depending on your machine, especially Windows)
-  ```bash
-    vim ~/.gitconfig
-  ```
+
+```bash
+ vim ~/.gitconfig
+```
 
 <div align="center">
 <div style="display:flex; justify-content: center;"><img width ="400px" src="src/public/readmeimg/config.png" alt="current branch menu"/></div></div><br>
