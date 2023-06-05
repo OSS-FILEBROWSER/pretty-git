@@ -1,5 +1,6 @@
 import fs from "fs";
 import { spawn } from "child_process";
+import { resolve } from "path";
 
 const gitInit = (curPath) => {
   return new Promise((resolve, reject) => {
@@ -172,6 +173,38 @@ const gitStatus = (path) => {
   });
 };
 
+const gitBranch = (userPath, branchName) => {
+  return new Promise((resolve, reject) => {
+    const args = ["branch", branchName];
+    const child = spawn("git", args, { cwd: userPath });
+
+    let stdout = "";
+    let stderr = "";
+
+    // Log any output from the command to the console
+    child.stdout.on("data", (data) => {
+      stdout += data;
+    });
+
+    child.stderr.on("data", (data) => {
+      stderr += data;
+    });
+
+    child.on("exit", (code, signal) => {
+      if (code === 0) {
+        const message = `Successfully create branch : ${stdout}`;
+        resolve(message);
+      } else {
+        reject(stderr);
+      }
+    });
+
+    child.on("error", (error) => {
+      reject(`git branch ${branchName} 실행 중 오류 발생: ${error}`);
+    });
+  });
+};
+
 export {
   gitAdd,
   gitInit,
@@ -180,4 +213,5 @@ export {
   gitRestore,
   gitStatus,
   gitCommit,
+  gitBranch,
 };

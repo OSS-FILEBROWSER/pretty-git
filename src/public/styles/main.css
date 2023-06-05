@@ -86,7 +86,9 @@ input[type="reset"] {
 }
 
 /* back button */
-.back-button {
+.back-button,
+.branch-button,
+.log-button {
   display: flex;
   font-weight: 700;
   font-size: 20px;
@@ -386,6 +388,48 @@ input[type="reset"] {
   border-radius: 10px;
 }
 
+.branch-button {
+  display: flex;
+  font-weight: 700;
+  font-size: 20px;
+  border-radius: 15px;
+  border: 2px solid black;
+  width: 180px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  margin-right: 20px;
+  transition: all 0.3s;
+}
+
+.branch-button:hover {
+  background-color: rgba(133, 120, 120, 0.2);
+}
+
+.clone-button {
+  display: flex;
+  font-weight: 700;
+  font-size: 20px;
+  border-radius: 15px;
+  border: 2px solid black;
+  width: 180px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 0;
+  margin-right: 20px;
+  transition: all 0.3s;
+}
+
+.clone-button:hover {
+  background-color: rgba(133, 120, 120, 0.2);
+}
+
+.merge-button {
+  display: flex;
+}
+
 .hidden {
   display: none;
 }
@@ -404,5 +448,13 @@ input[type="reset"] {
 }
 
 .commit-button:hover {
+  background-color: rgba(133, 120, 120, 0.2);
+}
+
+.log-button {
+  justify-content: center;
+}
+
+.log-button:hover {
   background-color: rgba(133, 120, 120, 0.2);
 }

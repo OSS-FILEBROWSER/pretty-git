@@ -15,6 +15,7 @@
 }
 
 .custom-context-menu-li {
+  position : relative;
   font-weight: 700;
   border-bottom: 1px solid rgba(138, 132, 132, 0.3);
   padding: 3px 5px;
@@ -25,4 +26,37 @@
 .custom-context-menu li:hover {
   background-color: #f0f0f0;
   border-radius: 10px;
+}
+
+.submenu-arrow {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 5px 4px 0 4px;
+  border-color: #000000 transparent transparent transparent;
+  transition: transform 0.2s ease-in-out;
+}
+
+.submenu-container {
+  position: absolute;
+  top: 0;
+  left: 100%; /* branch 메뉴 오른쪽에 위치하도록 설정 */
+  display: none;
+  min-width: 150px;
+  background-color: #fff;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 15px;
+  padding-right: 10px;
+  padding-left: 10px;
+}
+
+.submenu {
+  position: absolute;
+  display: none;
+  left: 100%;
+  top: 0;
 }

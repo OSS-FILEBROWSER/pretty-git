@@ -3,10 +3,13 @@ const directories = document.querySelectorAll(".directory-item");
 const backButton = document.querySelector("#back");
 const gitStatusModal = document.querySelector(".git-status-modal");
 const openModalButton = document.querySelector(".open-modal");
+const branchButton = document.querySelector(".branch-button");
+const cloneButton = document.querySelector(".clone-button");
 const closeModalButton = document.querySelector(".close-modal");
 const untrackedList = document.querySelector(".status-item.untracked ul");
 const modifiedList = document.querySelector(".status-item.modified ul");
 const stagedList = document.querySelector(".status-item.staged ul");
+const logButton = document.querySelector(".log-button");
 // const committedList = document.querySelector(".status-item.committed ul");
 let untracked = [];
 let modified = [];
@@ -318,6 +321,24 @@ function renderContextMenuList(list) {
 
     ctxMenuItem.className = "custom-context-menu-li";
 
+    if (item.submenu) {
+      const arrowIcon = document.createElement("span");
+      arrowIcon.className = "submenu-arrow";
+      ctxMenuItemAnchor.appendChild(arrowIcon);
+
+      const submenu = renderContextMenuList(item.submenu);
+      submenu.className = "submenu-container";
+      ctxMenuItem.appendChild(submenu);
+
+      ctxMenuItem.addEventListener("mouseenter", () => {
+        submenu.style.display = "block";
+      });
+
+      ctxMenuItem.addEventListener("mouseleave", () => {
+        submenu.style.display = "none";
+      });
+    }
+
     // 클릭 이벤트 설정
     if (item.onClick) {
       ctxMenuItem.addEventListener("click", item.onClick, false);
@@ -398,14 +419,263 @@ const res = axios
   .get("/dirs/git/isRepo")
   .then((res) => {
     if (res.data) {
+      var pTag = branchButton.querySelector("p");
+
+      axios
+        .post("/dirs/git/branch", { mode: "get" })
+        .then((res) => {
+          console.log(res.data);
+          pTag.textContent = res.data;
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+        });
+
       openModalButton.classList.remove("hidden");
+      branchButton.classList.remove("hidden");
+      logButton.classList.remove("hidden");
+      cloneButton.classList.add("hidden");
     }
   })
   .catch((err) => console.log(err));
 
-window.addEventListener("click", (event) => {
+rootElement.addEventListener("click", (event) => {
   const contextMenu = document.getElementById("context-menu");
   if (contextMenu && !contextMenu.contains(event.target)) {
     contextMenu.remove();
+  }
+});
+
+branchButton.addEventListener("click", (event) => {
+  axios
+    .get("/dirs/git/branches")
+    .then((res) => {
+      const branchList = Object.keys(res.data.data.branches);
+      const currentBranch = res.data.data.current;
+
+      const ctxMenu = document.createElement("div");
+      ctxMenu.id = "context-menu";
+      ctxMenu.className = "custom-context-menu";
+      // ctxMenu.style.top = event.pageY + "px";
+      // ctxMenu.style.left = event.pageX + "px";
+
+      const targetElement = event.target.tagName.toLowerCase() === "p" ? event.target.parentNode : event.target;
+      const buttonRect = targetElement.getBoundingClientRect();
+      const buttonBottom = buttonRect.top + buttonRect.height;
+
+      ctxMenu.style.top = buttonBottom + "px";
+      ctxMenu.style.left = buttonRect.left + "px";
+
+      ctxMenu.appendChild(
+        renderContextMenuList([
+          {
+            label: "Create new branch",
+            onClick: async () => {
+              try {
+                const input = prompt("Enter branch name");
+                if (input !== null) {
+                  const response = await axios.post("/dirs/git/branch", {
+                    mode: "create",
+                    branchName: input,
+                  });
+                }
+                window.location.href = "/";
+              } catch (error) {
+                console.log(error);
+                alert(error.response.data.msg);
+              }
+            },
+          },
+          ...branchList.map((branch) => ({
+            label: branch,
+            onClick: async () => {
+              // 클릭 이벤트
+            },
+            submenu: [
+              ...(branch !== currentBranch
+                ? [
+                    {
+                      label: "Checkout",
+                      onClick: async () => {
+                        try {
+                          const response = await axios.post(
+                            "/dirs/git/branch",
+                            {
+                              mode: "checkout",
+                              branchName: branch,
+                            }
+                          );
+                          window.location.href = "/";
+                        } catch (error) {
+                          console.log(error);
+                          const errorList =
+                            error.response.data.msg.split("Error: error:");
+                          alert("!![ERROR] : " + errorList[1]);
+                          console.log(branch);
+                        }
+                      },
+                    },
+                    {
+                      label: "Delete",
+                      onClick: async () => {
+                        try {
+                          const response = await axios.post(
+                            "/dirs/git/branch",
+                            {
+                              mode: "delete",
+                              branchName: branch,
+                            }
+                          );
+                          window.location.href = "/";
+                        } catch (error) {
+                          console.log(error);
+                          const errorList =
+                            error.response.data.msg.split("Error: error:");
+                          alert("!![ERROR] : " + errorList[1]);
+                        }
+                      },
+                    },
+                    {
+                      label: "Merge",
+                      onClick: async () => {
+                        try {
+                          const response = await axios.post("/dirs/git/merge", {
+                            mode: "merge",
+                            targetBranch: branch,
+                          });
+                          if (response.data.type === "success") {
+                            alert(response.data.msg);
+                            window.location.href = "/";
+                          } 
+                          window.location.href = "/"; // 성공 시 페이지 리로드
+                        } catch (error) {
+                          console.log(error);
+                          alert(error.response.data.errorData.git.result 
+                            + "\n" 
+                            + error.response.data.msg
+                            + "\n"
+                            + "reason: " + error.response.data.errorData.git.conflicts[0].reason + ", file:" + error.response.data.errorData.git.conflicts[0].file);
+                        }
+                      },
+                    },
+                  ]
+                : []),
+              {
+                label: "Rename",
+                onClick: async () => {
+                  try {
+                    const input = prompt("Enter branch name");
+                    if (input !== null) {
+                      const response = await axios.post("/dirs/git/branch", {
+                        mode: "rename",
+                        branchName: branch,
+                        newName: input,
+                      });
+                    }
+                    window.location.href = "/";
+                  } catch (error) {
+                    console.log(error);
+                    const errorList =
+                      error.response.data.msg.split("Error: error:");
+                    alert("!![ERROR] : " + errorList[1]);
+                  }
+                },
+              },
+            ],
+          })),
+        ])
+      );
+
+      document.body.appendChild(ctxMenu);
+    })
+    .catch((err) => console.log(err));
+});
+
+cloneButton.addEventListener("click", (event) => {
+  const ctxMenu = document.createElement("div");
+  ctxMenu.id = "context-menu";
+  ctxMenu.className = "custom-context-menu";
+
+  const targetElement = event.target.tagName.toLowerCase() === "p" ? event.target.parentNode : event.target;
+  const buttonRect = targetElement.getBoundingClientRect();
+  const buttonBottom = buttonRect.top + buttonRect.height;
+
+  ctxMenu.style.top = buttonBottom + "px";
+  ctxMenu.style.left = buttonRect.left + "px";
+
+  ctxMenu.appendChild(
+    renderContextMenuList([
+      {
+        label: "Cloning public Repo",
+        onClick: async () => {
+          try {
+            const repoURL = prompt("Enter public repository address");
+            if (repoURL !== null) {
+              const response = await axios.post("/dirs/git/clone/public", {
+                remoteAddress : repoURL
+              })
+            } 
+            window.location.href = "/";
+          } catch (error) {
+            console.log(error);
+            alert(error.response.data.msg + "\n" + error.response.data.error);
+          }
+        },
+      },
+      {
+        label: "Cloning private repo",
+        onClick: async () => {
+          try {
+            const repoURL = prompt("Enter private repository address");
+            if (repoURL !== null) {
+              const response = await axios.post("/dirs/git/clone/private/id", {
+                remoteAddress : repoURL
+              })
+
+              if (response.data.type === "success") {
+                const response = await axios.post("/dirs/git/clone/private/config", {
+                  remoteAddress : repoURL
+                })
+              } else {
+                const userId = prompt("Enter ID");
+                if (userId !== null) {
+                  const token = prompt("Enter Access Token");
+                  if (token !== null) {
+                    const response = await axios.post("/dirs/git/clone/private/new", {
+                      remoteAddress : repoURL,
+                      newPrivateId : userId,
+                      newPrivateToken : token
+                    })
+                  }
+                }
+              }
+            }
+            window.location.href = "/";
+          } catch (error) {
+            console.log(error);
+            alert(error.response.data.msg + "\n" + error.response.data.error);
+          }
+        },
+      },
+    ])
+  );
+  const prevCtxMenu = document.getElementById("context-menu");
+  if (prevCtxMenu) {
+    prevCtxMenu.remove();
+  }
+
+  document.body.appendChild(ctxMenu);
+  event.stopPropagation();
+})
+/**
+ * Click Log button event
+ */
+logButton.addEventListener("click", async () => {
+  try {
+    await axios.get(`dirs/git/log`);
+    window.location.href = "dirs/git/log";
+  } catch (error) {
+    window.location.href = "/";
+    console.log(error);
   }
 });

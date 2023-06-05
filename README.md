@@ -13,6 +13,8 @@
   - express : v4.18.2
   - pug : v3.0.2
   - nodemon : v2.0.20
+  - simple-git: v3.18.0
+  - minimatch: v9.0.0
 
 # Prerequisites
 
@@ -41,6 +43,12 @@
 
   ```
    npm i -g nodemon
+  ```
+
+- Install 'simple-git' npm module.
+
+  ```
+   npm i simple-git
   ```
 
 - Our project doesn't guarantee that it will work on every browser. We recommend you to use chrome browser.
@@ -86,6 +94,112 @@
    ```
      const PORT = 3000; //<-- modify the number here.
    ```
+
+# New Features in v2.0.0
+
+There are new features in version 2. <br>
+Branch management, Branch merge, Git commit history, and Git clone from GitHub.
+
+## 1. Branch Mangement
+
+Pretty-git provides you a menu to create, delete, rename, and checkout branches. <br>
+Now, you can mangage your branches on the browser.
+
+- Here is the branch menu button.
+
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="500px" src="src/public/readmeimg/branch-btn.png" alt="branch menu img"/></div></div><br>
+
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="0px" src="src/public/readmeimg/branch-btn.png" alt="branch menu img"/></div></div><br>
+
+- When you click the branch button to the right of the 'Go Back' button, you can find the branches you made in local environment.
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="300px" src="src/public/readmeimg/branch-menu.png" alt="branch menu img"/></div></div><br>
+
+- Hovering over the current branch, entry loads the rename button.
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="400px" src="src/public/readmeimg/current-branch.png" alt="current branch menu"/></div></div><br>
+
+- Hovering over other branches, entry loads below buttons. You can checkout, delete, merge, and rename the branches. Use the option you want.
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="400px" src="src/public/readmeimg/other-branch.png" alt="current branch menu"/></div></div><br>
+
+## 2. Branch merge
+
+- As seen in the image above, you can merge the target branch into the current branch.
+
+- If branch merging process get a problem, like conflict, Pretty-git automatically aborted merge process.
+
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="400px" height="px" src="src/public/readmeimg/unmerge-path.png" alt="current branch menu"/></div></div><br>
+
+- On the other hand, to merge the target branch get no prblem, you can check the success message like this.
+
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="400px" height="px" src="src/public/readmeimg/success-merge.png" alt="current branch menu"/></div></div><br>
+
+## 3. Git commit history
+
+- When you click the 'Git Log' button to the left of the 'Git Status' button, Pretty-git will show you the commit history of your project in the form of a graph.
+
+  - Click 'Git Log' button.
+  <div align="center">
+  <div style="display:flex; justify-content: center;"><img width ="300px" height="px" src="src/public/readmeimg/log-btn.png" alt="current branch menu"/></div></div><br>
+
+  - Pretty-git will show you the graph. The graph includes the workflow of the current branch.
+  <div align="center">
+  <div style="display:flex; justify-content: center;"><img width ="500px" src="src/public/readmeimg/commit-history.png" alt="current branch menu"/></div></div><br>
+
+  - Furthermore, If you choose a commit object shaped yellow circle, Pretty-git will provide the detailed information about the commit.
+  <div align="center">
+  <div style="display:flex; justify-content: center;"><img width ="500px" src="src/public/readmeimg/detail-commit.png" alt="current branch menu"/></div></div><br>
+
+  - If you want to close the detailed commit tab, just click the 'close' button.
+
+## 4. Git clone from GitHub
+
+You can easily clone both private and public repository using HTTPS of it.
+
+- Click the 'Git Clone' button in the upper-right of the screen.
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="300px" src="src/public/readmeimg/clone-btn.png" alt="current branch menu"/></div></div><br>
+
+- You should choose 'pubic' or 'private repo' button depending on the type of the repository you want to clone.
+
+- If you click the 'public repo', Pretty-git will show you the pop-up window to get a repository address. Now you give the address and the cloning is done.
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="400px" src="src/public/readmeimg/public-repo.png" alt="current branch menu"/></div></div><br>
+
+- If you click the 'private repo', It will ask you the address of the repository.
+  <div align="center">
+  <div style="display:flex; justify-content: center;"><img width ="400px" src="src/public/readmeimg/private-url.png" alt="current branch menu"/></div></div><br>
+
+  - If you already have the id and token that needed for cloning, Pretty-git directly clone the private repository.
+
+  - Otherwise, if you have no information that needed for cloning, Pretty-git ask you the id, token about the repository.
+
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="400px" src="src/public/readmeimg/enter-id.png" alt="current branch menu"/></div></div><br>
+
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="400px" src="src/public/readmeimg/enter-token.png" alt="current branch menu"/></div></div><br>
+
+- By the way, you can't process 'git clone {remote_address}' command if there already exists a directory whose name is same with remote directory. You will get this error message in this case.
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="400px" src="src/public/readmeimg/gitclone-fail.png" alt="current branch menu"/></div></div><br>
+
+- When you enter the ID and token through the prompt, you can see the information you entered on the global git cofig file. As follows the image, there are user and token inforamtion made below the [github] tag
+
+- If you think an information of the access token is wrong or want to renew the token information by yourselves, you can update it in .gitconfig, which is global config file of git VCS.
+
+- To enter and edit .gitconfig file, run the below command (The command might not work depending on your machine, especially Windows)
+  ```bash
+    vim ~/.gitconfig
+  ```
+
+<div align="center">
+<div style="display:flex; justify-content: center;"><img width ="400px" src="src/public/readmeimg/config.png" alt="current branch menu"/></div></div><br>
 
 # Usages
 
@@ -219,6 +333,7 @@ You are allowed to browse in ignored directories, but are restricted to do funct
 - pug for view template engine(MIT License)
 - node runtime, node fs module, node path module(MIT License)
 - minimatch for regular expression pattern check(ISC License)
+- simple-git for git commands(MIT License)
 - icons from flaticon (private use and commercial usage allowed)
 
 # License
