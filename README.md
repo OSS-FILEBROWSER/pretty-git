@@ -233,9 +233,6 @@ You can easily clone both private and public repository using HTTPS of it.
  vim ~/.gitconfig
 ```
 
-<div align="center">
-<div style="display:flex; justify-content: center;"><img width ="400px" src="src/public/readmeimg/config.png" alt="current branch menu"/></div></div><br>
-
 # Usages
 
 <span style="color: orangered;">[Warning]</span> We assume that you're running our service on English language environment. You should set English to your terminal profile and git language as a default if you don't want to have any problems while using our service.(From v0.3.1, we started to support Korean git status parsing functionality. But it is still unstable)
